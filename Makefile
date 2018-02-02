@@ -12,24 +12,39 @@
 export PLATFORMS := x86
 
 
+# Internal variables
+LIBDIR := lib
+INCDIR := include
+
 # Targets
-.PHONY: LibNbiotCore LibNbiot
+.PHONY: LibNbiotCore LibNbiot directories
 
 
 .NOT_PARALLEL: LibNbiotCore LibNbiot
 
 
-all: LibNbiotCore LibNbiot
+all: LibNbiotCore LibNbiot directories
 
 
-LibNbiotCore:
+LibNbiotCore: directories
 	$(MAKE) -j -e -C LibNbiotCore
+	cp -r LibNbiotCore/lib/* $(LIBDIR)/.
+	cp -r LibNbiotCore/include/* $(INCDIR)/.
 
 
-LibNbiot:
-	$(MAKE) -j -e -C LibNbiot 
+LibNbiot: directories
+	$(MAKE) -j -e -C LibNbiot
+	cp -r LibNbiot/lib/* $(LIBDIR)/.
+	cp -r LibNbiot/include/* $(INCDIR)/.
+
+
+directories:
+	@echo $(INCDIR)
+	[ -d $(INCDIR) ] || mkdir -p $(INCDIR)
+	[ -d $(LIBDIR) ] || mkdir -p $(LIBDIR)
 
 
 clean:
 	$(MAKE) clean -C LibNbiotCore
 	$(MAKE) clean -C LibNbiot
+	rm -rf $(LIBDIR) $(INCDIR)
