@@ -10,26 +10,38 @@
 # is controlled here.
 #
 # Currently these platforms are supported.
-# export PlATFORMS := x86 x86-debug x86_64 x86_64-debug arm-cortx-m3 arm-cortx-m3-debug
-export PLATFORMS := x86_64 x86_64-shared
+# export PLATFORMS := x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug
+export PLATFORMS := x86 x86-debug x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug
 
 
 # Internal variables
-LIBDIR := lib
-INCDIR := include
+LIBDIR   := lib
+INCDIR   := include
+
+# Name of lib directories
+APPLIB   := libNbiot
+CORELIB  := libNbiotCore
 
 
 # Targets
-.PHONY: LibNbiotCore LibNbiot directories
+.PHONY: $(CORELIB) $(APPLIB) directories
 
 
-.NOT_PARALLEL: LibNbiotCore LibNbiot
+.NOT_PARALLEL: $(CORELIB) $(APPLIB)
 
 
-all: LibNbiotCore LibNbiot
+all: $(CORELIB) $(APPLIB)
 
 
-LibNbiotCore LibNbiot: directories
+$(APPLIB): $(CORELIB)
+	@echo "building: $@"
+	$(MAKE) -j -e -C $@ CORE=../$(CORELIB)
+	@echo "copy build results"
+	cp -r $@/lib/* $(LIBDIR)/.
+	cp -r $@/include/* $(INCDIR)/.
+
+
+$(CORELIB): directories
 	@echo "building: $@"
 	$(MAKE) -j -e -C $@
 	@echo "copy build results"
@@ -44,6 +56,6 @@ directories:
 
 
 clean:
-	$(MAKE) clean -C LibNbiotCore
-	$(MAKE) clean -C LibNbiot
+	$(MAKE) clean -C $(CORELIB)
+	$(MAKE) clean -C $(APPLIB)
 	rm -rf $(LIBDIR) $(INCDIR)
