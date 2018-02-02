@@ -1,0 +1,6 @@
+[submodule "libNbiotCore"]
+	path = LibNbiotCore
+	url = https://infinity-wbench.wesp.telekom.net/gitlab/edgar.hindemith_1/LibNbiotCore.git
+[submodule "libNbiot"]
+	path = LibNbiot
+	url = https://infinity-wbench.wesp.telekom.net/gitlab/edgar.hindemith_1/LibNbiot.git
