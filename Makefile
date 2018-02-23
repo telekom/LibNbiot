@@ -10,8 +10,8 @@
 # is controlled here.
 #
 # Currently these platforms are supported.
-# export PLATFORMS := x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug
-export PLATFORMS := x86 x86-debug x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug
+# export PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug
+export PLATFORMS := default 
 
 
 # Internal variables
