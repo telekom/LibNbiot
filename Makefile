@@ -56,8 +56,8 @@ $(EXTERNAL): directories
 	@echo "building: $@"
 	$(MAKE) -j -e -C $@ CORE=../$(CORELIB)
 	@echo "copy build results"
-	cp -r $@/lib/* $(LIBDIR)/.
-	cp -r $@/include/* $(INCDIR)/.
+	cp -rf $@/lib/* $(LIBDIR)/.
+	cp -rf $@/include/* $(INCDIR)/.
 
 
 directories:

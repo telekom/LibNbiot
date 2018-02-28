@@ -110,7 +110,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	$(LINKER) $(LFLAGS) $(TARGET) $(OBJECTS)
-	cp $(TARGET) $(LIB)/.
+	cp -f $(TARGET) $(LIB)/.
 
 
 %.o: %.cpp
