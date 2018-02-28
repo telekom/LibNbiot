@@ -113,6 +113,9 @@ endif
 
 
 # Build targets, usually these don't need to be modified.
+.NOTPARALLEL: $(LISTINCLUDES) $(MQTTSNINCLUDES)
+
+
 first: all
 
 
