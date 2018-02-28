@@ -18,32 +18,43 @@ export PLATFORMS := default
 LIBDIR   := lib
 INCDIR   := include
 
+
 # Name of lib directories
 APPLIB   := libNbiot
 CORELIB  := libNbiotCore
+EXTERNAL := external
 
 
 # Targets
-.PHONY: $(CORELIB) $(APPLIB) directories
+.PHONY: $(EXTERNAL) $(CORELIB) $(APPLIB) directories
 
 
-.NOT_PARALLEL: $(CORELIB) $(APPLIB)
+.NOT_PARALLEL: $(EXTERNAL) $(CORELIB) $(APPLIB)
 
 
-all: $(CORELIB) $(APPLIB)
+all: $(EXTERNAL) $(CORELIB) $(APPLIB)
 
 
 $(APPLIB): $(CORELIB)
 	@echo "building: $@"
-	$(MAKE) -j -e -C $@ CORE=../$(CORELIB)
+	$(MAKE) -j -e -C $@ CORE=../$(CORELIB) \
+          EXT=../$(EXTERNAL)
 	@echo "copy build results"
 	cp -r $@/lib/* $(LIBDIR)/.
 	cp -r $@/include/* $(INCDIR)/.
 
 
-$(CORELIB): directories
+$(CORELIB): $(EXTERNAL)
 	@echo "building: $@"
 	$(MAKE) -j -e -C $@
+	@echo "copy build results"
+	cp -r $@/lib/* $(LIBDIR)/.
+	cp -r $@/include/* $(INCDIR)/.
+
+
+$(EXTERNAL): directories
+	@echo "building: $@"
+	$(MAKE) -j -e -C $@ CORE=../$(CORELIB)
 	@echo "copy build results"
 	cp -r $@/lib/* $(LIBDIR)/.
 	cp -r $@/include/* $(INCDIR)/.
@@ -56,6 +67,7 @@ directories:
 
 
 clean:
+	$(MAKE) clean -C $(EXTERNAL)
 	$(MAKE) clean -C $(CORELIB)
 	$(MAKE) clean -C $(APPLIB)
 	rm -rf $(LIBDIR) $(INCDIR)

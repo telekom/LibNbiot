@@ -1,3 +1,7 @@
 include/**
 lib/**
 .vscode/**
+build/**
+external/build/**
+external/lib/**
+external/include/**
