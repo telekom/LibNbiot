@@ -53,7 +53,6 @@ FPINCLUDES     := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/FP -name "
 # forget to activate them by adding an entry to PLATFORMS above:
 ifeq ($(ARCH),default)
 CXX      := g++
-CXXFLAGS := -std=c++11 -Wall -Os
 CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb
 endif
 ifeq ($(ARCH),x86)
