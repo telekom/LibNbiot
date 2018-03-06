@@ -47,7 +47,7 @@
 #define MAX_TOPIC_COUNT_LIMIT 256 /*!< MAXTOPICCOUNT: maximum 256 topics : 256 * (22 Bytes + individual topic length) of RAM usage (max) */
 
 
-#define MIN_PORT 1024 /*!< PORT: values below 1024 will cause the default to be used */
+#define MIN_PORT 1024 /*!< PORT: values below 1024 will cause an error */
 
 #define DEFAULT_PORT 1883 /*!< PORT: default MQTT-port */
 
@@ -84,7 +84,7 @@ enum NbiotConfigError
     ErrorAutoPollInt = 128, /*!< Invalid autopoll-interval */
     ErrorMaxTopicCount = 256, /*!< Invalid topic maximum */
     ErrorGateway = 512, /*!< No gateway */
-    WarnPort = 1024, /*!< Warning: default port will be used (config is still valid) */
+    ErrorPort = 1024, /*!< Invalid port number (privileged-port-numbers: < 1024) */
     ErrorMultipleConfig = 16384, /*!< Configuration was called more than one time */
     ErrorNoConfig = 32768 /*!< Configuration was never called */
 };
