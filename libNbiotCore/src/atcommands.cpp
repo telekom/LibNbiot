@@ -6,9 +6,9 @@ const nbiot::string AtCommands::okReply = "OK";
 const nbiot::string AtCommands::errReply = "ERROR";
 
 AtCommands::AtCommands(Serial &s) :
+    dbg_prefix(s.getDebugPrefix()),
     serial(s),
-    response(),
-    dbg_prefix(s.getDebugPrefix())
+    response()
 {
 }
 
