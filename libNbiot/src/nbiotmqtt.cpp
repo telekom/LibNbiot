@@ -75,6 +75,11 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
 #ifdef DEBUG_MQTT
                         debugPrintf("error while publishing value\r\n");
 #endif
+                        // PUBACK notification retcode other then 0 may be in loop-value
+                        m_dataPool.m_currentTopic.returnCode = static_cast<enum MQTTSN_returnCodes>(m_loopController.getLoopValue());
+                        pubackNotify(m_dataPool.m_currentTopic);
+
+                        /// \todo checkout if we really need to disconnect or if we can recover from here
                         m_dataPool.m_errno = ConnectionError;
                         sendEvent(NbiotStm::DisconnectEvent); /// disconnect: @TODO check if send or post event?
                     }
@@ -87,7 +92,11 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                 NbiotLoopId loopId = m_loopController.getLoopId();
 
                 // handling of topic-registry entries after successful register- or subscribe-loop
-                if((LC_Idle == loopResult) && ((LI_Register == loopId) || (LI_Subscribe == loopId) || (LI_Connect == loopId)))
+                if((LC_Idle == loopResult) &&
+                        ((LI_Register == loopId) ||
+                         (LI_Subscribe == loopId) ||
+                         (LI_Connect == loopId) ||
+                         (LI_Publish == loopId)))
                 {
                     m_dataPool.m_currentTopic.id = m_dataPool.m_topicid.data.id;
                     if(m_dataPool.m_currentTopic.valid())
@@ -108,6 +117,13 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                         {
                             m_dataPool.m_topicRegistry->updateWildcardMessageHandler(m_dataPool.m_currentTopic);
                             m_dataPool.m_hasSubscription = true;
+                        }
+
+                        if(LI_Publish == loopId)
+                        {
+                            // PUBACK notification
+                            m_dataPool.m_currentTopic.returnCode = RC_ACCEPTED;
+                            pubackNotify(m_dataPool.m_currentTopic);
                         }
                     }
                     if((LI_Connect == loopId) && m_dataPool.client.isConnected())
@@ -505,7 +521,14 @@ void NbiotMQTT::pubackNotify(nbiot::NbiotTopic& topic)
         n.state = static_cast<enum StateIds>(getCurrentStateId());
         n.action = Publish;
         n.returnCode = static_cast<enum MQTTSN_returnCodes>(topic.returnCode);
-        n.errorNumber = Success;
+        if(RC_ACCEPTED != n.returnCode)
+        {
+            n.errorNumber = ConnectionError;
+        }
+        else
+        {
+            n.errorNumber = Success;
+        }
         m_notifyHandler(&n);
     }
     if(RC_REJECTED_INVALID_TOPIC_ID == topic.returnCode)

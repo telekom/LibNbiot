@@ -1266,6 +1266,7 @@ bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishPubLoop(int& loop
             unsigned short mypacketid;
             unsigned short topicid;
             unsigned char returncode;
+            loopTime = SUCCESS;
 
             if (1 != MQTTSNDeserialize_puback(&topicid, &mypacketid, &returncode, readbuf, MAX_PACKET_SIZE))
             {
@@ -1276,6 +1277,7 @@ bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishPubLoop(int& loop
                 inflightMsgid = 0;
                 if(SUCCESS != static_cast<int>(returncode))
                 {
+                    loopTime = static_cast<int>(returncode);
                     ret = false;
                 }
             }
