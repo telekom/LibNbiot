@@ -63,8 +63,7 @@ unsigned int nbiotConfig(NbiotConf* conf)
         }
         else
         {
-            nbiotMqtt.setPort(DEFAULT_PORT);
-            result |= WarnPort;
+            result |= ErrorPort;
         }
         
         configError = result;
