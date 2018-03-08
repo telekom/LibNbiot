@@ -34,7 +34,7 @@ public:
         mqttPort(defaultMqttPort),
         keepAliveInterval(minKeepAlive),
         autoPollInterval(0),
-        eventLoopExecInterval(oneSecondMs),
+        eventLoopExecInterval(oneHundredMs),
         eventLoopLock(true),
         eventLoopMs(0l),
         lastPollMs(0l),
@@ -79,6 +79,7 @@ public:
     NbiotLoop& m_loopCtrl;
 
     static const unsigned int oneSecondMs = 1000;
+    static const unsigned int oneHundredMs = 100;
     static const unsigned short invalidTopicId = 0xFFFF;
 
 private:

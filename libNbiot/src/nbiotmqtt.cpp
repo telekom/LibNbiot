@@ -13,7 +13,8 @@ NbiotMQTT::NbiotMQTT() :
     m_loopController(),
     m_dataPool(m_loopController),
     m_stm(m_dataPool),
-    m_notifyHandler(nullptr)
+    m_notifyHandler(nullptr),
+    m_evLoopRc(LC_Idle)
 {
     m_dataPool.client.setPubackNotifyHandler(this, &NbiotMQTT::pubackNotify);
     m_dataPool.client.setRegisterNotifyHandler(this, &NbiotMQTT::registerNotify);
@@ -29,7 +30,6 @@ NbiotMQTT::~NbiotMQTT()
 
 NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
 {
-    NbiotResult ret = LC_Idle;
     if((0 < m_dataPool.eventLoopExecInterval) && (InvalidState != getCurrentStateId()))
     {
         if(!m_dataPool.eventLoopLock)
@@ -155,10 +155,11 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                             m_dataPool.lastPollMs = millis;
                         }
                     }
+                    m_evLoopRc = LC_Idle;
                 }
                 else
                 {
-                    ret = LC_Pending;
+                    m_evLoopRc = LC_Pending;
                 }
                 /* -------------------------------------------------------------------------------------------- */
 
@@ -182,7 +183,7 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
         }
 #endif
     }
-    return ret;
+    return m_evLoopRc;
 }
 
 int NbiotMQTT::connect(unsigned char cleanSession)
