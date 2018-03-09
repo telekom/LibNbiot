@@ -32,6 +32,15 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
 {
     if((0 < m_dataPool.eventLoopExecInterval) && (InvalidState != getCurrentStateId()))
     {
+        // --------------------------------------------------------------------------
+        // After receiving LC_Idle as returncode of a previous call:
+        // We may be too early for this eventLoop() call but LC could be busy already
+        if((LC_Idle == m_evLoopRc) && m_loopController.isBusy())
+        {
+            m_evLoopRc = LC_Pending;
+        }
+        // --------------------------------------------------------------------------
+
         if(!m_dataPool.eventLoopLock)
         {
             long long millis = getMillis();
