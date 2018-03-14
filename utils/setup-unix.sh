@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# Simple shell script to copy unix compatible makefiles to
+# their destination folders. The copied files have been tested
+# with various toolchains.
 
 cp Makefile.unix.toplevel ../Makefile
 cp Makefile.unix.nbiot ../libNbiot/Makefile
