@@ -1,4 +1,4 @@
-# Don't change anything in this file, unless you no what you are doing.
+# Don't change anything in this file, unless you know what you are doing.
 .SUFFIXES:
 
 

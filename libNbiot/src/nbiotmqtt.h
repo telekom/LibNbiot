@@ -89,6 +89,7 @@ private:
     nbiot::NbiotStmDataPool m_dataPool;
     nbiot::NbiotStm m_stm;
     notifyHandler m_notifyHandler;
+    NbiotResult m_evLoopRc;
 
     static const unsigned int tenSecondsMs = 10000;
     static const unsigned int halfSecondMs = 500;
