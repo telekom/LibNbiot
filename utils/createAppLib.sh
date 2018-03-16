@@ -2,7 +2,7 @@
 
 PLATFORM=default
 
-cd lib/$PLATFORM
+cd ../lib/$PLATFORM
 
 ar -x libmqttsnPaho.a
 ar -x libnbiot.a
@@ -19,4 +19,4 @@ rm -f libmqttsnPaho.a
 rm -f libnbiot.a
 rm -f libstm.a
 
-cd ../..
+cd ../../utils
