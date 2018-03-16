@@ -950,7 +950,7 @@ void NbiotStm::doDisconnect()
         }
     }
     // clear the loop-controller
-    m_dataPool.m_loopCtrl.registerLoopClient(nullptr);
+    m_dataPool.m_loopCtrl.loopBreak();
 }
 
 void NbiotStm::sendEvent(int type)

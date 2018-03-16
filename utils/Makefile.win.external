@@ -29,24 +29,24 @@ VPATH     := $(SRCDIR) $(INC) $(addprefix $(SRCDIR)/,MQTTSNPacket StateMachine L
 
 
 # Variable definitions.
-INCLUDES  := $(addprefix -I ,$(VPATH)) -I $(COREINC) -I $(INC)
+INCLUDES  := $(addprefix -I ,$(VPATH)) -I $(COREINC)
 AR        := ar cq
 ARFLAGS   := 
 LINKER    := $(AR)
 LFLAGS    := $(ARFLAGS)
 
-STMOBJECTS     := $(subst $(SRCDIR)/StateMachine,,$(subst .cpp,.o,$(notdir $(shell find $(SRCDIR)/StateMachine -name "*.cpp"))))
-STMINCLUDES    := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/StateMachine -name "*.h")))
+STMOBJECTS     := $(subst .cpp,.o,$(shell dir /b "$(SRCDIR)\StateMachine\*.cpp"))
+STMINCLUDES    := $(subst src\StateMachine,include,$(shell dir /b/s "$(SRCDIR)\StateMachine\*.h"))
 STMTARGET      := libstm.a
 
-LISTINCLUDES   := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/List -name "*.h")))
+LISTINCLUDES   := $(subst src\List,include,$(shell dir /b/s "$(SRCDIR)\List\*.h"))
 
-MQTTSNOBJECTS  := $(subst $(SRCDIR)/MQTTSNPacket,,$(subst .c,.co,$(notdir $(shell find $(SRCDIR)/MQTTSNPacket -name "*.c"))))
-MQTTSNINCLUDES := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/MQTTSNPacket -name "*.h")))
-MQTTSNINCLUDES += $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/MQTTSNClient -name "*.h"))) 
+MQTTSNOBJECTS  := $(subst $(SRCDIR)\MQTTSNPacket,,$(subst .c,.co,$(notdir $(shell dir /b "$(SRCDIR)\MQTTSNPacket\*.c"))))
+MQTTSNINCLUDES := $(subst src\MQTTSNPacket,include,$(shell dir /b/s "$(SRCDIR)\MQTTSNPacket\*.h"))
+MQTTSNINCLUDES += $(subst src\MQTTSNClient,include,$(shell dir /b/s "$(SRCDIR)\MQTTSNClient\*.h")) 
 MQTTSNTARGET   := libmqttsnPaho.a
 
-FPINCLUDES     := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/FP -name "*.h")))
+FPINCLUDES     := $(shell dir /b/s "$(SRCDIR)\FP\*.h"))
 
 
 # Add special definitions and compile options for target platforms here. Don't
@@ -122,39 +122,38 @@ all: $(STMTARGET) $(MQTTSNTARGET) $(FPINCLUDES)
 
 
 $(FPINCLUDES):
-	cp $(SRCDIR)/FP/FP.h $(INC)/.
+	xcopy /y $(subst /,\\,$(SRCDIR)\FP\FP.h) $(INC)
 
 
 $(MQTTSNTARGET): $(MQTTSNOBJECTS) $(MQTTSNINCLUDES)
-	@echo $(MQTTSNOBJECTS)
 	$(LINKER) $(LFLAGS) $(MQTTSNTARGET) $(MQTTSNOBJECTS)
-	cp $(MQTTSNTARGET) $(LIB)/.
+	xcopy /s/y $(MQTTSNTARGET) $(LIB)\$(MQTTSNTARGET)*
 
-
+	
 $(MQTTSNINCLUDES):
-	cp -f $(SRCDIR)/MQTTSNPacket/*.h $(INC)/.
-	cp -f $(SRCDIR)/MQTTSNClient/*.h $(INC)/.
+	xcopy /s/y $(subst /,\\,$(SRCDIR)/MQTTSNPacket/*.h) $(INC)
+	xcopy /s/y $(subst /,\\,$(SRCDIR)/MQTTSNClient/*.h) $(INC)
 
 
 $(STMTARGET): $(STMOBJECTS) $(STMINCLUDES)
 	$(LINKER) $(LFLAGS) $(STMTARGET) $(STMOBJECTS)
-	cp $(STMTARGET) $(LIB)/.
+	xcopy /s/y $(STMTARGET) $(LIB)\$(STMTARGET)*
 
 
 $(STMINCLUDES):
-	cp -f $(SRCDIR)/StateMachine/*.h $(INC)/.
+	@echo "list inculudes: $(LISTINCLUDES)"
+	xcopy /s/y $(subst /,\\,$(SRCDIR)/List/*.h) $(INC)
+	xcopy /s/y $(subst /,\\,$(SRCDIR)/StateMachine/*.h) $(INC)
 
 
-%.o: %.cpp $(LISTINCLUDES)
+%.o: %.cpp
+	@echo $(INCLUDES)
+	@echo $(INCLUDES)
 	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $< -o $@
 
 
 %.co: %.c
 	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $< -o $@
-
-
-$(LISTINCLUDES):
-	cp -f $(SRCDIR)/List/*.h $(INC)/.
 
 
 endif

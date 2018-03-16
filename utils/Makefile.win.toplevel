@@ -1,0 +1,74 @@
+#############################################################################
+# Makefile for building Telekom nbiot libraries
+#############################################################################
+#
+# Define any target platforms here. Only platforms listed here will be build.
+# Each platform entry requires the according entries in the Makefiles of the
+# subprojects.
+# Platforms listed here will override settings in the subprojects. I.e. all
+# platforms can be activated in the subprojects but which are actually build
+# is controlled here.
+#
+# Currently these platforms are supported.
+# export PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug
+export PLATFORMS := default 
+
+
+# Internal variables
+LIBDIR   := lib
+INCDIR   := include
+
+
+# Name of lib directories
+APPLIB   := libNbiot
+CORELIB  := libNbiotCore
+EXTERNAL := external
+
+
+# Targets
+.PHONY: $(EXTERNAL) $(CORELIB) $(APPLIB) directories
+
+
+.NOTPARALLEL: $(EXTERNAL) $(CORELIB) $(APPLIB)
+
+
+all: $(EXTERNAL) $(CORELIB) $(APPLIB)
+
+
+$(APPLIB): $(CORELIB)
+	@echo "building: $@"
+	$(MAKE) -j -e -C $@ CORE=../$(CORELIB) EXT=../$(EXTERNAL)        
+	@echo "copy build results"
+	xcopy /s/y $@\$(LIBDIR) $(LIBDIR)
+	xcopy /s/y $@\$(INCDIR) $(INCDIR)
+
+
+$(CORELIB): $(EXTERNAL)
+	@echo "building: $@"
+	$(MAKE) -j -e -C $@
+	@echo copy build results
+	xcopy /s/y $@\$(INCDIR) $(INCDIR)
+	xcopy /s/y $@\$(LIBDIR) $(LIBDIR)
+
+
+$(EXTERNAL): directories
+	@echo "building: $@"
+	$(MAKE) -j -e -C $@ CORE=../$(CORELIB)
+	@echo "copy build results"
+	xcopy /s/y $@\$(LIBDIR) $(LIBDIR)
+	xcopy /s/y $@\$(INCDIR) $(INCDIR)
+
+
+directories:
+	@echo "creating directories for headers and libs"
+	$(shell if not exist $(INCDIR) mkdir $(INCDIR))
+	$(shell if not exist $(LIBDIR) mkdir $(LIBDIR)) 
+
+	
+clean:
+	$(shell if exist $(LIBDIR) rmdir /s/q $(LIBDIR))	
+	$(shell if exist $(INCDIR) rmdir /s/q $(INCDIR))
+	$(MAKE) clean -C $(EXTERNAL)
+	$(MAKE) clean -C $(CORELIB)
+	$(MAKE) clean -C $(APPLIB)
+	

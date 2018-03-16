@@ -30,13 +30,20 @@ public:
         m_clientList(nullptr),
         m_loopClient(nullptr),
         m_loopValue(0),
-        m_loopId(LI_Unknown)
+        m_loopId(LI_Unknown),
+        m_breakFlag(false)
     {}
     virtual ~NbiotLoop() {}
 
     NbiotResult nbiotLoop()
     {
         NbiotResult ret = LC_Idle;
+
+        if(m_breakFlag)
+        {
+            clear();
+            m_breakFlag = false;
+        }
         // is there a client hooked?
         if(nullptr != m_loopClient)
         {
@@ -90,11 +97,13 @@ public:
         }
         else
         {
-            m_clientList.clear();
-            m_loopClient = nullptr;
-            m_loopValue = 0;
-            m_loopId = LI_Unknown;
+            clear();
         }
+    }
+
+    void loopBreak()
+    {
+        m_breakFlag = true;
     }
 
     int getLoopValue() const { return m_loopValue; }
@@ -116,10 +125,19 @@ private:
     NbiotLoop(NbiotLoop&);
     NbiotLoop& operator = (NbiotLoop&);
 
+    void clear()
+    {
+        m_clientList.clear();
+        m_loopClient = nullptr;
+        m_loopValue = 0;
+        m_loopId = LI_Unknown;
+    }
+
     util::list<iLoopControlled*> m_clientList;
     iLoopControlled* m_loopClient;
     int m_loopValue;
     NbiotLoopId m_loopId;
+    bool m_breakFlag;
 };
 
 }
