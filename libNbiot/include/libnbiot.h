@@ -2,7 +2,7 @@
  * LibNbiot: API definition
  *
  * Copyright (c) 2018, Edgar Hindemith, Yassine Amraue, Thorsten Krautscheid, Kolja Vornholt, T-Systems International GmbH
- * contact: opensource@telekom.de
+ * contact: libnbiot@t-systems.com, opensource@telekom.de
  *
  * This file is distributed under the conditions of the Apache2 license.
  * For details see the file LICENSE at the toplevel.
