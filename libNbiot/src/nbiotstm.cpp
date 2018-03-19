@@ -949,8 +949,11 @@ void NbiotStm::doDisconnect()
             m_dataPool.m_modemAttached = false;
         }
     }
-    // clear the loop-controller
-    m_dataPool.m_loopCtrl.loopBreak();
+    if(m_dataPool.m_loopCtrl.isBusy())
+    {
+        // clear the loop-controller
+        m_dataPool.m_loopCtrl.loopBreak();
+    }
 }
 
 void NbiotStm::sendEvent(int type)

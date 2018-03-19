@@ -103,7 +103,10 @@ public:
 
     void loopBreak()
     {
-        m_breakFlag = true;
+        if(0 < m_clientList.count()) // don't set break-flag in advance
+        {
+            m_breakFlag = true;
+        }
     }
 
     int getLoopValue() const { return m_loopValue; }
