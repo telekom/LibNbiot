@@ -55,13 +55,13 @@ limitations under the License.
 
 Several parts of paho.mqtt-sn.embedded-c are used to implement the MQTT-SN 
 protocol functionalities, such as packet packet deserializing/serialiazing. 
-paho.mqtt-sn.embedded-c implements basic features of MQTT-SN like publish or 
+paho.mqtt-sn.embedded-c implements basic functions of MQTT-SN like publish or 
 subscribe blocking. Because this can be a problem in different scenarios, 
-especially on RTOS systems, LibNbiot makes smaller changes in the original 
-methods and adds addtional features to the pago.mqtt-sn.embedded-c 
-implementation. The smaller changes are published under the Eclipse Public 
-License and the additional features are published under the Apache License, 
-Version 2.0.
+especially on RTOS systems, LibNbiot implements the basic MQTT-SN functions
+non-blocking by making smaller changes in the original code and by adding 
+additional features to the paho.mqtt-sn.embedded-c implementation. The smaller 
+changes are published under the Eclipse Public License and the additional 
+features are published under the Apache License, Version 2.0.
 
 https://github.com/eclipse/paho.mqtt-sn.embedded-c
 
