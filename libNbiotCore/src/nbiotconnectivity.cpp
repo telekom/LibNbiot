@@ -194,7 +194,7 @@ bool NbiotConnectivity::write(unsigned char* buffer, unsigned long len, unsigned
         nbiot::string hex = nbiot::string((char*)(buffer), len).toHex();
         data += hex;
         #ifdef DEBUG_MODEM
-        debugPrintf("data(%d) = %s", len, hex.c_str());
+        debugPrintf("data(%d) = %s\n", len, hex.c_str());
         #endif
 
         if(m_cmd.sendCommand(data.c_str()))

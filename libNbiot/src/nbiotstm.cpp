@@ -170,15 +170,11 @@ void NbiotStm::setUpStateMachine()
 
 
     m_sleep->setTarget(m_ConnectedSleep);
-#if defined(UNITTEST_MQTT) || defined (DEBUG_MQTT)
     m_sleep->setAction(this, &NbiotStm::actionSleep);
-#endif
     m_sleep->setEventType(SleepEvent);
 
     m_wakeup->setTarget(m_Connected);
-#if defined(UNITTEST_MQTT) || defined (DEBUG_MQTT)
     m_wakeup->setAction(this, &NbiotStm::actionWakeup);
-#endif
     m_wakeup->setEventType(WakeupEvent);
 
     m_sleepAwake->setTarget(m_ConnectedAwake);
