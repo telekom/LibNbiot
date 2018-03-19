@@ -1,0 +1,41 @@
+# Don't change anything in this file, unless you know what you are doing.
+.SUFFIXES:
+
+
+TARGETDIRS := $(addprefix $(BUILDDIR)\,$(PLATFORMS))
+
+
+.PHONY: OVERALLTARGET clean $(TARGETDIRS)
+
+
+OVERALLTARGET: $(TARGETDIRS)
+
+
+define PLATFORMRULE
+$(BUILDDIR)\$(P): $(INCDIR)
+	$(shell if not exist $(BUILDDIR)\$(P) mkdir $(BUILDDIR)\$(P))
+	$(shell if not exist $(LIBDIR) mkdir $(LIBDIR))	
+	+@$(MAKE) -C $$@ -f $(CURDIR)/Makefile \
+            SRCDIR=$(CURDIR)/src INC=$(subst /,\\,$(CURDIR)\\$$<) \
+            ARCH=$(P) LIB=$(subst /,\\,$(CURDIR)/$(LIBDIR)/$(P)) \
+            COREINC=$(CURDIR)/$(CORE)/include $(MAKECMDGOALS)
+endef
+$(foreach P,$(PLATFORMS),$(eval $(PLATFORMRULE)))
+
+
+$(INCDIR):
+	mkdir $@
+
+
+Makefile : ;
+%.mk :: ;
+
+
+% :: $(TARGETDIRS) ; :
+
+
+clean:
+	$(shell if exist $(BUILDDIR) rmdir /s/q $(BUILDDIR))
+	$(shell if exist $(INCDIR) rmdir /s/q $(INCDIR))
+	$(shell if exist $(LIBDIR) rmdir /s/q $(LIBDIR))
+

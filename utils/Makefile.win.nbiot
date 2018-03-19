@@ -12,47 +12,37 @@ PLATFORMS := default
 # These directories can be renamed but the variables should not be empty
 BUILDDIR  := build
 LIBDIR    := lib
-INCDIR    := include
 
 
 # Relative path to core library
 CORE      := ../libNbiotCore
+EXT       := ../external
 
 
 # Don't change anything from here....
-ifneq ($(notdir $(realpath $(CURDIR)/..)),$(BUILDDIR))
+ifneq ($(notdir $(realpath $(CURDIR)/..)),build)
 include targets.mk
 else
 
-VPATH     := $(SRCDIR) $(INC) $(addprefix $(SRCDIR)/,MQTTSNPacket StateMachine List FP)
+VPATH     := $(SRCDIR) $(INCDIR)
 # ... to here, unless you know what you are doing.
 
 
 # Variable definitions.
-INCLUDES  := $(addprefix -I ,$(VPATH)) -I $(COREINC) -I $(INC)
+INCLUDES  := $(addprefix -I ,$(VPATH)) -I $(COREINC) -I  $(EXTINC)
+OBJECTS   := $(subst .cpp,.o,$(shell dir /b "$(SRCDIR)\*.cpp"))
 AR        := ar cq
 ARFLAGS   := 
+TARGET    := libnbiot.a
 LINKER    := $(AR)
 LFLAGS    := $(ARFLAGS)
-
-STMOBJECTS     := $(subst $(SRCDIR)/StateMachine,,$(subst .cpp,.o,$(notdir $(shell find $(SRCDIR)/StateMachine -name "*.cpp"))))
-STMINCLUDES    := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/StateMachine -name "*.h")))
-STMTARGET      := libstm.a
-
-LISTINCLUDES   := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/List -name "*.h")))
-
-MQTTSNOBJECTS  := $(subst $(SRCDIR)/MQTTSNPacket,,$(subst .c,.co,$(notdir $(shell find $(SRCDIR)/MQTTSNPacket -name "*.c"))))
-MQTTSNINCLUDES := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/MQTTSNPacket -name "*.h")))
-MQTTSNINCLUDES += $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/MQTTSNClient -name "*.h"))) 
-MQTTSNTARGET   := libmqttsnPaho.a
-
-FPINCLUDES     := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/FP -name "*.h")))
 
 
 # Add special definitions and compile options for target platforms here. Don't
 # forget to activate them by adding an entry to PLATFORMS above:
 ifeq ($(ARCH),default)
 CXX      := g++
+CXXFLAGS := -std=c++11 -Wall -Os
 CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb
 endif
 ifeq ($(ARCH),x86)
@@ -112,49 +102,19 @@ endif
 
 
 # Build targets, usually these don't need to be modified.
-.NOTPARALLEL: $(LISTINCLUDES) $(MQTTSNINCLUDES)
-
-
 first: all
 
 
-all: $(STMTARGET) $(MQTTSNTARGET) $(FPINCLUDES)
+all: $(TARGET)
 
 
-$(FPINCLUDES):
-	cp $(SRCDIR)/FP/FP.h $(INC)/.
+$(TARGET): $(OBJECTS)
+	$(LINKER) $(LFLAGS) $(TARGET) $(OBJECTS)
+	xcopy /y $(TARGET) $(subst /,\\,$(LIB)/$(TARGET)*)
 
 
-$(MQTTSNTARGET): $(MQTTSNOBJECTS) $(MQTTSNINCLUDES)
-	@echo $(MQTTSNOBJECTS)
-	$(LINKER) $(LFLAGS) $(MQTTSNTARGET) $(MQTTSNOBJECTS)
-	cp $(MQTTSNTARGET) $(LIB)/.
-
-
-$(MQTTSNINCLUDES):
-	cp -f $(SRCDIR)/MQTTSNPacket/*.h $(INC)/.
-	cp -f $(SRCDIR)/MQTTSNClient/*.h $(INC)/.
-
-
-$(STMTARGET): $(STMOBJECTS) $(STMINCLUDES)
-	$(LINKER) $(LFLAGS) $(STMTARGET) $(STMOBJECTS)
-	cp $(STMTARGET) $(LIB)/.
-
-
-$(STMINCLUDES):
-	cp -f $(SRCDIR)/StateMachine/*.h $(INC)/.
-
-
-%.o: %.cpp $(LISTINCLUDES)
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $< -o $@
-
-
-%.co: %.c
-	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $< -o $@
-
-
-$(LISTINCLUDES):
-	cp -f $(SRCDIR)/List/*.h $(INC)/.
 
 
 endif
