@@ -389,7 +389,7 @@ int NbiotMQTT::unsubscribe(const char* topic)
             // index does not need to be checked because hasSubscription(topic) is true
             NbiotTopic nbTopic = m_dataPool.m_topicRegistry->operator [](index);
             MQTTSN_topicid topicid;
-            nbTopic.toSNTopic(topicid, NbiotTopic::TOPIC_ID);
+            nbTopic.toSNTopic(topicid, NbiotTopic::TOPIC_NAME);
             rc = m_dataPool.client.unsubscribe(topicid);
             if (Success != rc)
             {
