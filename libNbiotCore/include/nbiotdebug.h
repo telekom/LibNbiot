@@ -6,7 +6,7 @@
 #ifdef DEBUG
 
 #define DEBUG_SERIAL /*!< debugging output for the class Serial */
-//#undef DEBUG_SERIAL
+#undef DEBUG_SERIAL
 
 #define DEBUG_SERIAL_VERBOSE /*!< verbose debugging output for the method Serial::readLine */
 #undef DEBUG_SERIAL_VERBOSE
@@ -15,13 +15,13 @@
 #undef DEBUG_SERIAL_RAW
 
 #define DEBUG_ATCOMMANDS /*!< debugging output for the class AtCommands */
-//#undef DEBUG_ATCOMMANDS
+#undef DEBUG_ATCOMMANDS
 
 #define DEBUG_MODEM /*!< debugging output for the classes NbiotModemTools and NbiotConnectivity */
-//#undef DEBUG_MODEM
+// #undef DEBUG_MODEM
 
 #define DEBUG_MQTT /*!< debugging output for LibNbiot classes */
-//#undef DEBUG_MQTT
+#undef DEBUG_MQTT
 
 #define DEBUG_STRING /*!< debugging output for the nbiot::string class */
 #undef DEBUG_STRING
