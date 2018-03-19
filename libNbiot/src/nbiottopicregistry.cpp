@@ -21,7 +21,7 @@ int NbiotTopicRegistry::messageDispatcher(MQTTSN::MessageData& md)
     int rc = RC_REJECTED_INVALID_TOPIC_ID;
     for (util::ListIterator<NbiotTopic> it = m_registry.begin(); it != m_registry.end(); ++it)
     {
-        if ((*it).valid() && (*it == md.topic))
+        if ((*it).valid() && (*it == md.topic.data.id))
         {
             if ((*it).hasHandler())
             {
