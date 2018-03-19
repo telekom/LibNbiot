@@ -49,20 +49,24 @@ int NbiotTopicRegistry::messageDispatcher(MQTTSN::MessageData& md)
 
 void NbiotTopicRegistry::insertTopic(const NbiotTopic& topic)
 {
-    int index = m_registry.indexOf(topic.topicName.c_str());
-    if(-1 == index)
+    // don't allow empty topic-names
+    if(!topic.topicName.empty())
     {
-        m_registry.append(topic);
+        int index = m_registry.indexOf(topic.topicName.c_str());
+        if(-1 == index)
+        {
+            m_registry.append(topic);
 #ifdef DEBUG_MQTT
         debugPrintf("TopicRegistry: ID %04X %s appended\r\n",topic.id, topic.topicName.c_str());
 #endif
-    }
-    else
-    {
+        }
+        else
+        {
 #ifdef DEBUG_MQTT
         debugPrintf("TopicRegistry: ID %04X updated\r\n",topic.id);
 #endif
-        m_registry[index] = topic;
+            m_registry[index] = topic;
+        }
     }
 }
 
@@ -146,7 +150,12 @@ int NbiotTopicRegistry::findTopic(unsigned short topicId) const
 
 int NbiotTopicRegistry::findTopic(const char* name) const
 {
-    return m_registry.indexOf(name);
+    int ret = -1;
+    if('\0' != *name) // skip search for empty string
+    {
+        ret = m_registry.indexOf(name);
+    }
+    return ret;
 }
 
 void NbiotTopicRegistry::setTopicFlag(int index, NbiotTopic::RegistrationFlag topicFlag)
