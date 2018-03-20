@@ -17,7 +17,7 @@ Create a new directory for CMakeFiles, e.g. build, and change to the directory. 
     cmake ..
     make
 
-After building the static libraries libnbiot.a and libnbiotcore.a are located in lib/
+After building the project, the static libraries libnbiot.a and libnbiotcore.a are located in lib/
 
 #### Make
 
