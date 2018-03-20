@@ -1,7 +1,7 @@
 ### Install
 
 After cloning this project, the submodules (libNbiot libNbiotCore) need to be enabled.
-This ist performed by executing the commands:
+This is performed by executing the commands:
 
 `git submodule init`
 `git submodule update`
