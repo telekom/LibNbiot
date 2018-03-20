@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdarg.h> // for va_list
 #include "nbiotstringlist.h"
-#include "nbiotstring.h"
 
 #include "nbiotdebug.h"
 

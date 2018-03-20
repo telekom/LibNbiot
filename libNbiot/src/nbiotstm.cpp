@@ -5,7 +5,6 @@
 #include <nbiotcoreapp.h>
 #include <nbiottimer.h>
 #include "nbiotdebug.h"
-#include "atcommands.h"
 
 #include "nbiotstm.h"
 
