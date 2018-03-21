@@ -8,16 +8,6 @@ This is performed by executing the commands:
 
 ### Compile
 
-#### CMake
-
-Create a new directory for CMakeFiles, e.g. build, and change to the directory. Afterwards, you can use cmake and make:
-
-    mkdir build && cd build
-    cmake ..
-    make
-
-After building the project, the static libraries libnbiot.a and libnbiotcore.a are located in lib/
-
 #### Make
 
 Afterwards, the project can be compiled by issuing
