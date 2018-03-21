@@ -12,8 +12,7 @@ This is performed by executing the commands:
 
 Create a new directory for CMakeFiles, e.g. build, and change to the directory. Afterwards, you can use cmake and make:
 
-    mkdir build
-    cd build/
+    mkdir build && cd build
     cmake ..
     make
 
