@@ -25,12 +25,12 @@ NbiotConnectivity::NbiotConnectivity(Serial& serial) :
 }
 
 
-bool NbiotConnectivity::connect(const char* hostname, int port)
+bool NbiotConnectivity::connect(const char* hostname, unsigned short port)
 {
     bool ret = true;
 
-    int listenPort = m_lastListenPort;
-    if(0 <= m_connectionNumber)
+    unsigned short listenPort = m_lastListenPort;
+    if((0 <= m_connectionNumber) && (maxSocket > m_connectionNumber))
     {
         listenPort = (listenPortBase + m_connectionNumber);
     }
@@ -50,13 +50,26 @@ bool NbiotConnectivity::connect(const char* hostname, int port)
     {
         nbiot::string response = m_cmd.getResponse();
         m_connectionNumber = atoi(response.c_str());
-        m_hostname = hostname;
-        m_port = port;
-        m_lastListenPort = listenPort;
+        if((0 <= m_connectionNumber) && (maxSocket > m_connectionNumber))
+        {
+            m_hostname = hostname;
+            m_port = port;
+            m_lastListenPort = listenPort;
+        }
+        else
+        {
+            m_hostname = "";
+            m_port = 0;
+            m_connectionNumber = -1;
+            ret = false;
+        }
     }
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
-    m_nsonmi = nbiot::string::Printf(respNSONMI_arg, m_connectionNumber);
-    m_cmd.addUrcFilter(m_nsonmi.c_str(), this, &NbiotConnectivity::parseFilterResult);
+    if(ret)
+    {
+        m_nsonmi = nbiot::string::Printf(respNSONMI_arg, m_connectionNumber);
+        m_cmd.addUrcFilter(m_nsonmi.c_str(), this, &NbiotConnectivity::parseFilterResult);
+    }
 #ifdef DEBUG_MODEM
      debugPrintf("modem connect: %s\r\n", ((ret)?"ok":"fail"));
 #endif
@@ -187,7 +200,7 @@ bool NbiotConnectivity::write(unsigned char* buffer, unsigned long len, unsigned
 {
     bool ret = false;
 
-    if((!m_hostname.empty()) && (0 < m_port) && (maxPort > m_port))
+    if((!m_hostname.empty()) && (0 < m_port))
     {
         nbiot::string data = nbiot::string::Printf(cmdNSOST_arg, m_connectionNumber, m_hostname.c_str(), m_port, len);
         nbiot::string hex = nbiot::string((char*)(buffer), len).toHex();
