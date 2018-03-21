@@ -1,7 +1,6 @@
 #include <stdarg.h>
 #include <stdio.h> // for size_t
 
-#include "nbiottime.h"
 #include "nbiotdebug.h"
 
 #ifdef DEBUG_STRING

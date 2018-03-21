@@ -1,19 +1,24 @@
 ### Install
 
 After cloning this project, the submodules (libNbiot libNbiotCore) need to be enabled.
-This ist performed by executing the commands:
+This is performed by executing the commands:
 
 `git submodule init`
 `git submodule update`
 
-As the build structure of the submodules is different from the one in 'master' branch, the used
-branches have to be changed to 'make':
+### Compile
 
-`cd libNbiot`
-`git checkout make`
-`cd ..`
-`cd libNbiotCore`
-`git checkout make`
+#### CMake
+
+Create a new directory for CMakeFiles, e.g. build, and change to the directory. Afterwards, you can use cmake and make:
+
+    mkdir build && cd build
+    cmake ..
+    make
+
+After building the project, the static libraries libnbiot.a and libnbiotcore.a are located in lib/
+
+#### Make
 
 Afterwards, the project can be compiled by issuing
 

@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include "atcommands.h"
-#include "serial.h"
 #include "nbiottimer.h"
 #include "nbiotstringlist.h"
 #include "nbiotdebug.h"
