@@ -12,7 +12,7 @@ public:
     explicit NbiotConnectivity(Serial& serial);
     virtual ~NbiotConnectivity() {}
 
-    virtual bool connect(const char* hostname, int port);
+    virtual bool connect(const char* hostname, unsigned short port);
     virtual int read(unsigned char* buffer, int len, unsigned short timeout_ms);
     virtual bool write(unsigned char* buffer, unsigned long len, unsigned short timeout);
     virtual bool disconnect();
@@ -30,10 +30,10 @@ private:
     AtCommands m_cmd;
     int m_connectionNumber;
     nbiot::string m_hostname;
-    int m_port;
+    unsigned short m_port;
     size_t m_bytesAvail;
     nbiot::string m_nsonmi;
-    int m_lastListenPort;
+    unsigned short m_lastListenPort;
 
 
     static const unsigned int readInterval = 100;
@@ -41,8 +41,8 @@ private:
     static const unsigned int threeSeconds = 3000;
     static const unsigned int tenSeconds = 10000;
 
-    static const int maxPort = 65536;
-    static const int listenPortBase = 10001;
+    static const int maxSocket = 7; /*!< Specific for NEUL chipset: A maximum of 7 sockets are supported. */
+    static const unsigned short listenPortBase = 10001;
     static const unsigned short byteCountMask = 0xFFFF;
 
     static const int nsorfRespIdx_connNum = 0;

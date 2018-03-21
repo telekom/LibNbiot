@@ -62,7 +62,7 @@ public:
     nbiot::string imsi;
     nbiot::string imsiAuth;
     nbiot::string gateway;
-    int mqttPort;
+    unsigned short mqttPort;
     unsigned int keepAliveInterval;
     unsigned int autoPollInterval;
     unsigned long eventLoopExecInterval;
@@ -89,7 +89,7 @@ private:
 
     static const unsigned int minKeepAlive = 60;
     static const unsigned int clientCommandTimeout = 15000;
-    static const int defaultMqttPort = 1883;
+    static const unsigned short defaultMqttPort = 1883;
     static const unsigned short defaultMaxTopics = 20;
 };
 

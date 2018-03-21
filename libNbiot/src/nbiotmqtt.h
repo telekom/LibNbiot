@@ -47,7 +47,7 @@ public:
 
     void setGateway(const char* hostname) { m_dataPool.gateway = hostname; }
     const char* getGateway() const { return m_dataPool.gateway.c_str(); }
-    void setPort(unsigned short port) { m_dataPool.mqttPort = static_cast<int>(port); }
+    void setPort(unsigned short port) { m_dataPool.mqttPort = port; }
     void setKeepAlive(unsigned int keepAlive) { m_dataPool.keepAliveInterval = keepAlive; }
     void setAutoPoll(unsigned int autoPoll) { m_dataPool.autoPollInterval = autoPoll; }
     void setTimerCallback(unsigned long tcInterval) { m_dataPool.eventLoopExecInterval = tcInterval; }
