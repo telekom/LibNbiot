@@ -913,7 +913,7 @@ bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishConLoop(int& loop
             ret = false;
     }
 
-    if (inflightMsgid > 0)
+    if (cleansession==0 && inflightMsgid>0)
     {
         memcpy(sendbuf, pubbuf, MAX_PACKET_SIZE);
         Timer connect_timer = Timer(loopTime);
@@ -1213,13 +1213,12 @@ bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::startPubLoop(int& packe
               m_topicName, (unsigned char*)m_payload, m_payloadlen);
     if (0 < len)
     {
-        if (!cleansession)
-        {
-            memcpy(pubbuf, sendbuf, len);
-            inflightLen = len;
-            inflightMsgid = id;
-            inflightQoS = m_qos;
-        }
+
+        memcpy(pubbuf, sendbuf, len);
+        inflightLen = len;
+        inflightMsgid = id;
+        inflightQoS = m_qos;
+
 
         Timer timer = Timer(m_pubLoopClient.getTimer().getTime());
         if (SUCCESS == sendPacket(len, timer)) // send the publish packet
