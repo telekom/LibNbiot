@@ -121,7 +121,8 @@ int NbiotConnectivity::read(unsigned char* buffer, int len, unsigned short timeo
         debugPrintf("\r\n");
     }
 #endif
-
+    //Quick Fix: Make sure that dgmLen is updated in all cases, especially if while-loop is left because )timer.remaining <= readInterval)
+    dgmLen = ipAvailable();
     if(0 < dgmLen)
     {
 #ifdef DEBUG_MODEM
