@@ -400,15 +400,12 @@ int NbiotMQTT::unsubscribe(const char* topic)
             }
             else
             {
-                m_dataPool.m_topicRegistry->unsetTopicFlag(index, NbiotTopic::REG_SUB);
-                if((m_dataPool.m_topicRegistry->operator [](index)).isReg(NbiotTopic::REG_NONE))
+                m_dataPool.m_topicRegistry->removeTopic(index);
+                if(!hasSubscription())
                 {
-                    m_dataPool.m_topicRegistry->removeTopic(index);
-                    if(!hasSubscription())
-                    {
-                        m_dataPool.m_hasSubscription = false;
-                    }
+                    m_dataPool.m_hasSubscription = false;
                 }
+
             }
         }
     }
