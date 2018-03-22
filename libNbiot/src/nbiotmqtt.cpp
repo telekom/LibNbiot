@@ -92,11 +92,7 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                 NbiotLoopId loopId = m_loopController.getLoopId();
 
                 // handling of topic-registry entries after successful register- or subscribe-loop
-                if((LC_Idle == loopResult) &&
-                        ((LI_Register == loopId) ||
-                         (LI_Subscribe == loopId) ||
-                         (LI_Connect == loopId) ||
-                         (LI_Publish == loopId)))
+                if((LC_Idle == loopResult) && (LI_Unknown != loopId))
                 {
                     m_dataPool.m_currentTopic.id = m_dataPool.m_topicid.data.id;
                     if(m_dataPool.m_currentTopic.valid())
@@ -111,7 +107,10 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                             m_dataPool.m_currentTopic.setReg(NbiotTopic::REG_SUB);
                         }
 
-                        m_dataPool.m_topicRegistry->insertTopic(m_dataPool.m_currentTopic);
+                        if((LI_Register == loopId) || (LI_Subscribe == loopId))
+                        {
+                            m_dataPool.m_topicRegistry->insertTopic(m_dataPool.m_currentTopic);
+                        }
 
                         if(LI_Subscribe == loopId)
                         {
