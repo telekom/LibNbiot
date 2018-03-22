@@ -4,7 +4,7 @@
 class INetwork
 {
 public:
-    virtual ~INetwork();
+    virtual ~INetwork() {}//;
 
     virtual bool connect(const char* hostname, unsigned short port) = 0;
     virtual int read(unsigned char* buffer, int len, unsigned short timeout) = 0;
@@ -13,8 +13,8 @@ public:
     virtual bool isConnected() = 0;
 };
 
-INetwork::~INetwork()
-{
-}
+//INetwork::~INetwork()
+//{
+//}
 #endif // INETWORK_H
 
