@@ -51,6 +51,7 @@ public:
     bool mqttConnect(unsigned char cleanSession = 0);
 
     void doDisconnect();
+    void finishDisconnect();
     void doReconnect();
     void sendEvent(int type);
     void postEvent(int type);

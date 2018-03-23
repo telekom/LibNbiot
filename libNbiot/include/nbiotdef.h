@@ -89,7 +89,8 @@ enum NbiotLoopId
     LI_Publish,
     LI_Register,
     LI_Subscribe,
-    LI_Unsubscribe
+    LI_Unsubscribe,
+    LI_Disconnect
 };
 
 typedef enum NbiotEventMode NbiotEventMode;

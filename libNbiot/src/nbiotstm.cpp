@@ -1053,6 +1053,14 @@ void NbiotStm::doDisconnect()
     {
         m_dataPool.client.disconnect(m_dataPool.m_duration);
     }
+    else
+    {
+        finishDisconnect();
+    }
+}
+
+void NbiotStm::finishDisconnect()
+{
     if(NbiotCoreApp::getInstance().getNetworkInstance().isConnected())
     {
         NbiotCoreApp::getInstance().getNetworkInstance().disconnect();

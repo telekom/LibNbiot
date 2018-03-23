@@ -76,7 +76,13 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                 NbiotResult loopResult = m_loopController.nbiotLoop();
                 if(LC_Fail == loopResult)
                 {
-                    if(LI_Publish == m_loopController.getLoopId())
+                    // may have been a timeout while waiting for DISCONNECT from GW
+                    // nevertheless continue disconnect process
+                    if(LI_Disconnect == m_loopController.getLoopId())
+                    {
+                        m_stm.finishDisconnect();
+                    }
+                    else if(LI_Publish == m_loopController.getLoopId())
                     {
 #ifdef DEBUG_MQTT
 #ifdef DEBUG_COLOR
@@ -90,8 +96,11 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
 
                         /// \todo checkout if we really need to disconnect or if we can recover from here
                         m_dataPool.m_errno = ConnectionError;
-                        sendEvent(NbiotStm::DisconnectEvent); /// disconnect: @TODO check if send or post event?
+                        postEvent(NbiotStm::DisconnectEvent); // disconnect: need to be post event!
+                                                              // otherwise the (new) disconnect-loop-client
+                                                              // would be deleted from the client-list in the next step
                     }
+
                     // clear loop controller by registering nullptr:
                     // - clear the client-list
                     // - set loopValue = 0
@@ -137,6 +146,11 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                     if((LI_Connect == loopId) && m_dataPool.client.isConnected())
                     {
                         postEvent(NbiotStm::ConnectedEvent);
+                    }
+                    // continue disconnect process
+                    if(LI_Disconnect == loopId)
+                    {
+                        m_stm.finishDisconnect();
                     }
                     // requires one more call to m_loopController.nbiotLoop() during the next cycle
                     // in the following cycle the next loop client will be loaded
