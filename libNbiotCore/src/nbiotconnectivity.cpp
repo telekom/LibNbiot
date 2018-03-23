@@ -114,7 +114,6 @@ int NbiotConnectivity::read(unsigned char* buffer, int len, unsigned short timeo
         if(0 == dgmLen)
         {
 #ifdef DEBUG_COLOR
-
             if (!dbgLine)
                 debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
 #endif
@@ -250,7 +249,7 @@ void NbiotConnectivity::parseFilterResult(const char *strFilterResult)
         m_bytesAvail = static_cast<size_t>(atoi(number.c_str()));
         #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
-        debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+        debugPrintf("\n\033[0;32m[ MODEM    ]\033[0m ");
 #endif
         debugPrintf("available bytes:: %d\r\n", m_bytesAvail);
         #endif

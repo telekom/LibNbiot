@@ -31,6 +31,9 @@ bool AtCommands::sendCommand(const nbiot::string& cmd)
 
     size_t sz = serial.write(cmd);
     #ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
     debugPrintf("%d:s(%d): %s\r\n", dbg_prefix, sz, cmd.c_str());
     #endif
     if((cmd.size() == sz) && (Serial::NoError == serial.getError()))
@@ -54,6 +57,9 @@ bool AtCommands::readResponse(ExpectedReply expected, unsigned short timeout_ms)
         {
             size_t n = serial.readLine(response, timeout_ms);
             #ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
             debugPrintf("%d:r(%d): %s\r\n", dbg_prefix, n, response.c_str());
             #endif
             if((okReply.size() == n) && (Serial::NoError == serial.getError()))
@@ -66,6 +72,9 @@ bool AtCommands::readResponse(ExpectedReply expected, unsigned short timeout_ms)
         {
             size_t i = serial.readLine(response, timeout_ms);
             #ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
             debugPrintf("%d:r(%d): %s e=%d\r\n", dbg_prefix, i, response.c_str(), serial.getError());
             #endif
             if((0 < i) && (Serial::NoError == serial.getError()))
@@ -73,6 +82,9 @@ bool AtCommands::readResponse(ExpectedReply expected, unsigned short timeout_ms)
                 nbiot::string ok;
                 size_t n = serial.readLine(ok, timeout_ms, Serial::Simple);
                 #ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+                debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
                 debugPrintf("%d:r(%d): %s\r\n", dbg_prefix, n, ok.c_str());
                 #endif
                 if((okReply.size() == n) && (Serial::NoError == serial.getError()))
@@ -97,6 +109,9 @@ bool AtCommands::readResponse(ExpectedReply expected, unsigned short timeout_ms)
                 if(0 < i)
                 {
 #ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+                    debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
                     debugPrintf("%d:r(%d): %s e=%d\r\n", dbg_prefix, i, resp.c_str(), serial.getError());
 #endif
                     result = true;
@@ -120,6 +135,9 @@ bool AtCommands::readResponse(ExpectedReply expected, unsigned short timeout_ms)
         {
             size_t i = serial.readLine(response, timeout_ms);
             #ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
             debugPrintf("%d:r(%d): %s e=%d\r\n", dbg_prefix, i, response.c_str(), serial.getError());
             #endif
             if((0 < i) && (Serial::NoError == serial.getError()))
@@ -169,6 +187,9 @@ bool AtCommands::readUntil(const char* expected, unsigned short timeout_ms, bool
     response = "";
 
     #ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
     debugPrintf("%d:AtCommands::readUntil(%s, %d)\r\n", dbg_prefix, expected, timeout_ms);
     #endif
 
@@ -179,6 +200,9 @@ bool AtCommands::readUntil(const char* expected, unsigned short timeout_ms, bool
         if( ((!exact) && (0 == response.find(expected))) || ((exact) && (response == expected)) )
         {
             #ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
             debugPrintf("%d:r(%d)*: %s\r\n", dbg_prefix, response.size(), response.c_str());
             #endif
             result = true;
@@ -187,6 +211,9 @@ bool AtCommands::readUntil(const char* expected, unsigned short timeout_ms, bool
         else
         {
             #ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
             debugPrintf("%d:r(%d)-: %s\r\n", dbg_prefix, response.size(), response.c_str());
             #endif
         }
