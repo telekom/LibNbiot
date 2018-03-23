@@ -47,7 +47,8 @@ enum ErrorNumber
     ConnectionError,
     NotStartedError,
     MaxTopicsExceeded,
-    LoopCtrlBusyError
+    LoopCtrlBusyError,
+    InvalidTopicID
 };
 
 enum NbiotAction
