@@ -1420,11 +1420,6 @@ bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishDisLoop(int& loop
 {
     bool ret = true;
 
-    if(0 == loopTime)
-    {
-        ret = false;
-    }
-
     isconnected = false;
     pmPingResp_outstanding = false;
 
@@ -1432,7 +1427,7 @@ bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishDisLoop(int& loop
 #ifdef DEBUG_COLOR
     debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
 #endif
-    debugPrintf("MQTTSN::disconnect %s\r\n", ret?"ok":"fail");
+    debugPrintf("MQTTSN::disconnect %s\r\n", (0 == loopTime)?"timeout":"ok");
 #endif
     return ret;
 }
