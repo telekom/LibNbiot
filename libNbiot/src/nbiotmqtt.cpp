@@ -49,6 +49,9 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                     if(ConnectedSleepState == getCurrentStateId())
                     {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                         debugPrintf("eventLoop (sleep): handle wakeup and ping\r\n");
 #endif
                         sendEvent(NbiotStm::ConnectedAwakeEvent);
@@ -59,6 +62,9 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
 #ifdef DEBUG_MQTT
                     else
                     {
+#ifdef DEBUG_COLOR
+                        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                         debugPrintf("eventLoop (sleep): not in sleep state\r\n");
                     }
 #endif
@@ -73,6 +79,9 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                     if(LI_Publish == m_loopController.getLoopId())
                     {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                         debugPrintf("error while publishing value\r\n");
 #endif
                         // PUBACK notification retcode other then 0 may be in loop-value
@@ -170,6 +179,9 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
             {
                 if(EventModeAsleep == mode)
                 {
+#ifdef DEBUG_COLOR
+                    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                     debugPrintf("eventLoop (sleep): not now\r\n");
                 }
             }
@@ -178,6 +190,9 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
 #ifdef DEBUG_MQTT
         else
         {
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
             debugPrintf("eventLoop LOCKED\r\n");
         }
 #endif
@@ -203,6 +218,9 @@ int NbiotMQTT::connect(unsigned char cleanSession)
         if(!isConnected() && !isSleeping())
         {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
             debugPrintf("NbiotMQTT::connect: send ConnectEvent\r\n");
 #endif
             m_dataPool.m_cleanSession = cleanSession;
@@ -236,6 +254,9 @@ int NbiotMQTT::publish(const char *topic, const char* data, size_t len, QoS qos)
             if(!m_loopController.isBusy())
             {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                 debugPrintf("send value: %s\r\n", data);
 #endif
                 m_dataPool.m_errno = Success;
@@ -252,6 +273,9 @@ int NbiotMQTT::publish(const char *topic, const char* data, size_t len, QoS qos)
 
                 int index = m_dataPool.m_topicRegistry->findTopic(topic);
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                 debugPrintf("topic index: %d\r\n", index);
 #endif
                 if(0 > index)
@@ -280,12 +304,18 @@ int NbiotMQTT::publish(const char *topic, const char* data, size_t len, QoS qos)
                 if(MQTTSN::SUCCESS == rc)
                 {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                     debugPrintf("publish: TID=%04X -> %s\r\n", m_dataPool.m_topicid.data.id, data);
 #endif
                     rc = m_dataPool.client.publish(m_dataPool.m_topicid, message);
                     if(0 > rc)
                     {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                         debugPrintf("error while sending value\r\n");
 #endif
                         m_dataPool.m_errno = ConnectionError;
@@ -299,6 +329,9 @@ int NbiotMQTT::publish(const char *topic, const char* data, size_t len, QoS qos)
                 else
                 {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                     debugPrintf("error while sending value\r\n");
 #endif
                     if(Success == m_dataPool.m_errno)
@@ -335,6 +368,9 @@ int NbiotMQTT::subscribe(const char *topic, messageHandler mh)
                     if (Success != rc)
                     {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                         debugPrintf("rc from MQTT subscribe is %d\r\n", rc);
 #endif
                         rc = ConnectionError;
@@ -357,6 +393,9 @@ int NbiotMQTT::subscribe(const char *topic, messageHandler mh)
                     if (Success != rc)
                     {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                         debugPrintf("rc from MQTT subscribe is %d\r\n", rc);
 #endif
                         rc = ConnectionError;
@@ -393,6 +432,9 @@ int NbiotMQTT::unsubscribe(const char* topic)
             if (Success != rc)
             {
     #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                 debugPrintf("rc from MQTT sunubscribe is %d\r\n", rc);
     #endif
                 rc = ConnectionError;
@@ -552,6 +594,9 @@ int NbiotMQTT::registerNotify(nbiot::NbiotTopic& topic)
 {
     int rc = RC_ACCEPTED;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:registerNotify [%04X]%s\r\n", topic.id, topic.topicName.c_str());
 #endif
     //! @TODO apply topic flags
@@ -595,6 +640,9 @@ int NbiotMQTT::registerNotify(nbiot::NbiotTopic& topic)
 void NbiotMQTT::disconnectNotify(int duration)
 {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:disconnectNotify d=%d\r\n", duration);
 #endif
     uint32_t stateId = getCurrentStateId();
@@ -618,6 +666,9 @@ void NbiotMQTT::pingRespNotify(int duration)
 {
     (void)duration;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:pingResponseNotify\r\n");
 #endif
     if(ConnectedAwakeState == getCurrentStateId())

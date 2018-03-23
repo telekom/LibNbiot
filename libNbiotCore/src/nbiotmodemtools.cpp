@@ -61,7 +61,10 @@ bool NbiotModemTools::reboot()
     }
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
 #ifdef DEBUG_MODEM
-     debugPrintf("modem restart: %s - %dms\r\n", ((ok)?"ok":"fail"), t.expired());
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
+    debugPrintf("modem restart: %s - %dms\r\n", ((ok)?"ok":"fail"), t.expired());
 #endif
     return ok;
 }
@@ -115,7 +118,10 @@ bool NbiotModemTools::initialize()
     }
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
 #ifdef DEBUG_MODEM
-     debugPrintf("modem init: %s - %dms\r\n", ((ok)?"ok":"fail"), t.expired());
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
+    debugPrintf("modem init: %s - %dms\r\n", ((ok)?"ok":"fail"), t.expired());
 #endif
     return ok;
 }
@@ -151,7 +157,10 @@ bool NbiotModemTools::attach()
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
 
 #ifdef DEBUG_MODEM
-     debugPrintf("attach: %s, state = %s\r\n", ((ret)?"ok":"fail"), ((state)?"attached":"detached"));
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
+    debugPrintf("attach: %s, state = %s\r\n", ((ret)?"ok":"fail"), ((state)?"attached":"detached"));
 #endif
 
     return ret;
@@ -179,7 +188,10 @@ bool NbiotModemTools::detach()
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
 
 #ifdef DEBUG_MODEM
-     debugPrintf("detach: %s\r\n", ((ret)?"ok":"fail"));
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
+    debugPrintf("detach: %s\r\n", ((ret)?"ok":"fail"));
 #endif
 
     return ret;
@@ -201,6 +213,9 @@ int NbiotModemTools::getAttachState()
         {
             nbiot::string response = m_cmd.getResponse();
             #ifdef DEBUG_MODEM
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
             debugPrintf("CGATT-Response: %s\r\n", response.c_str());
             #endif
             size_t pos = response.find(':');
@@ -220,6 +235,9 @@ int NbiotModemTools::getAttachState()
         }
     }
     #ifdef DEBUG_MODEM
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
     debugPrintf("Attachment-State: %d\r\n", ret);
     #endif
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
@@ -240,6 +258,9 @@ bool NbiotModemTools::getImsi(nbiot::string& imsi, bool usePw)
                 imsi = m_cmd.getResponse();
                 ret = true;
                 #ifdef DEBUG_MODEM
+#ifdef DEBUG_COLOR
+                debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
                 debugPrintf("IMSI: %s\r\n", imsi.c_str());
                 #endif
             }
@@ -282,7 +303,10 @@ NbiotModemTools::ModemState NbiotModemTools::switchModem(ModemState state)
         m_cmd.readResponse(REPLY_IGNORE, oneSecond);
     }
 #ifdef DEBUG_MODEM
-     debugPrintf("switch modem: %s\r\n", ((ret)?"on":"off"));
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
+    debugPrintf("switch modem: %s\r\n", ((ret)?"on":"off"));
 #endif
     return ret;
 }
@@ -309,7 +333,10 @@ NbiotModemTools::ModemState NbiotModemTools::isModemOn()
     }
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
 #ifdef DEBUG_MODEM
-     debugPrintf("is modem on?: %s\r\n", ((ret)?"on":"off"));
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
+    debugPrintf("is modem on?: %s\r\n", ((ret)?"on":"off"));
 #endif
     return ret;
 }

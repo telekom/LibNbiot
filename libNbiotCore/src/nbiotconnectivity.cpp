@@ -71,7 +71,10 @@ bool NbiotConnectivity::connect(const char* hostname, unsigned short port)
         m_cmd.addUrcFilter(m_nsonmi.c_str(), this, &NbiotConnectivity::parseFilterResult);
     }
 #ifdef DEBUG_MODEM
-     debugPrintf("modem connect: %s\r\n", ((ret)?"ok":"fail"));
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
+    debugPrintf("modem connect: %s\r\n", ((ret)?"ok":"fail"));
 #endif
     return ret;
 }
@@ -110,6 +113,11 @@ int NbiotConnectivity::read(unsigned char* buffer, int len, unsigned short timeo
 #ifdef DEBUG_MODEM
         if(0 == dgmLen)
         {
+#ifdef DEBUG_COLOR
+
+            if (!dbgLine)
+                debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
             debugPrintf(".");
             dbgLine = true;
         }
@@ -126,6 +134,9 @@ int NbiotConnectivity::read(unsigned char* buffer, int len, unsigned short timeo
     if(0 < dgmLen)
     {
 #ifdef DEBUG_MODEM
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
         debugPrintf("datagram-len: %d\r\n", dgmLen);
 #endif
         unsigned short to = (readInterval < timer.remaining())?static_cast<unsigned short>(timer.remaining()):readInterval;
@@ -136,6 +147,9 @@ int NbiotConnectivity::read(unsigned char* buffer, int len, unsigned short timeo
         rc = bytes;
     }
 #ifdef DEBUG_MODEM
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
     debugPrintf("r(%d): ", rc);
 #endif
     if(0 < rc)
@@ -207,6 +221,9 @@ bool NbiotConnectivity::write(unsigned char* buffer, unsigned long len, unsigned
         nbiot::string hex = nbiot::string((char*)(buffer), len).toHex();
         data += hex;
         #ifdef DEBUG_MODEM
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
         debugPrintf("data(%d) = %s\n", len, hex.c_str());
         #endif
 
@@ -232,6 +249,9 @@ void NbiotConnectivity::parseFilterResult(const char *strFilterResult)
         nbiot::string number = response.substr((pos + 1));
         m_bytesAvail = static_cast<size_t>(atoi(number.c_str()));
         #ifdef DEBUG_MODEM
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
         debugPrintf("available bytes:: %d\r\n", m_bytesAvail);
         #endif
     }

@@ -57,6 +57,9 @@ public:
                 m_loopClient = nullptr;
             }
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
             debugPrintf("loop controller: step %s %s\r\n", (LI_Unknown == m_loopId)?"LI_Unknown":loop_id[m_loopId], (LC_Pending != ret)?"finished":"ok");
 #endif
         }
@@ -73,6 +76,9 @@ public:
                     m_loopId = LI_Unknown;
                 }
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+                debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
                 debugPrintf("loop controller: start %s %s\r\n", (LI_Unknown == m_loopId)?"LI_Unknown":loop_id[m_loopId], (LC_Pending != ret)?"fail":"ok");
 #endif
             }
@@ -91,6 +97,9 @@ public:
         {
 #ifdef DEBUG_MQTT
             NbiotLoopId loopId = client->getLoopId();
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
             debugPrintf("loop controller: register client %s\r\n", (LI_Unknown == loopId)?"LI_Unknown":loop_id[loopId]);
 #endif
             m_clientList.append(client);

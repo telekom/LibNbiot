@@ -125,7 +125,7 @@ void nbiotPoll()
 unsigned char isNbiotConnected()
 {
     unsigned char ret = 0;
-    if(nbiotMqtt.isConnected())
+    if(nbiotMqtt.isConnected() || nbiotMqtt.isConSleeping() || nbiotMqtt.isConAwake())
     {
         ret = 1;
     }

@@ -427,6 +427,9 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::sendPacket(int length, T
     }
         
     char printbuf[50];
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("Rc %d from sending packet %s\r\n", rc, MQTTPacket_toString(printbuf, sizeof(printbuf), sendbuf, length));
     if(FAILURE == rc)
     {
@@ -471,6 +474,9 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Timer& timer)
 
 
 #if defined(DEBUG_MQTT)
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("MQTT::readPacket(%d)\r\n", timer.left_ms());
 #endif
     #define MAX_NO_OF_PACKET_LENGTH_BYTES 3
@@ -562,6 +568,9 @@ exit:
         
 #if defined(DEBUG_MQTT)
     char printbuf[50];
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("Rc %d:%d from receiving packet %s\r\n", rc, reason, (MQTTSN_MIN_PACKET_LENGTH <= len)?MQTTPacket_toString(printbuf, sizeof(printbuf), readbuf, len):"");
 #endif
     return rc;
@@ -606,6 +615,9 @@ template<class Network, class Timer, int a, int b>
 bool MQTTSN::Client<Network, Timer, a, b>::startYieldLoop(int& loopTime)
 {
 #if defined(DEBUG_MQTT)
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("MQTT::yield start %d\r\n", loopTime);
 #endif
     m_yieldLoopClient.getTimer().start(static_cast<unsigned long>(loopTime));
@@ -632,6 +644,9 @@ bool MQTTSN::Client<Network, Timer, a, b>::doYieldLoop(int& loopTime)
 #if defined(DEBUG_MQTT)
     if(!yieldRunning)
     {
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
         debugPrintf("MQTT::yield stopped at %d\r\n", loopTime);
     }
 #endif
@@ -649,6 +664,9 @@ bool MQTTSN::Client<Network, Timer, a, b>::finishYieldLoop(int& loopTime)
     }
 
 #if defined(DEBUG_MQTT)
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("MQTT::yield end %d\r\n", loopTime);
 #endif
     yieldRunning = false;
@@ -660,6 +678,9 @@ int MQTTSN::Client<Network, Timer, a, b>::yield(unsigned long timeout_ms)
 {
     int rc = SUCCESS;
 #if defined(DEBUG_MQTT)
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("MQTT::yield(%d)\r\n", timeout_ms);
 #endif
 
@@ -675,12 +696,18 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::cycle(Timer& timer)
     /* get one piece of work off the wire and one pass through */
 
 #if defined(DEBUG_MQTT)
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("MQTT::cycle(%d)\r\n", timer.left_ms());
 #endif
     // read the socket, see what work is due
     unsigned short packet_type = readPacket(timer);
 
 #if defined(DEBUG_MQTT)
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("MQTT::cycle: readPacket done @ %d\r\n", timer.left_ms());
 #endif
 
@@ -769,7 +796,10 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::cycle(Timer& timer)
                 {
                     len = MQTTSNSerialize_puback(sendbuf, MAX_PACKET_SIZE, topicid.data.id, msg.id, (FAILURE == retCode)?0:retCode);
 #if defined(DEBUG_MQTT)
-    debugPrintf("MQTT::cycle send PUBACK\r\n");
+#ifdef DEBUG_COLOR
+                    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
+                    debugPrintf("MQTT::cycle send PUBACK\r\n");
 #endif
                 }
                 else if (msg.qos == QOS2)
@@ -925,7 +955,10 @@ bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishConLoop(int& loop
         isconnected = true;
         pmPingResp_outstanding = false;
 #if defined(DEBUG_MQTT)
-debugPrintf("MQTTSN::connected\r\n");
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
+        debugPrintf("MQTTSN::connected\r\n");
 #endif
     }
     return ret;
@@ -1007,7 +1040,10 @@ bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishRegLoop(int& loop
             if((SUCCESS == returncode))
             {
 #if defined(DEBUG_MQTT)
-debugPrintf("MQTTSN::reg(%s)=%d\r\n", m_topicName.data.long_.name, topicid);
+#ifdef DEBUG_COLOR
+                debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
+                debugPrintf("MQTTSN::reg(%s)=%d\r\n", m_topicName.data.long_.name, topicid);
 #endif
                 m_topicName.data.id = topicid;
             }
@@ -1103,7 +1139,10 @@ bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishSubLoop(int& loop
             ret = false;
     }
 #if defined(DEBUG_MQTT)
-debugPrintf("MQTTSN::subscribe(%d)=%s\r\n", m_topicName.data.id, ret?"ok":"fail");
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
+    debugPrintf("MQTTSN::subscribe(%d)=%s\r\n", m_topicName.data.id, ret?"ok":"fail");
 #endif
     return ret;
 }
@@ -1175,7 +1214,10 @@ bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishUnsubLoop(int& lo
         }
     }
 #if defined(DEBUG_MQTT)
-debugPrintf("MQTTSN::unsubscribe(%d)=%s\r\n", m_topicName.data.id, ret?"ok":"fail");
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
+    debugPrintf("MQTTSN::unsubscribe(%d)=%s\r\n", m_topicName.data.id, ret?"ok":"fail");
 #endif
     return ret;
 }

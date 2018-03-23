@@ -5,6 +5,9 @@
 #define DEBUGLINE_LENGTH (256u) /*!< maximum length of a single debugging output line */
 #ifdef DEBUG
 
+#define DEBUG_COLOR
+// #undef DEBUG_COLOR
+
 #define DEBUG_SERIAL /*!< debugging output for the class Serial */
 #undef DEBUG_SERIAL
 
@@ -21,7 +24,7 @@
 // #undef DEBUG_MODEM
 
 #define DEBUG_MQTT /*!< debugging output for LibNbiot classes */
-#undef DEBUG_MQTT
+// #undef DEBUG_MQTT
 
 #define DEBUG_STRING /*!< debugging output for the nbiot::string class */
 #undef DEBUG_STRING

@@ -57,13 +57,19 @@ void NbiotTopicRegistry::insertTopic(const NbiotTopic& topic)
         {
             m_registry.append(topic);
 #ifdef DEBUG_MQTT
-        debugPrintf("TopicRegistry: ID %04X %s appended\r\n",topic.id, topic.topicName.c_str());
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
+            debugPrintf("TopicRegistry: ID %04X %s appended\r\n",topic.id, topic.topicName.c_str());
 #endif
         }
         else
         {
 #ifdef DEBUG_MQTT
-        debugPrintf("TopicRegistry: ID %04X updated\r\n",topic.id);
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
+            debugPrintf("TopicRegistry: ID %04X updated\r\n",topic.id);
 #endif
             m_registry[index] = topic;
         }

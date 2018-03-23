@@ -365,6 +365,9 @@ bool NbiotStm::actionInitialize(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionInitialize\r\n");
 #endif
     return false;
@@ -374,6 +377,9 @@ bool NbiotStm::actionIsInitializedDisconnected(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionIsInitializedDisconnected\r\n");
 #endif
     return false;
@@ -385,6 +391,9 @@ bool NbiotStm::actionIsInitializedError(const StmEvent& e)
     (void)e;
     m_dataPool.m_errno = InitializeError;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionIsInitializedError %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -398,7 +407,10 @@ bool NbiotStm::actionConnect(const StmEvent& e)
     m_dataPool.m_errno = Success;
     m_dataPool.m_waitTimer.start(timeoutOneMinute);
 #ifdef DEBUG_MQTT
-    debugPrintf("STM:actionConnect\r\n");
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
+        debugPrintf("STM:actionConnect\r\n");
 #endif
     doModemAttach();
     return false;
@@ -413,12 +425,18 @@ bool NbiotStm::actionIsGprsEnabledIpConnect(const StmEvent& e)
     if(!m_dataPool.gateway.empty())
     {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
         debugPrintf("Connecting to %s:%d\r\n", m_dataPool.gateway.c_str(), m_dataPool.mqttPort);
 #endif
         int rc = NbiotCoreApp::getInstance().getNetworkInstance().connect(m_dataPool.gateway.getData(), m_dataPool.mqttPort);
         if (rc != 1)
         {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
             debugPrintf("rc from TCP connect is %d\r\n", rc);
 #endif
         }
@@ -426,10 +444,16 @@ bool NbiotStm::actionIsGprsEnabledIpConnect(const StmEvent& e)
     else
     {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
         debugPrintf("TCP connect is impossible: No host\r\n");
 #endif
     }
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:IsGprsEnabledIpConnect %s\r\n", (NbiotCoreApp::getInstance().getNetworkInstance().isConnected()?"true":"false"));
 #endif
     return NbiotCoreApp::getInstance().getNetworkInstance().isConnected();
@@ -441,6 +465,9 @@ bool NbiotStm::actionIsGprsEnabledError(const StmEvent& e)
     m_dataPool.m_errno = GprsNotConnected;
     m_dataPool.m_modemRestartOnError++;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionIsGprsEnabledError %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -451,6 +478,9 @@ bool NbiotStm::actionIsIpConnectedError(const StmEvent& e)
     (void)e;
     m_dataPool.m_errno = IpNotConnected;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionIsIpConnectedError %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -460,6 +490,9 @@ bool NbiotStm::actionIsConnectedConnected(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionIsConnectedConnected %d\r\n",m_dataPool.client.isConnected());
 #endif
     return true;
@@ -470,6 +503,9 @@ bool NbiotStm::actionWaitConnectIsConnected(const StmEvent& e)
     (void)e;
     bool ret = mqttConnect(m_dataPool.m_cleanSession);
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionWaitConnectIsConnected %d\r\n",ret);
 #endif
     return ret;
@@ -480,6 +516,9 @@ bool NbiotStm::actionIsConnectedError(const StmEvent& e)
     (void)e;
     m_dataPool.m_errno = ConnectionError;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionIsConnectedError %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -489,6 +528,9 @@ bool NbiotStm::actionSleep(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionSleep\r\n");
 #endif
     if(0 < m_dataPool.m_duration)
@@ -502,6 +544,9 @@ bool NbiotStm::actionWakeup(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionWakeup\r\n");
 #endif
     if(0 < m_dataPool.m_duration)
@@ -516,6 +561,9 @@ bool NbiotStm::actionSleepAwake(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionSleepAwake %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -525,6 +573,9 @@ bool NbiotStm::actionAwakeSleep(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionAwakeSleep %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -535,6 +586,9 @@ bool NbiotStm::actionAwakeActive(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionAwakeActive %d\r\n",m_dataPool.m_errno);
 #endif
     mqttConnect();
@@ -546,6 +600,9 @@ bool NbiotStm::actionAwakeTimeout(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionAwakeTimeout %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -555,6 +612,9 @@ bool NbiotStm::actionHibernate(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionHibernate\r\n");
 #endif
     return false;
@@ -564,6 +624,9 @@ bool NbiotStm::actionReInitialize(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionReInitialize\r\n");
 #endif
     return false;
@@ -573,6 +636,9 @@ bool NbiotStm::actionDisconnect(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionDisconnect %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -582,6 +648,9 @@ bool NbiotStm::actionErrorDisconnect(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionErrorDisconnect %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -591,6 +660,9 @@ bool NbiotStm::actionErrorReInitialize(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionErrorReInitialize %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -600,6 +672,9 @@ bool NbiotStm::actionDisSleep(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionDisSleep %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -609,6 +684,9 @@ bool NbiotStm::actionDisWakeup(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionDisWakeup %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -618,6 +696,9 @@ bool NbiotStm::actionDisHibernate(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionDisHibernate %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -629,6 +710,9 @@ bool NbiotStm::actionIsInitialized(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionIsInitialized %d\r\n",m_dataPool.initialized);
 #endif
     return m_dataPool.initialized;
@@ -638,6 +722,9 @@ bool NbiotStm::actionIsIpConnected(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:actionIsIpConnected %s\r\n", (NbiotCoreApp::getInstance().getNetworkInstance().isConnected()?"true":"false"));
 #endif
     return NbiotCoreApp::getInstance().getNetworkInstance().isConnected();
@@ -706,6 +793,9 @@ bool NbiotStm::actionInitialEntry(const StmEvent& e)
         m_notifyHandler(&n);
     }
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:initialized %d\r\n",m_dataPool.initialized);
 #endif
     // set a timeout for this state, to go to error-state or disconnected-state if we're stuck here
@@ -727,6 +817,9 @@ bool NbiotStm::actionDisconnectedEntry(const StmEvent& e)
         m_notifyHandler(&n);
     }
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:disconnected %d\r\n",m_dataPool.m_errno);
 #endif
     // reset error number
@@ -781,6 +874,9 @@ bool NbiotStm::actionErrorEntry(const StmEvent& e)
         m_notifyHandler(&n);
     }
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:error %d\r\n",m_dataPool.m_errno);
 #endif
     return false;
@@ -809,6 +905,9 @@ bool NbiotStm::actionConnectedEntry(const StmEvent& e)
         m_notifyHandler(&n);
     }
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:connected %d\r\n",m_dataPool.m_errno);
 #endif
     return true;
@@ -819,6 +918,9 @@ bool NbiotStm::actionConnectedSleepEntry(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:sleep %d\r\n",m_dataPool.m_errno);
 #endif
     return true;
@@ -830,6 +932,9 @@ bool NbiotStm::actionConnectedAwakeEntry(const StmEvent& e)
     (void)e;
     m_evDisp->setTimeout(NbiotStmDataPool::oneSecondMs * m_dataPool.m_duration);
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:connected awake %d\r\n",m_dataPool.m_errno);
 #endif
     return true;
@@ -852,6 +957,9 @@ bool NbiotStm::actionDeepSleepEntry(const StmEvent& e)
         m_notifyHandler(&n);
     }
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:hibernate %d\r\n",m_dataPool.m_errno);
 #endif
     return true;
@@ -862,6 +970,9 @@ bool NbiotStm::actionDisconnectedSleepEntry(const StmEvent& e)
 {
     (void)e;
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("STM:sleep (disconnected) %d\r\n",m_dataPool.m_errno);
 #endif
     return true;
@@ -897,6 +1008,9 @@ void NbiotStm::mqttDisconnect()
     if(m_dataPool.client.isConnected())
     {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
         debugPrintf("MQTT disconnecting\r\n");
 #endif
         m_dataPool.client.disconnect(m_dataPool.m_duration);
@@ -909,6 +1023,9 @@ bool NbiotStm::mqttConnect(unsigned char cleanSession)
     if(!m_dataPool.client.isConnected())
     {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
         debugPrintf("MQTT connecting\r\n");
 #endif
         MQTTSNPacket_connectData data = MQTTSNPacket_connectData_initializer;
@@ -919,6 +1036,9 @@ bool NbiotStm::mqttConnect(unsigned char cleanSession)
         if (rc != 0)
         {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
             debugPrintf("rc from MQTT connect is %d\r\n", rc);
 #endif
             ret = false;
@@ -969,6 +1089,9 @@ void NbiotStm::postEvent(int type)
 void NbiotStm::doModemAttach()
 {
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("register CGATT loop client\r\n");
 #endif
     m_dataPool.m_modemAttached = false;
@@ -983,6 +1106,9 @@ bool NbiotStm::startCgattLoop(int& i)
     bool ret = false;
 
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("start CGATT loop\r\n");
 #endif
     Timer timer = Timer(m_cgattLoopClient.getTimer().getTime());
@@ -1001,6 +1127,9 @@ bool NbiotStm::doCgattLoop(int& loopTime)
     bool ret = true;
 
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("CGATT loop: step T = %d\r\n", m_cgattLoopClient.getTimer().remaining());
 #endif
     loopTime = static_cast<int>(m_cgattLoopClient.getTimer().remaining());
@@ -1032,6 +1161,9 @@ bool NbiotStm::finishCgattLoop(int& loopTime)
     bool ret = true;
 
 #ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
     debugPrintf("finish CGATT loop\r\n");
 #endif
     if(0 == loopTime)
