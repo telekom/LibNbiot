@@ -46,6 +46,7 @@
 
 #define MAX_TOPIC_COUNT_LIMIT 256 /*!< MAXTOPICCOUNT: maximum 256 topics : 256 * (22 Bytes + individual topic length) of RAM usage (max) */
 
+#define MIN_POLL_INTERVAL 1000 /*!< POLL: minimum 1000ms, means one second polling for subscribed messges */
 
 #define MIN_PORT 1024 /*!< PORT: values below 1024 will cause an error */
 
@@ -66,13 +67,14 @@ struct NbiotConf
     unsigned int keepAliveInterval; /*!< The maximum time to send a keepalive-message to the gateway */
     unsigned int autoPollInterval; /*!< The interval to invoke an automatic keepalive-message (must be less than keepAliveInterval) */
     unsigned short maxTopicCount; /*!< The maximum number of topics. Wildcard subscribtions may exceed this limit. Adjust it carfully: costs RAM. */
+    unsigned short pollInterval; /*!< The interval in msec. to poll for subscribed messages after publish */
     const char* gateway; /*!< IP-address of the nbIOT gateway server */
     unsigned short port; /*!< (MQTT-)port of the nbIOT gateway server */
 };
 
 typedef struct NbiotConf NbiotConf;
 
-#define NbiotConf_initializer {NULL, NULL, NULL, NULL, NULL, 300, 0, 20, NULL, 1883, NULL, NULL, NULL, NULL}
+#define NbiotConf_initializer {NULL, 300, 0, 20, 10000, NULL, 1883}
 
 /*!
  * \brief The NbiotConfigError enum enumerates the possible errors of the configuration ( nbiotConfig returns an OR'ed result )
@@ -83,8 +85,9 @@ enum NbiotConfigError
     ErrorKeepAliveInt = 64, /*!< Invalid keepalive-interval */
     ErrorAutoPollInt = 128, /*!< Invalid autopoll-interval */
     ErrorMaxTopicCount = 256, /*!< Invalid topic maximum */
-    ErrorGateway = 512, /*!< No gateway */
-    ErrorPort = 1024, /*!< Invalid port number (privileged-port-numbers: < 1024) */
+    ErrorPollInterval = 512, /*!< Invalid autopoll-interval */
+    ErrorGateway = 1024, /*!< No gateway */
+    ErrorPort = 2048, /*!< Invalid port number (privileged-port-numbers: < 1024) */
     ErrorMultipleConfig = 16384, /*!< Configuration was called more than one time */
     ErrorNoConfig = 32768 /*!< Configuration was never called */
 };
@@ -161,8 +164,9 @@ void nbiotWakeup();
 /*  */
 /*!
  * \brief nbiotPoll polls the gateway/broker to maintain the keep-alive and to look for new messages
+ * \param pollInterval the polling time in ms. If 0 the configured default-interval is used \sa NbiotConf.
  */
-void nbiotPoll();
+void nbiotPoll(unsigned short pollInterval);
 
 /*!
  * \brief isNbiotConnected checks whether the internal state machine state is connected
@@ -214,6 +218,12 @@ unsigned int getNbiotError();
  * \returns indicates the status of the internal event queue according the enum NbiotResult in nbiotdef.h. LC_Idle(0) means that there is no action currently executing, because e.g. there are no pending actions in the queue or one was successfully executed. LC_Pending(1) means that there is an action currently executing.
  */
 enum NbiotResult nbiotEventLoop(NbiotEventMode mode);
+
+/*!
+ * \brief getNbiotEventLoopStatus gives information about the current status of the event loop.
+ * \return the status of the internal event queue according the enum NbiotResult in nbiotdef.h. LC_Idle(0) means that there is no action currently executing
+ */
+enum NbiotResult getNbiotEventLoopStatus();
 
 /* /nbiot-functions ---------------------------------------------------------- */
 

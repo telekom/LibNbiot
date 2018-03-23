@@ -48,6 +48,15 @@ unsigned int nbiotConfig(NbiotConf* conf)
             result |= ErrorMaxTopicCount;
         }
 
+        if(MIN_POLL_INTERVAL <= conf->pollInterval)
+        {
+            nbiotMqtt.setPollInterval(conf->pollInterval);
+        }
+        else
+        {
+            result |= ErrorPollInterval;
+        }
+
         if((NULL != conf->gateway) && (0 < strlen(conf->gateway)))
         {
             nbiotMqtt.setGateway(conf->gateway);
@@ -117,9 +126,9 @@ void nbiotWakeup()
     nbiotMqtt.wakeup();
 }
 
-void nbiotPoll()
+void nbiotPoll(unsigned short pollInterval)
 {
-    nbiotMqtt.poll();
+    nbiotMqtt.poll(pollInterval);
 }
 
 unsigned char isNbiotConnected()
@@ -191,6 +200,11 @@ unsigned int getNbiotError()
 NbiotResult nbiotEventLoop(NbiotEventMode mode)
 {
     return nbiotMqtt.eventLoop(mode);
+}
+
+NbiotResult getNbiotEventLoopStatus()
+{
+    return nbiotMqtt.eventLoopStatus();
 }
 
 const char* currentNbiotState()

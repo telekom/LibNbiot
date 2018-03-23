@@ -37,7 +37,7 @@ public:
     void hibernate(unsigned short duration);
     void wakeup();
 
-    void poll();
+    void poll(unsigned short pollInterval = 0);
 
     unsigned long getMessageCount() const;
 
@@ -53,6 +53,7 @@ public:
     void setTimerCallback(unsigned long tcInterval) { m_dataPool.eventLoopExecInterval = tcInterval; }
     void setMaxTopics(unsigned short maxTopics) { m_dataPool.m_maxTopics = maxTopics; }
     const char* getClientId() const { return m_dataPool.imsi.c_str(); }
+    void setPollInterval(unsigned short pollInterval) { m_pollInterval = pollInterval; }
 
     /*!
      * \deprecated only used in deprecated function of public "C" interface
@@ -77,6 +78,8 @@ public:
         m_stm.setNotifyHandler(nh);
     }
 
+    NbiotResult eventLoopStatus() { return ((LC_Pending == m_evLoopRc) || m_loopController.isBusy())?LC_Pending:LC_Idle; }
+
 
 private:
     NbiotMQTT(NbiotMQTT&);
@@ -90,9 +93,11 @@ private:
     nbiot::NbiotStm m_stm;
     notifyHandler m_notifyHandler;
     NbiotResult m_evLoopRc;
+    unsigned short m_pollInterval;
 
     static const unsigned int tenSecondsMs = 10000;
     static const unsigned int halfSecondMs = 500;
+    static const unsigned short oneSecondMs = 1000;
 };
 
 #endif // NBIOTMQTT_H

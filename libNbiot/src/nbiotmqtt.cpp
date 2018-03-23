@@ -14,7 +14,8 @@ NbiotMQTT::NbiotMQTT() :
     m_dataPool(m_loopController),
     m_stm(m_dataPool),
     m_notifyHandler(nullptr),
-    m_evLoopRc(LC_Idle)
+    m_evLoopRc(LC_Idle),
+    m_pollInterval(oneSecondMs)
 {
     m_dataPool.client.setPubackNotifyHandler(this, &NbiotMQTT::pubackNotify);
     m_dataPool.client.setRegisterNotifyHandler(this, &NbiotMQTT::registerNotify);
@@ -541,7 +542,7 @@ void NbiotMQTT::wakeup()
     m_dataPool.m_duration = 0;
 }
 
-void NbiotMQTT::poll()
+void NbiotMQTT::poll(unsigned short pollInterval)
 {
     if(isConnected() || isSleeping())
     {
@@ -555,7 +556,7 @@ void NbiotMQTT::poll()
         }
         else
         {
-            m_dataPool.client.yield();
+            m_dataPool.client.yield((0 == pollInterval)?m_pollInterval:pollInterval);
         }
         m_dataPool.lastPollMs = getMillis();
     }
