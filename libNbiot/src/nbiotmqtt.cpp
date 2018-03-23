@@ -94,11 +94,13 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                         m_dataPool.m_currentTopic.returnCode = static_cast<enum MQTTSN_returnCodes>(m_loopController.getLoopValue());
                         pubackNotify(m_dataPool.m_currentTopic);
 
-                        /// \todo checkout if we really need to disconnect or if we can recover from here
-                        m_dataPool.m_errno = ConnectionError;
-                        postEvent(NbiotStm::DisconnectEvent); // disconnect: need to be post event!
-                                                              // otherwise the (new) disconnect-loop-client
-                                                              // would be deleted from the client-list in the next step
+                        if (m_dataPool.m_currentTopic.returnCode!=RC_REJECTED_INVALID_TOPIC_ID) {
+                            /// \todo checkout if we really need to disconnect or if we can recover from here
+                            m_dataPool.m_errno = ConnectionError;
+                            postEvent(NbiotStm::DisconnectEvent); // disconnect: need to be post event!
+                            // otherwise the (new) disconnect-loop-client
+                            // would be deleted from the client-list in the next step
+                        }
                     }
 
                     // clear loop controller by registering nullptr:
@@ -586,7 +588,7 @@ void NbiotMQTT::pubackNotify(nbiot::NbiotTopic& topic)
         n.returnCode = static_cast<enum MQTTSN_returnCodes>(topic.returnCode);
         if(RC_ACCEPTED != n.returnCode)
         {
-            n.errorNumber = ConnectionError;
+            n.errorNumber = (n.returnCode == RC_REJECTED_INVALID_TOPIC_ID) ? InvalidTopicID : ConnectionError;
         }
         else
         {
