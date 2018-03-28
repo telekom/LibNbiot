@@ -29,7 +29,8 @@
 #include "nbiotloop.h"
 #include "nbiottopicregistry.h"
 
-#include "MQTTSNClient.h"
+//#include "MQTTSNClient.h"
+#include "nbiotmqttsnclient.h"
 
 #define MAX_PACKET_SIZE 200
 #define MAX_MSG_HANDLER 0
@@ -44,7 +45,8 @@ public:
         m_errno(NotStartedError),
         m_topicid({MQTTSN_TOPIC_TYPE_NORMAL,invalidTopicId}),
         m_currentTopic(),
-        client(NbiotCoreApp::getInstance().getNetworkInstance(), lc, m_topicid, clientCommandTimeout),
+        //client(NbiotCoreApp::getInstance().getNetworkInstance(), lc, m_topicid, clientCommandTimeout),
+        client(lc, m_topicid, clientCommandTimeout),
         m_topicRegistry(new NbiotTopicRegistry()),
         initialized(false),
         m_hasSubscription(false),
@@ -75,7 +77,8 @@ public:
     unsigned int m_errno;
     MQTTSN_topicid m_topicid;
     NbiotTopic m_currentTopic;
-    MQTTSN::Client<INetwork, nbiot::Timer, MAX_PACKET_SIZE, MAX_MSG_HANDLER> client;
+    //MQTTSN::Client<INetwork, nbiot::Timer, MAX_PACKET_SIZE, MAX_MSG_HANDLER> client;
+    NbiotMqttSnClient client;
     NbiotTopicRegistry* m_topicRegistry;
     bool initialized;
     bool m_hasSubscription;

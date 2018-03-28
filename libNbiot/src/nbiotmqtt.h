@@ -27,7 +27,8 @@
 #include "nbiotmessage.h"
 #include "nbiotnotify.h"
 #include "nbiotloop.h"
-#include "MQTTSNClient.h"
+//#include "MQTTSNClient.h"
+#include "nbiotmqttsnclient.h"
 
 #include "nbiotstm.h"
 

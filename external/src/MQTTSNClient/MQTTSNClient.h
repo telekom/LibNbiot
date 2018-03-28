@@ -104,7 +104,7 @@ private:
  * @param Network a network class which supports send, receive
  * @param Timer a timer class with the methods:
  */
-template<class Network, class Timer, int MAX_PACKET_SIZE = 100, int MAX_MESSAGE_HANDLERS = 5>
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE = 100, int MAX_MESSAGE_HANDLERS = 5>
 class Client
 {
 
@@ -117,7 +117,7 @@ public:
      *      before calling MQTT connect
      *  @param limits an instance of the Limit class - to alter limits as required
      */
-    Client(Network& network, nbiot::NbiotLoop& lc, MQTTSN_topicid& topicName, unsigned int command_timeout_ms = 20000);
+    Client(Network& network, MQTTSN_topicid& topicName, unsigned int command_timeout_ms = 20000);
 
     /** Set the default message handling callback - used for any message which does not match a subscription message handler
      *  @param mh - pointer to the callback function
@@ -203,11 +203,6 @@ public:
      */
     int yield(unsigned long timeout_ms = 15000L);
 
-    void stopYield()
-    {
-        yieldRunning = false;
-    }
-
     int pmPing(char* cID);
 
     /** Is the client connected?
@@ -223,45 +218,15 @@ public:
         return command_timeout_ms;
     }
 
-    bool startConLoop(int&);
-    bool doConLoop(int&);
-    bool finishConLoop(int&);
-
-    bool startPubLoop(int&);
-    bool doPubLoop(int&);
-    bool finishPubLoop(int&);
-
-    bool startRegLoop(int&);
-    bool doRegLoop(int&);
-    bool finishRegLoop(int&);
-
-    bool startSubLoop(int&);
-    bool doSubLoop(int&);
-    bool finishSubLoop(int&);
-
-    bool startUnsubLoop(int&);
-    bool doUnsubLoop(int&);
-    bool finishUnsubLoop(int&);
-
-    bool startYieldLoop(int&);
-    bool doYieldLoop(int&);
-    bool finishYieldLoop(int&);
-
-    bool startDisLoop(int&);
-    bool doDisLoop(int&);
-    bool finishDisLoop(int&);
-
-
 protected:
 
+    constexpr int getMaxPacketSize(){
+        return MAX_PACKET_SIZE;
+    }
+
     int cycle(Timer& timer);
-    bool loopWait(int breakValue, int interval);
-
-private:
-
     int keepalive();
     int publish(int len, Timer& timer, enum QoS qos);
-
     int readPacket(Timer& timer);
     int sendPacket(int length, Timer& timer);
     int deliverMessage(MQTTSN_topicid& topic, Message& message);
@@ -287,16 +252,6 @@ private:
     FP<void, int> disconnectNotifyHandler;
     FP<void, int> pingRespNotifyHandler;
 
-    nbiot::NbiotLoop& m_loopController;
-
-    nbiot::LoopClient m_conLoopClient;
-    nbiot::LoopClient m_pubLoopClient;
-    nbiot::LoopClient m_regLoopClient;
-    nbiot::LoopClient m_subLoopClient;
-    nbiot::LoopClient m_unsubLoopClient;
-    nbiot::LoopClient m_yieldLoopClient;
-    nbiot::LoopClient m_disLoopClient;
-
     MQTTSN_topicid& m_topicName;
 
     void* m_payload;
@@ -306,35 +261,24 @@ private:
 
     bool isconnected;
 
-    static const int loopInterval = 1000;
     static const int minSendTime = 100;
     static const int recomendedSendTime = 1000;
     static const int oneSecond = 1000;
-    static const int invalidRC = 255;
     
 
     unsigned char pubbuf[MAX_PACKET_SIZE];  // store the last publish for sending on reconnect
     int inflightLen;
     unsigned short inflightMsgid;
     enum QoS inflightQoS;
-
 };
 
 }
 
 
-template<class Network, class Timer, int a, int MAX_MESSAGE_HANDLERS>
-MQTTSN::Client<Network, Timer, a, MAX_MESSAGE_HANDLERS>::Client(Network& network, nbiot::NbiotLoop &lc, MQTTSN_topicid& topicName, unsigned int command_timeout_ms)  :
+template<class Derived, class Network, class Timer, int a, int MAX_MESSAGE_HANDLERS>
+MQTTSN::Client<Derived, Network, Timer, a, MAX_MESSAGE_HANDLERS>::Client(Network& network, MQTTSN_topicid& topicName, unsigned int command_timeout_ms)  :
     ipstack(network),
     packetid(),
-    m_loopController(lc),
-    m_conLoopClient(LI_Connect),
-    m_pubLoopClient(LI_Publish),
-    m_regLoopClient(LI_Register),
-    m_subLoopClient(LI_Subscribe),
-    m_unsubLoopClient(LI_Unsubscribe),
-    m_yieldLoopClient(LI_Yield),
-    m_disLoopClient(LI_Disconnect),
     m_topicName(topicName),
     m_payload(nullptr),
     m_payloadlen(0),
@@ -347,43 +291,13 @@ MQTTSN::Client<Network, Timer, a, MAX_MESSAGE_HANDLERS>::Client(Network& network
     this->command_timeout_ms = command_timeout_ms;
     isconnected = false;
 
-    m_conLoopClient.setLoopStartHandler(this, &Client::startConLoop);
-    m_conLoopClient.setLoopStepHandler(this, &Client::doConLoop);
-    m_conLoopClient.setLoopStopHandler(this, &Client::finishConLoop);
-
-    m_pubLoopClient.setLoopStartHandler(this, &Client::startPubLoop);
-    m_pubLoopClient.setLoopStepHandler(this, &Client::doPubLoop);
-    m_pubLoopClient.setLoopStopHandler(this, &Client::finishPubLoop);
-
-    m_regLoopClient.setLoopStartHandler(this, &Client::startRegLoop);
-    m_regLoopClient.setLoopStepHandler(this, &Client::doRegLoop);
-    m_regLoopClient.setLoopStopHandler(this, &Client::finishRegLoop);
-
-    m_subLoopClient.setLoopStartHandler(this, &Client::startSubLoop);
-    m_subLoopClient.setLoopStepHandler(this, &Client::doSubLoop);
-    m_subLoopClient.setLoopStopHandler(this, &Client::finishSubLoop);
-
-    m_unsubLoopClient.setLoopStartHandler(this, &Client::startUnsubLoop);
-    m_unsubLoopClient.setLoopStepHandler(this, &Client::doUnsubLoop);
-    m_unsubLoopClient.setLoopStopHandler(this, &Client::finishUnsubLoop);
-
-    m_yieldLoopClient.setLoopStartHandler(this, &Client::startYieldLoop);
-    m_yieldLoopClient.setLoopStepHandler(this, &Client::doYieldLoop);
-    m_yieldLoopClient.setLoopStopHandler(this, &Client::finishYieldLoop);
-
-    m_disLoopClient.setLoopStartHandler(this, &Client::startDisLoop);
-    m_disLoopClient.setLoopStepHandler(this, &Client::doDisLoop);
-    m_disLoopClient.setLoopStopHandler(this, &Client::finishDisLoop);
-
-
     inflightMsgid = 0;
     inflightQoS = QOS0;
-
 }
 
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::sendPacket(int length, Timer& timer)
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int b>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::sendPacket(int length, Timer& timer)
 {
     int rc = FAILURE,
         sent = 0;
@@ -473,8 +387,8 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::sendPacket(int length, T
  * @param timeout the max time to wait for the packet read to complete, in milliseconds
  * @return the MQTT packet type, or -1 if none
  */
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Timer& timer)
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int b>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Timer& timer)
 {
     int rc = FAILURE;
     int len = 0;  // the length of the whole packet including length field 
@@ -588,8 +502,8 @@ exit:
     return rc;
 }
 
-template<class Network, class Timer, int a, int MAX_MESSAGE_HANDLERS>
-int MQTTSN::Client<Network, Timer, a, MAX_MESSAGE_HANDLERS>::deliverMessage(MQTTSN_topicid& topic, Message& message)
+template<class Derived, class Network, class Timer, int a, int MAX_MESSAGE_HANDLERS>
+int MQTTSN::Client<Derived, Network, Timer, a, MAX_MESSAGE_HANDLERS>::deliverMessage(MQTTSN_topicid& topic, Message& message)
 {
     int rc = FAILURE;
 
@@ -602,91 +516,9 @@ int MQTTSN::Client<Network, Timer, a, MAX_MESSAGE_HANDLERS>::deliverMessage(MQTT
     return rc;
 }
 
-template<class Network, class Timer, int a, int b>
-bool MQTTSN::Client<Network, Timer, a, b>::loopWait(int breakValue, int interval)
-{
-    bool ret = true;
 
-    if(0 == interval)
-    {
-        ret = false;
-    }
-    else
-    {
-        Timer timer(interval);
-
-        if(breakValue == cycle(timer))
-        {
-            ret = false;
-        }
-    }
-    return ret;
-}
-
-template<class Network, class Timer, int a, int b>
-bool MQTTSN::Client<Network, Timer, a, b>::startYieldLoop(int& loopTime)
-{
-#if defined(DEBUG_MQTT)
-#ifdef DEBUG_COLOR
-    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
-#endif
-    debugPrintf("MQTT::yield start %d\r\n", loopTime);
-#endif
-    m_yieldLoopClient.getTimer().start(static_cast<unsigned long>(loopTime));
-    yieldRunning = true;
-    return true;
-}
-
-template<class Network, class Timer, int a, int b>
-bool MQTTSN::Client<Network, Timer, a, b>::doYieldLoop(int& loopTime)
-{
-    bool ret = true;
-
-    loopTime = static_cast<int>(m_yieldLoopClient.getTimer().remaining());
-
-    if(yieldRunning)
-    {
-        int interval = (loopInterval < loopTime)?loopInterval:loopTime;
-        ret = loopWait(FAILURE, interval);
-    }
-    else
-    {
-        ret = false;
-    }
-#if defined(DEBUG_MQTT)
-    if(!yieldRunning)
-    {
-#ifdef DEBUG_COLOR
-        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
-#endif
-        debugPrintf("MQTT::yield stopped at %d\r\n", loopTime);
-    }
-#endif
-    return ret;
-}
-
-template<class Network, class Timer, int a, int b>
-bool MQTTSN::Client<Network, Timer, a, b>::finishYieldLoop(int& loopTime)
-{
-    bool ret = true;
-
-    if(0 != loopTime)
-    {
-        ret = false;
-    }
-
-#if defined(DEBUG_MQTT)
-#ifdef DEBUG_COLOR
-    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
-#endif
-    debugPrintf("MQTT::yield end %d\r\n", loopTime);
-#endif
-    yieldRunning = false;
-    return ret;
-}
-
-template<class Network, class Timer, int a, int b>
-int MQTTSN::Client<Network, Timer, a, b>::yield(unsigned long timeout_ms)
+template<class Derived, class Network, class Timer, int a, int b>
+int MQTTSN::Client<Derived, Network, Timer, a, b>::yield(unsigned long timeout_ms)
 {
     int rc = SUCCESS;
 #if defined(DEBUG_MQTT)
@@ -696,14 +528,13 @@ int MQTTSN::Client<Network, Timer, a, b>::yield(unsigned long timeout_ms)
     debugPrintf("MQTT::yield(%d)\r\n", timeout_ms);
 #endif
 
-    m_yieldLoopClient.setValue(static_cast<int>(timeout_ms));
-    m_loopController.registerLoopClient(&m_yieldLoopClient);
+    static_cast<Derived*>(this)->loopYield(timeout_ms);
     return rc;
 }
 
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::cycle(Timer& timer)
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int b>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::cycle(Timer& timer)
 {
     /* get one piece of work off the wire and one pass through */
 
@@ -859,8 +690,8 @@ exit:
 }
 
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::keepalive()
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int b>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::keepalive()
 {
     int rc = FAILURE;
 
@@ -885,99 +716,9 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::keepalive()
     return rc;
 }
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::pmPing(char *cID)
-{
-    int rc = FAILURE;
-    if (!pmPingResp_outstanding)
-    {
-        MQTTSNString clientid = MQTTSNString_initializer;
-        clientid.cstring = cID;
-        Timer timer = Timer(1000);
-        int len = MQTTSNSerialize_pingreq(sendbuf, MAX_PACKET_SIZE, clientid);
-        if (len > 0 && (rc = sendPacket(len, timer)) == SUCCESS) // send the ping packet
-            pmPingResp_outstanding = true;
-    }
-    return rc;
-}
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::startConLoop(int& len)
-{
-    bool ret = false;
-
-    Timer timer = Timer(m_conLoopClient.getTimer().getTime());
-    if (SUCCESS == sendPacket(len, timer)) // send the connect packet
-    {
-        if (this->duration > 0)
-            last_received.countdown(this->duration);
-
-        m_conLoopClient.getTimer().start(timer.left_ms());
-        ret = true;
-    }
-
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::doConLoop(int& loopTime)
-{
-    bool ret = true;
-
-    loopTime = static_cast<int>(m_conLoopClient.getTimer().remaining());
-    int interval = (loopInterval < loopTime)?loopInterval:loopTime;
-    ret = loopWait(MQTTSN_CONNACK, interval);
-
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishConLoop(int& loopTime)
-{
-    bool ret = true;
-
-    if(0 == loopTime)
-    {
-        ret = false;
-    }
-    else
-    {
-        int connack_rc = invalidRC;
-        if (MQTTSNDeserialize_connack(&connack_rc, readbuf, MAX_PACKET_SIZE) == 1)
-        {
-            if((SUCCESS != connack_rc))
-            {
-                ret = false;
-            }
-        }
-        else
-            ret = false;
-    }
-
-    if (cleansession==0 && inflightMsgid>0)
-    {
-        memcpy(sendbuf, pubbuf, MAX_PACKET_SIZE);
-        Timer connect_timer = Timer(loopTime);
-        if(SUCCESS != publish(inflightLen, connect_timer, inflightQoS))
-            ret = false;
-    }
-
-    if(ret)
-    {
-        isconnected = true;
-        pmPingResp_outstanding = false;
-#if defined(DEBUG_MQTT)
-#ifdef DEBUG_COLOR
-        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
-#endif
-        debugPrintf("MQTTSN::connected\r\n");
-#endif
-    }
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::connect(MQTTSNPacket_connectData& options)
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int b>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::connect(MQTTSNPacket_connectData& options)
 {
     int rc = FAILURE;
     int len = 0;
@@ -988,9 +729,7 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::connect(MQTTSNPacket_con
         this->cleansession = options.cleansession;
         if (0 < (len = MQTTSNSerialize_connect(sendbuf, MAX_PACKET_SIZE, &options)))
         {
-            m_conLoopClient.setValue(len);
-            m_conLoopClient.getTimer().setTime(command_timeout_ms);
-            m_loopController.registerLoopClient(&m_conLoopClient);
+            static_cast<Derived*>(this)->loopConnect(len);
             rc = SUCCESS;
         }
     }
@@ -999,169 +738,16 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::connect(MQTTSNPacket_con
 }
 
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::connect()
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int b>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::connect()
 {
     MQTTSNPacket_connectData default_options = MQTTSNPacket_connectData_initializer;
     return connect(default_options);
 }
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::startRegLoop(int& len)
-{
-    bool ret = false;
 
-    Timer timer = Timer(m_regLoopClient.getTimer().getTime());
-    if (SUCCESS == sendPacket(len, timer)) // send the register packet
-    {
-        m_regLoopClient.getTimer().start(timer.left_ms());
-        ret = true;
-    }
-
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::doRegLoop(int& loopTime)
-{
-    bool ret = true;
-
-    loopTime = static_cast<int>(m_regLoopClient.getTimer().remaining());
-    int interval = (loopInterval < loopTime)?loopInterval:loopTime;
-    ret = loopWait(MQTTSN_REGACK, interval);
-
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishRegLoop(int& loopTime)
-{
-    bool ret = true;
-
-    if(0 == loopTime)
-    {
-        ret = false;
-    }
-    else
-    {
-        unsigned short topicid;
-        unsigned short submsgid;
-        unsigned char returncode;
-        if (0 < MQTTSNDeserialize_regack(&topicid, &submsgid, &returncode, readbuf, MAX_PACKET_SIZE))
-        {
-            if((SUCCESS == returncode))
-            {
-#if defined(DEBUG_MQTT)
-#ifdef DEBUG_COLOR
-                debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
-#endif
-                debugPrintf("MQTTSN::reg(%s)=%d\r\n", m_topicName.data.long_.name, topicid);
-#endif
-                m_topicName.data.id = topicid;
-            }
-            else
-                ret = false;
-        }
-        else
-            ret = false;
-    }
-    return ret;
-}
-
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::registerTopic(MQTTSN_topicid& topicName)
-{
-    int rc = FAILURE;
-    int len = 0;
-    MQTTSNString topicstr;
-
-    topicstr.cstring = topicName.data.long_.name;
-    topicstr.lenstring.len = topicName.data.long_.len;
-
-    unsigned short msgid = packetid.getNext();
-
-    if(0 < (len = MQTTSNSerialize_register(sendbuf, MAX_PACKET_SIZE, 0, msgid, &topicstr)))
-    {
-        m_topicName = topicName;
-        m_regLoopClient.setValue(len);
-        m_regLoopClient.getTimer().setTime(command_timeout_ms);
-        m_loopController.registerLoopClient(&m_regLoopClient);
-        rc = SUCCESS;
-    }
-    return rc;
-}
-
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::startSubLoop(int& len)
-{
-    bool ret = false;
-
-    Timer timer = Timer(m_subLoopClient.getTimer().getTime());
-    if (SUCCESS == sendPacket(len, timer)) // send the register packet
-    {
-        m_subLoopClient.getTimer().start(timer.left_ms());
-        ret = true;
-    }
-
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::doSubLoop(int& loopTime)
-{
-    bool ret = true;
-
-    loopTime = static_cast<int>(m_subLoopClient.getTimer().remaining());
-    int interval = (loopInterval < loopTime)?loopInterval:loopTime;
-    ret = loopWait(MQTTSN_SUBACK, interval);
-
-    return ret;
-}
-
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishSubLoop(int& loopTime)
-{
-    bool ret = true;
-
-    if(0 == loopTime)
-    {
-        ret = false;
-    }
-    else
-    {
-        int grantedQoS = -1;
-        unsigned short mypacketid;
-        unsigned char retcode;
-        if (MQTTSNDeserialize_suback(&grantedQoS, &m_topicName.data.id, &mypacketid, &retcode, readbuf, MAX_PACKET_SIZE) == 1)
-        {
-            if(MQTTSN_RC_ACCEPTED == retcode)
-            {
-                if(!defaultMessageHandler.attached())
-                {
-                    ret = false;
-                }
-            }
-            else
-                ret = false;
-        }
-        else
-            ret = false;
-    }
-#if defined(DEBUG_MQTT)
-#ifdef DEBUG_COLOR
-    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
-#endif
-    debugPrintf("MQTTSN::subscribe(%d)=%s\r\n", m_topicName.data.id, ret?"ok":"fail");
-#endif
-    return ret;
-}
-
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int MAX_MESSAGE_HANDLERS>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::subscribe(MQTTSN_topicid& topicFilter, enum QoS qos, messageHandler messageHandler)
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int MAX_MESSAGE_HANDLERS>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::subscribe(MQTTSN_topicid& topicFilter, enum QoS qos, messageHandler messageHandler)
 {
     int rc = FAILURE;
     int len = 0;
@@ -1172,70 +758,17 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::subsc
         {
             (void)messageHandler;
             m_topicName = topicFilter;
-            m_subLoopClient.setValue(len);
-            m_subLoopClient.getTimer().setTime(command_timeout_ms);
-            m_loopController.registerLoopClient(&m_subLoopClient);
+
+            static_cast<Derived*>(this)->loopSubscribe(len);
             rc = SUCCESS;
         }
     }
     return rc;
 }
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::startUnsubLoop(int& len)
-{
-    bool ret = false;
 
-    Timer timer = Timer(m_unsubLoopClient.getTimer().getTime());
-    if (SUCCESS == sendPacket(len, timer)) // send the register packet
-    {
-        m_unsubLoopClient.getTimer().start(timer.left_ms());
-        ret = true;
-    }
-
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::doUnsubLoop(int& loopTime)
-{
-    bool ret = true;
-
-    loopTime = static_cast<int>(m_unsubLoopClient.getTimer().remaining());
-    int interval = (loopInterval < loopTime)?loopInterval:loopTime;
-    ret = loopWait(MQTTSN_UNSUBACK, interval);
-
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishUnsubLoop(int& loopTime)
-{
-    bool ret = true;
-
-    if(0 == loopTime)
-    {
-        ret = false;
-    }
-    else
-    {
-        unsigned short mypacketid;  // should be the same as the packetid above
-        if (MQTTSNDeserialize_unsuback(&mypacketid, readbuf, MAX_PACKET_SIZE) != 1)
-        {
-            ret = false;
-        }
-    }
-#if defined(DEBUG_MQTT)
-#ifdef DEBUG_COLOR
-    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
-#endif
-    debugPrintf("MQTTSN::unsubscribe(%d)=%s\r\n", m_topicName.data.id, ret?"ok":"fail");
-#endif
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int MAX_MESSAGE_HANDLERS>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::unsubscribe(MQTTSN_topicid& topicFilter)
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int MAX_MESSAGE_HANDLERS>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::unsubscribe(MQTTSN_topicid& topicFilter)
 {
     int rc = FAILURE;
     int len = 0;
@@ -1245,9 +778,7 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::unsub
         if ( 0 < (len = MQTTSNSerialize_unsubscribe(sendbuf, MAX_PACKET_SIZE, packetid.getNext(), &topicFilter)))
         {
             m_topicName = topicFilter;
-            m_unsubLoopClient.setValue(len);
-            m_unsubLoopClient.getTimer().setTime(command_timeout_ms);
-            m_loopController.registerLoopClient(&m_unsubLoopClient);
+            static_cast<Derived*>(this)->loopUnsubscribe(len);
             rc = SUCCESS;
         }
     }
@@ -1255,92 +786,8 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::unsub
 }
 
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::startPubLoop(int& packetId)
-{
-    bool ret = false;
-    int len = 0;
-    unsigned short id = static_cast<unsigned short>(packetId);
-
-    len = MQTTSNSerialize_publish(sendbuf, MAX_PACKET_SIZE, 0, m_qos, m_retained, id,
-              m_topicName, (unsigned char*)m_payload, m_payloadlen);
-    if (0 < len)
-    {
-
-        memcpy(pubbuf, sendbuf, len);
-        inflightLen = len;
-        inflightMsgid = id;
-        inflightQoS = m_qos;
-
-
-        Timer timer = Timer(m_pubLoopClient.getTimer().getTime());
-        if (SUCCESS == sendPacket(len, timer)) // send the publish packet
-        {
-            m_pubLoopClient.getTimer().start(timer.left_ms());
-            ret = true;
-        }
-    }
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::doPubLoop(int& loopTime)
-{
-    bool ret = true;
-
-    if(QOS0 == m_qos)
-    {
-        ret = false;
-    }
-    else
-    {
-        loopTime = static_cast<int>(m_pubLoopClient.getTimer().remaining());
-        int interval = (loopInterval < loopTime)?loopInterval:loopTime;
-        ret = loopWait(MQTTSN_PUBACK, interval);
-    }
-
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishPubLoop(int& loopTime)
-{
-    bool ret = true;
-
-    if((QOS0 != m_qos))
-    {
-        if(0 == loopTime)
-        {
-            ret = false;
-        }
-        else
-        {
-            unsigned short mypacketid;
-            unsigned short topicid;
-            unsigned char returncode;
-            loopTime = SUCCESS;
-
-            if (1 != MQTTSNDeserialize_puback(&topicid, &mypacketid, &returncode, readbuf, MAX_PACKET_SIZE))
-            {
-                ret = false;
-            }
-            else if (inflightMsgid == mypacketid)
-            {
-                inflightMsgid = 0;
-                if(SUCCESS != static_cast<int>(returncode))
-                {
-                    loopTime = static_cast<int>(returncode);
-                    ret = false;
-                }
-            }
-        }
-    }
-    return ret;
-}
-
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::publish(int len, Timer& timer, enum QoS qos)
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int b>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::publish(int len, Timer& timer, enum QoS qos)
 {
     int rc = SUCCESS;
     
@@ -1360,8 +807,8 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::publish(int len, Timer& 
 }
 
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::publish(MQTTSN_topicid& topicName, Message& message)
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int b>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::publish(MQTTSN_topicid& topicName, Message& message)
 {
     int rc = FAILURE;
     Timer timer = Timer(command_timeout_ms);
@@ -1379,63 +826,16 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::publish(MQTTSN_topicid& 
         m_retained = message.retained;
         m_qos = message.qos;
 
-        m_pubLoopClient.getTimer().setTime(static_cast<unsigned long>(timer.left_ms()));
-        m_pubLoopClient.setValue(id);
-        m_loopController.registerLoopClient(&m_pubLoopClient);
+        static_cast<Derived*>(this)->loopPublish(id, static_cast<unsigned long>(timer.left_ms()));
         rc = SUCCESS;
     }
 
     return rc;
 }
 
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::startDisLoop(int& len)
-{
-    bool ret = false;
 
-    Timer timer = Timer(m_disLoopClient.getTimer().getTime());
-    if (SUCCESS == sendPacket(len, timer)) // send the disconnect packet
-    {
-        m_disLoopClient.getTimer().start(timer.left_ms());
-        ret = true;
-    }
-
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::doDisLoop(int& loopTime)
-{
-    bool ret = true;
-
-    loopTime = static_cast<int>(m_disLoopClient.getTimer().remaining());
-    int interval = (loopInterval < loopTime)?loopInterval:loopTime;
-    ret = loopWait(MQTTSN_DISCONNECT, interval);
-
-    return ret;
-}
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-bool MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::finishDisLoop(int& loopTime)
-{
-    bool ret = true;
-
-    isconnected = false;
-    pmPingResp_outstanding = false;
-
-#if defined(DEBUG_MQTT)
-#ifdef DEBUG_COLOR
-    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
-#endif
-    debugPrintf("MQTTSN::disconnect %s\r\n", (0 == loopTime)?"timeout":"ok");
-#endif
-    return ret;
-}
-
-
-
-template<class Network, class Timer, int MAX_PACKET_SIZE, int b>
-int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::disconnect(unsigned short duration)
+template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int b>
+int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::disconnect(unsigned short duration)
 {
     int rc = FAILURE;
     Timer timer = Timer(command_timeout_ms);     // we might wait for incomplete incoming publishes to complete
@@ -1443,9 +843,7 @@ int MQTTSN::Client<Network, Timer, MAX_PACKET_SIZE, b>::disconnect(unsigned shor
     int len = MQTTSNSerialize_disconnect(sendbuf, MAX_PACKET_SIZE, int_duration);
     if (0 < len)
     {
-        m_disLoopClient.setValue(len);
-        m_disLoopClient.getTimer().setTime(command_timeout_ms);
-        m_loopController.registerLoopClient(&m_disLoopClient);
+        static_cast<Derived*>(this)->loopDisconnect(len);
         rc = SUCCESS;
     }
     return rc;
