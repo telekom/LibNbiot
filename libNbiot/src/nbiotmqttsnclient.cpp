@@ -164,6 +164,67 @@ bool NbiotMqttSnClient::startConLoop(int& len)
 }
 
 
+void NbiotMqttSnClient::loopSubscribe(int length)
+{
+    m_subLoopClient.setValue(length);
+    m_subLoopClient.getTimer().setTime(command_timeout_ms);
+    m_loopController.registerLoopClient(&m_subLoopClient);
+}
+
+
+void NbiotMqttSnClient::stopYield()
+{
+    yieldRunning = false;
+}
+
+
+void NbiotMqttSnClient::loopYield(unsigned long timeout_ms)
+{
+    m_yieldLoopClient.setValue(static_cast<int>(timeout_ms));
+    m_loopController.registerLoopClient(&m_yieldLoopClient);
+}
+
+
+void NbiotMqttSnClient::loopPublish(unsigned short id, unsigned long timer_left)
+{
+    m_pubLoopClient.getTimer().setTime(timer_left);
+    m_pubLoopClient.setValue(id);
+    m_loopController.registerLoopClient(&m_pubLoopClient);
+}
+
+
+void NbiotMqttSnClient::loopRegister(int length)
+{
+    m_regLoopClient.setValue(length);
+    m_regLoopClient.getTimer().setTime(command_timeout_ms);
+    m_loopController.registerLoopClient(&m_regLoopClient);
+}
+
+
+void NbiotMqttSnClient::loopDisconnect(int length)
+{
+    m_disLoopClient.setValue(length);
+    m_disLoopClient.getTimer().setTime(command_timeout_ms);
+    m_loopController.registerLoopClient(&m_disLoopClient);
+}
+
+
+void NbiotMqttSnClient::loopUnsubscribe(int length)
+{
+    m_unsubLoopClient.setValue(length);
+    m_unsubLoopClient.getTimer().setTime(command_timeout_ms);
+    m_loopController.registerLoopClient(&m_unsubLoopClient);
+}
+
+
+void NbiotMqttSnClient::loopConnect(int length)
+{
+    m_conLoopClient.setValue(length);
+    m_conLoopClient.getTimer().setTime(command_timeout_ms);
+    m_loopController.registerLoopClient(&m_conLoopClient);
+}
+
+
 bool NbiotMqttSnClient::doConLoop(int& loopTime)
 {
     bool ret = true;

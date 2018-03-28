@@ -16,67 +16,22 @@ class NbiotMqttSnClient : public MQTTSN::Client <NbiotMqttSnClient, INetwork, nb
 {
 
 public:
+
     NbiotMqttSnClient(nbiot::NbiotLoop& lc, MQTTSN_topicid& topicName, unsigned int command_timeout_ms = 20000);
 
+    void loopConnect(int length);
+    void loopDisconnect(int length);
 
-    void loopYield(unsigned long timeout_ms)
-    {
-        m_yieldLoopClient.setValue(static_cast<int>(timeout_ms));
-        m_loopController.registerLoopClient(&m_yieldLoopClient);
-    };
-
-
-    void loopDisconnect(int length)
-    {
-        m_disLoopClient.setValue(length);
-        m_disLoopClient.getTimer().setTime(command_timeout_ms);
-        m_loopController.registerLoopClient(&m_disLoopClient);
-    };
-
-
-    void loopUnsubscribe(int length)
-    {
-        m_unsubLoopClient.setValue(length);
-        m_unsubLoopClient.getTimer().setTime(command_timeout_ms);
-        m_loopController.registerLoopClient(&m_unsubLoopClient);
-    };
-
-
-    void loopConnect(int length)
-    {
-        m_conLoopClient.setValue(length);
-        m_conLoopClient.getTimer().setTime(command_timeout_ms);
-        m_loopController.registerLoopClient(&m_conLoopClient);
-    };
-
-    void loopRegister(int length)
-    {
-        m_regLoopClient.setValue(length);
-        m_regLoopClient.getTimer().setTime(command_timeout_ms);
-        m_loopController.registerLoopClient(&m_regLoopClient);
-    }; 
-
-    void loopPublish(unsigned short id, unsigned long timer_left)
-    {
-        m_pubLoopClient.getTimer().setTime(timer_left);
-        m_pubLoopClient.setValue(id);
-        m_loopController.registerLoopClient(&m_pubLoopClient);
-    };      
-
-
-    void loopSubscribe(int length)
-    {
-        m_subLoopClient.setValue(length);
-        m_subLoopClient.getTimer().setTime(command_timeout_ms);
-        m_loopController.registerLoopClient(&m_subLoopClient);
-    };
-
-    void stopYield()
-    {
-        yieldRunning = false;
-    };
+    void loopSubscribe(int length);
+    void loopUnsubscribe(int length);
 
     int registerTopic(MQTTSN_topicid& topicName);
+    void loopRegister(int length); 
+    void loopPublish(unsigned short id, unsigned long timer_left);
+
+    void loopYield(unsigned long timeout_ms);
+    void stopYield();
+
     int pmPing(char* cID);    
 
 protected:

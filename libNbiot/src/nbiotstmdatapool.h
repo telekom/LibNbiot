@@ -28,8 +28,6 @@
 #include "nbiotstring.h"
 #include "nbiotloop.h"
 #include "nbiottopicregistry.h"
-
-//#include "MQTTSNClient.h"
 #include "nbiotmqttsnclient.h"
 
 #define MAX_PACKET_SIZE 200
