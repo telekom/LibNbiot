@@ -34,7 +34,7 @@ public:
 
     int pmPing(char* cID);    
 
-protected:
+private:
 
     bool startConLoop(int&);
     bool doConLoop(int&);

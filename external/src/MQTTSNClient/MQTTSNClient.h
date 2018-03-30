@@ -242,7 +242,6 @@ protected:
     bool ping_outstanding;
     bool pmPingResp_outstanding;
     bool cleansession;
-    bool yieldRunning;
 
     PacketId packetid;
 
@@ -288,6 +287,8 @@ MQTTSN::Client<Derived, Network, Timer, a, MAX_MESSAGE_HANDLERS>::Client(Network
     last_sent = Timer();
     last_received = Timer();
     ping_outstanding = false;
+    pmPingResp_outstanding = false;
+    cleansession = false;
     this->command_timeout_ms = command_timeout_ms;
     isconnected = false;
 

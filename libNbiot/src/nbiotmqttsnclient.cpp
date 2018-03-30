@@ -9,7 +9,8 @@ NbiotMqttSnClient::NbiotMqttSnClient(nbiot::NbiotLoop& lc, MQTTSN_topicid& topic
         m_subLoopClient(LI_Subscribe),
         m_unsubLoopClient(LI_Unsubscribe),
         m_yieldLoopClient(LI_Yield),
-        m_disLoopClient(LI_Disconnect)       
+        m_disLoopClient(LI_Disconnect),
+        yieldRunning(false)
 {
     m_conLoopClient.setLoopStartHandler(this, &NbiotMqttSnClient::startConLoop);
     m_conLoopClient.setLoopStepHandler(this, &NbiotMqttSnClient::doConLoop);
