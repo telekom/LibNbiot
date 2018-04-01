@@ -12,14 +12,14 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #############################################################################
 
 # Define any target platforms here. Only targets defined here will be build.
 # Don't forget to add appropriate cases below.
-# PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug
+# PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortex-m3 arm-cortex-m3-debug
 PLATFORMS := default
 
 
@@ -45,9 +45,10 @@ VPATH     := $(SRCDIR) $(INCDIR)
 # Variable definitions.
 INCLUDES  := $(addprefix -I ,$(VPATH)) -I $(COREINC) -I  $(EXTINC)
 OBJECTS   := $(subst $(SRCDIR)/,,$(subst .cpp,.o,$(notdir $(shell find $(SRCDIR) -name "*.cpp"))))
-AR        := ar cq
-ARFLAGS   := 
+AR        := ar
+ARFLAGS   := cq
 TARGET    := libnbiot.a
+APPLIB    := libnbiotapp.a
 LINKER    := $(AR)
 LFLAGS    := $(ARFLAGS)
 
@@ -59,55 +60,59 @@ CXX      := g++
 CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb
 endif
 ifeq ($(ARCH),x86)
-CXX       := g++
-CXXFLAGS  := -m32 -std=c++0x -Wall -Os
+CXX      := g++
+CXXFLAGS := -m32 -std=c++0x -Wall -Os
 endif
 ifeq ($(ARCH),x86-debug)
-CXX       := g++
-CXXFLAGS  := -m32 -std=c++0x -Wall -D DEBUG -g -O0 -ggdb
+CXX      := g++
+CXXFLAGS := -m32 -std=c++0x -Wall -D DEBUG -g -O0 -ggdb
 endif
 ifeq ($(ARCH),x86-shared)
-CXX       := g++
-CXXFLAGS  := -m32 -std=c++0x -Wall -Os -fPIC
-LINKER    := g++
-LFLAGS    := -shared -o
-TARGET    := libnbiot.so
+CXX      := g++
+CXXFLAGS := -m32 -std=c++0x -Wall -Os -fPIC
+LINKER   := g++
+LFLAGS   := -shared -o
+TARGET   := libnbiot.so
+APPLIB   := 
 endif
 ifeq ($(ARCH),x86-debug-shared)
-CXX       := g++
-CXXFLAGS  := -m32 -std=c++0x -Wall -D DEBUG -g -O0 -fPIC -ggdb
-LINKER    := g++
-LFLAGS    := -shared -o
-TARGET    := libnbiot.so
+CXX      := g++
+CXXFLAGS := -m32 -std=c++0x -Wall -D DEBUG -g -O0 -fPIC -ggdb
+LINKER   := g++
+LFLAGS   := -shared -o
+TARGET   := libnbiot.so
+APPLIB   :=
 endif
 ifeq ($(ARCH),x86_64)
-CXX       := g++
-CXXFLAGS  := -m64 -std=c++0x -Wall -Os
+CXX      := g++
+CXXFLAGS := -m64 -std=c++0x -Wall -Os
 endif
 ifeq ($(ARCH),x86_64-shared)
-CXX       := g++
-CXXFLAGS  := -m64 -std=c++0x -Wall -Os -fPIC
-LINKER    := g++
-LFLAGS    := -shared -o
-TARGET    := libnbiot.so
+CXX      := g++
+CXXFLAGS := -m64 -std=c++0x -Wall -Os -fPIC
+LINKER   := g++
+LFLAGS   := -shared -o
+TARGET   := libnbiot.so
+APPLIB   :=
 endif
 ifeq ($(ARCH),x86_64-shared-debug)
-CXX       := g++
-CXXFLAGS  := -m64 -std=c++0x -Wall -D DEBUG -g -O0 -fPIC -ggdb
-LINKER    := g++
-LFLAGS    := -shared -o
-TARGET    := libnbiot.so
+CXX      := g++
+CXXFLAGS := -m64 -std=c++0x -Wall -D DEBUG -g -O0 -fPIC -ggdb
+LINKER   := g++
+LFLAGS   := -shared -o
+TARGET   := libnbiot.so
+APPLIB   :=
 endif
 ifeq ($(ARCH),x86_64-debug)
 CXX       := g++
 CXXFLAGS  := -m64 -std=c++0x -Wall -D DEBUG -g -O0 -ggdb
 endif
-ifeq ($(ARCH),arm-cortx-m3)
+ifeq ($(ARCH),arm-cortex-m3)
 CXX       := arm-none-eabi-gcc
 CXXFLAGS  := -mcpu=cortex-m3 -mthumb -Wa,-alh=nbiot_time.lst \
   -g -Wall -ffunction-sections -Os -ffat-lto-objects -std=c++0x
 endif
-ifeq ($(ARCH),arm-cortx-m3-debug)
+ifeq ($(ARCH),arm-cortex-m3-debug)
 CXX       := arm-none-eabi-gcc
 CXXFLAGS  := -mcpu=cortex-m3 -mthumb -Wa,-alh=nbiot_time.lst \
   -g -Wall -ffunction-sections -D DEBUG -g -O0 -ffat-lto-objects -std=c++0x -ggdb
@@ -118,7 +123,15 @@ endif
 first: all
 
 
-all: $(TARGET)
+all: $(TARGET) $(APPLIB)
+
+
+$(APPLIB): $(TARGET)
+	$(AR) -x $(EXTLIB)/libmqttsnpaho.a
+	$(AR) -x $(EXTLIB)/libstm.a
+	$(AR) -r $(APPLIB) *.o
+	$(AR) -r $(APPLIB) *.co
+	cp -f $(APPLIB) $(LIB)/.
 
 
 $(TARGET): $(OBJECTS)

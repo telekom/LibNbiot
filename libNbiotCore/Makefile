@@ -1,5 +1,5 @@
 #############################################################################
-# LibNbiot: Makefile for building: libnbiotCore.a
+# LibNbiot: Makefile for building: libnbiotcore.a
 #
 # Copyright (c) 2018, Edgar Hindemith, Yassine Amraue, Thorsten
 # Krautscheid, Kolja Vornholt, T-Systems International GmbH
@@ -19,7 +19,7 @@
 
 # Define any target platforms here. Only targets defined here will be build.
 # Don't forget to add appropriate cases below.
-# PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug
+# PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortex-m3 arm-cortex-m3-debug
 PLATFORMS := default
 
 
@@ -41,9 +41,9 @@ VPATH     := $(SRCDIR) $(INCDIR) $(EXTINC)
 # Variable definitions.
 INCLUDES  := $(addprefix -I ,$(VPATH))
 OBJECTS   := $(subst $(SRCDIR)/,,$(subst .cpp,.o,$(shell find $(SRCDIR) -name "*.cpp")))
-AR        := ar cq
-ARFLAGS   := 
-TARGET    := libnbiotCore.a
+AR        := ar
+ARFLAGS   := cq
+TARGET    := libnbiotcore.a
 LINKER    := $(AR)
 LFLAGS    := $(ARFLAGS)
 
@@ -67,14 +67,14 @@ CXX      := g++
 CXXFLAGS := -m32 -std=c++0x -Wall -Os -fPIC
 LINKER   := g++
 LFLAGS   := -shared -o
-TARGET   := libnbiot.so
+TARGET   := libnbiotcore.so
 endif
 ifeq ($(ARCH),x86-debug-shared)
 CXX      := g++
 CXXFLAGS := -m32 -std=c++0x -Wall -D DEBUG -g -O0 -ggdb
 LINKER   := g++
 LFLAGS   := -shared -o
-TARGET   := libnbiot.so
+TARGET   := libnbiotcore.so
 endif
 ifeq ($(ARCH),x86_64)
 CXX      := g++
@@ -89,21 +89,21 @@ CXX      := g++
 CXXFLAGS := -m64 -std=c++0x -Wall -O3 -fPIC
 LINKER   := g++
 LFLAGS   := -shared -o
-TARGET   := libnbiotCore.so
+TARGET   := libnbiotcore.so
 endif
 ifeq ($(ARCH),x86_64-shared-debug)
 CXX      := g++
 CXXFLAGS := -m64 -std=c++0x -Wall -D DEBUG -g  -O0 -ggdb -fPIC
 LINKER   := g++
 LFLAGS   := -shared -o
-TARGET   := libnbiotCore.so
+TARGET   := libnbiotcore.so
 endif
-ifeq ($(ARCH),arm-cortx-m3)
+ifeq ($(ARCH),arm-cortex-m3)
 CXX      := arm-none-eabi-gcc
 CXXFLAGS := -mcpu=cortex-m3 -mthumb -Wa,-alh=nbiot_time.lst \
   -g -Wall -ffunction-sections -Os -ffat-lto-objects -std=c++0x
 endif
-ifeq ($(ARCH),arm-cortx-m3-debug)
+ifeq ($(ARCH),arm-cortex-m3-debug)
 CXX      := arm-none-eabi-gcc
 CXXFLAGS := -mcpu=cortex-m3 -mthumb -Wa,-alh=nbiot_time.lst \
   -g -Wall -ffunction-sections -D DEBUG -g -Og -ffat-lto-objects -std=c++0x

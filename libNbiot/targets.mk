@@ -38,6 +38,7 @@ $(BUILDDIR)/$(P):
             SRCDIR=$(CURDIR)/src INCDIR=$(CURDIR)/include \
             ARCH=$(P) LIB=$(CURDIR)/$(LIBDIR)/$(P) \
 	    EXTINC=$(CURDIR)/$(EXT)/include \
+	    EXTLIB=$(CURDIR)/$(EXT)/lib/$(P) \
             COREINC=$(CURDIR)/$(CORE)/include $(MAKECMDGOALS)
 endef
 $(foreach P,$(PLATFORMS),$(eval $(PLATFORMRULE)))
