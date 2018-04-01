@@ -22,6 +22,7 @@
 #define STRING_H
 
 #include <string.h>
+#include <strings.h>
 
 namespace nbiot {
 
