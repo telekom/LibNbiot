@@ -42,6 +42,49 @@ NbiotMqttSnClient::NbiotMqttSnClient(nbiot::NbiotLoop& lc, MQTTSN_topicid& topic
 }
 
 
+void NbiotMqttSnClient::notifyPingResponse()
+{
+    if(pingRespNotifyHandler.attached())
+    {
+        pingRespNotifyHandler(0);
+    }
+}
+ 
+
+void NbiotMqttSnClient::notifyDisconnect()
+{
+    if(disconnectNotifyHandler.attached())
+    {
+        disconnectNotifyHandler(0);
+    }
+}
+
+unsigned char NbiotMqttSnClient::notifyRegister(unsigned short topicid, MQTTSNString topicName)
+{
+    unsigned char rc = 0;
+    if(registerNotifyHandler.attached())
+      {
+	  nbiot::NbiotTopic topic = nbiot::NbiotTopic(topicid);
+	  topic.topicName = nbiot::string(topicName.lenstring.data, topicName.lenstring.len);
+	  rc = registerNotifyHandler(topic);
+      }
+    return rc;
+}
+
+
+void NbiotMqttSnClient::notifyPublish(unsigned short topicid, unsigned char returncode)
+{
+    // send topic-id and returncode
+    if(pubackNotifyHandler.attached())
+    {
+        nbiot::NbiotTopic nbTopic;
+	nbTopic.id = topicid;
+	nbTopic.returnCode = returncode;
+	pubackNotifyHandler(nbTopic);
+    }
+}
+
+
 bool NbiotMqttSnClient::loopWait(int breakValue, int interval)
 {
     bool ret = true;

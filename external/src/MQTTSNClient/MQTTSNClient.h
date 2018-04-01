@@ -126,31 +126,7 @@ public:
     void setDefaultMessageHandler(MHC* mhc, int (MHC::*messageHandler)(MessageData&))
     {
         defaultMessageHandler.attach(mhc, messageHandler);
-    }
-
-    template<class NHC>
-    void setPubackNotifyHandler(NHC* nhc, void (NHC::*paNotifyHandler)(nbiot::NbiotTopic&))
-    {
-        pubackNotifyHandler.attach(nhc, paNotifyHandler);
-    }
-
-    template<class NHC>
-    void setRegisterNotifyHandler(NHC* nhc, int (NHC::*regNotifyHandler)(nbiot::NbiotTopic&))
-    {
-        registerNotifyHandler.attach(nhc, regNotifyHandler);
-    }
-
-    template<class NHC>
-    void setDisconnectNotifyHandler(NHC* nhc, void (NHC::*disNotifyHandler)(int))
-    {
-        disconnectNotifyHandler.attach(nhc, disNotifyHandler);
-    }
-
-    template<class NHC>
-    void setPingRespNotifyHandler(NHC* nhc, void (NHC::*pingrespNotifyHandler)(int))
-    {
-        pingRespNotifyHandler.attach(nhc, pingrespNotifyHandler);
-    }
+    }    
 
     /** MQTT Connect - send an MQTT connect packet down the network and wait for a Connack
      *  The nework object must be connected to the network endpoint before calling this
@@ -203,8 +179,6 @@ public:
      */
     int yield(unsigned long timeout_ms = 15000L);
 
-    int pmPing(char* cID);
-
     /** Is the client connected?
      *  @return flag - is the client connected or not?
      */
@@ -245,13 +219,9 @@ protected:
 
     PacketId packetid;
 
-    FP<int, MessageData&> defaultMessageHandler;
-    FP<void, nbiot::NbiotTopic&> pubackNotifyHandler;
-    FP<int, nbiot::NbiotTopic&> registerNotifyHandler;
-    FP<void, int> disconnectNotifyHandler;
-    FP<void, int> pingRespNotifyHandler;
-
     MQTTSN_topicid& m_topicName;
+
+    FP<int, MessageData&> defaultMessageHandler;
 
     void* m_payload;
     size_t m_payloadlen;
@@ -507,13 +477,11 @@ template<class Derived, class Network, class Timer, int a, int MAX_MESSAGE_HANDL
 int MQTTSN::Client<Derived, Network, Timer, a, MAX_MESSAGE_HANDLERS>::deliverMessage(MQTTSN_topicid& topic, Message& message)
 {
     int rc = FAILURE;
-
     if (defaultMessageHandler.attached())
     {
         MessageData md(topic, message);
         rc = defaultMessageHandler(md);
     }
-
     return rc;
 }
 
@@ -575,14 +543,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::cycle(Timer& ti
                     rc = FAILURE;
                 else
                 {
-                    // send topic-id and returncode
-                    if(pubackNotifyHandler.attached())
-                    {
-                        nbiot::NbiotTopic nbTopic;
-                        nbTopic.id = topicid;
-                        nbTopic.returnCode = returncode;
-                        pubackNotifyHandler(nbTopic);
-                    }
+		  static_cast<Derived*>(this)->notifyPublish(topicid,returncode);
                 }
             }
             break;
@@ -594,12 +555,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::cycle(Timer& ti
             rc = MQTTSN_RC_ACCEPTED;
             if (MQTTSNDeserialize_register(&topicid, &packetid, &topicName, readbuf, MAX_PACKET_SIZE) != 1)
                 goto exit;
-            if(registerNotifyHandler.attached())
-            {
-                nbiot::NbiotTopic topic = nbiot::NbiotTopic(topicid);
-                topic.topicName = nbiot::string(topicName.lenstring.data, topicName.lenstring.len);
-                rc = registerNotifyHandler(topic);
-            }
+	    rc = static_cast<Derived*>(this)->notifyRegister(topicid,topicName);
             len = MQTTSNSerialize_regack(sendbuf, MAX_PACKET_SIZE, topicid, packetid, rc);
             if (len <= 0)
                 rc = FAILURE;
@@ -617,10 +573,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::cycle(Timer& ti
             else
             {
                 isconnected = false;
-                if(disconnectNotifyHandler.attached())
-                {
-                    disconnectNotifyHandler(0);
-                }
+		static_cast<Derived*>(this)->notifyDisconnect();
             }
             break;
         }
@@ -667,11 +620,8 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::cycle(Timer& ti
         {
             if(pmPingResp_outstanding)
             {
-                if(pingRespNotifyHandler.attached())
-                {
-                    pingRespNotifyHandler(0);
-                }
                 pmPingResp_outstanding = false;
+		static_cast<Derived*>(this)->notifyPingResponse();
             }
             else
             {

@@ -32,7 +32,38 @@ public:
     void loopYield(unsigned long timeout_ms);
     void stopYield();
 
-    int pmPing(char* cID);    
+    unsigned char notifyRegister(unsigned short topicid, MQTTSNString topicName );
+    void notifyPublish(unsigned short topicid, unsigned char returncode);
+
+    void notifyPingResponse();
+    void notifyDisconnect();
+    
+
+    int pmPing(char* cID);
+
+    template<class NHC>
+    void setPubackNotifyHandler(NHC* nhc, void (NHC::*paNotifyHandler)(nbiot::NbiotTopic&))
+    {
+        pubackNotifyHandler.attach(nhc, paNotifyHandler);
+    }
+
+    template<class NHC>
+    void setRegisterNotifyHandler(NHC* nhc, int (NHC::*regNotifyHandler)(nbiot::NbiotTopic&))
+    {
+        registerNotifyHandler.attach(nhc, regNotifyHandler);
+    }
+
+    template<class NHC>
+    void setDisconnectNotifyHandler(NHC* nhc, void (NHC::*disNotifyHandler)(int))
+    {
+        disconnectNotifyHandler.attach(nhc, disNotifyHandler);
+    }
+
+    template<class NHC>
+    void setPingRespNotifyHandler(NHC* nhc, void (NHC::*pingrespNotifyHandler)(int))
+    {
+        pingRespNotifyHandler.attach(nhc, pingrespNotifyHandler);
+    }
 
 private:
 
@@ -75,6 +106,11 @@ private:
     nbiot::LoopClient m_unsubLoopClient;
     nbiot::LoopClient m_yieldLoopClient;
     nbiot::LoopClient m_disLoopClient;
+
+    FP<void, nbiot::NbiotTopic&> pubackNotifyHandler;
+    FP<int, nbiot::NbiotTopic&> registerNotifyHandler;
+    FP<void, int> disconnectNotifyHandler;
+    FP<void, int> pingRespNotifyHandler;    
 
     static const int loopInterval = 1000;    
     static const int invalidRC = 255;
