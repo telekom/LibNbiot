@@ -66,14 +66,14 @@ ifeq ($(ARCH),x86-shared)
 CXX      := g++
 CXXFLAGS := -m32 -std=c++0x -Wall -Os -fPIC
 LINKER   := g++
-LFLAGS   := -shared -o
+LFLAGS   := -shared -m32 -o
 TARGET   := libnbiotcore.so
 endif
 ifeq ($(ARCH),x86-debug-shared)
 CXX      := g++
 CXXFLAGS := -m32 -std=c++0x -Wall -D DEBUG -g -O0 -ggdb
 LINKER   := g++
-LFLAGS   := -shared -o
+LFLAGS   := -shared -m32 -o
 TARGET   := libnbiotcore.so
 endif
 ifeq ($(ARCH),x86_64)
@@ -88,14 +88,14 @@ ifeq ($(ARCH),x86_64-shared)
 CXX      := g++
 CXXFLAGS := -m64 -std=c++0x -Wall -O3 -fPIC
 LINKER   := g++
-LFLAGS   := -shared -o
+LFLAGS   := -shared -m64 -o
 TARGET   := libnbiotcore.so
 endif
 ifeq ($(ARCH),x86_64-shared-debug)
 CXX      := g++
 CXXFLAGS := -m64 -std=c++0x -Wall -D DEBUG -g  -O0 -ggdb -fPIC
 LINKER   := g++
-LFLAGS   := -shared -o
+LFLAGS   := -shared -m64 -o
 TARGET   := libnbiotcore.so
 endif
 ifeq ($(ARCH),arm-cortex-m3)

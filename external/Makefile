@@ -81,7 +81,7 @@ ifeq ($(ARCH),x86-shared)
 CXX       := g++
 CXXFLAGS  := -m32 -std=c++0x -Wall -Os -fPIC
 LINKER    := g++
-LFLAGS    := -shared -o
+LFLAGS    := -shared -m32 -o
 STMTARGET := libstm.so
 MQTTSNTARGET := libmqttsnpaho.so
 endif
@@ -89,7 +89,7 @@ ifeq ($(ARCH),x86-debug-shared)
 CXX       := g++
 CXXFLAGS  := -m32 -std=c++0x -Wall -D DEBUG -g -O0 -fPIC -ggdb
 LINKER    := g++
-LFLAGS    := -shared -o
+LFLAGS    := -shared -m32 -o
 STMTARGET := libstm.so
 MQTTSNTARGET := libmqttsnpaho.so
 endif
@@ -101,7 +101,7 @@ ifeq ($(ARCH),x86_64-shared)
 CXX       := g++
 CXXFLAGS  := -m64 -std=c++0x -Wall -Os -fPIC
 LINKER    := g++
-LFLAGS    := -shared -o
+LFLAGS    := -shared -m64 -o
 STMTARGET := libstm.so
 MQTTSNTARGET := libmqttsnpaho.so
 endif
@@ -109,7 +109,7 @@ ifeq ($(ARCH),x86_64-shared-debug)
 CXX       := g++
 CXXFLAGS  := -m64 -std=c++0x -Wall -D DEBUG -g -O0 -fPIC -ggdb
 LINKER    := g++
-LFLAGS    := -shared -o
+LFLAGS    := -shared -m64 -o
 STMTARGET := libstm.so
 MQTTSNTARGET := libmqttsnpaho.o
 endif
