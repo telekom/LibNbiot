@@ -37,7 +37,7 @@ ifneq ($(notdir $(realpath $(CURDIR)/..)),$(BUILDDIR))
 include targets.mk
 else
 
-VPATH     := $(SRCDIR) $(INC) $(addprefix $(SRCDIR)/,MQTTSNPacket StateMachine List FP)
+VPATH     := $(SRCDIR) $(INC) $(addprefix $(SRCDIR)/,paho.mqtt-sn.embedded-c/MQTTSNPacket StateMachine List FP)
 # ... to here, unless you know what you are doing.
 
 
@@ -54,9 +54,9 @@ STMTARGET      := libstm.a
 
 LISTINCLUDES   := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/List -name "*.h")))
 
-MQTTSNOBJECTS  := $(subst $(SRCDIR)/MQTTSNPacket,,$(subst .c,.co,$(notdir $(shell find $(SRCDIR)/MQTTSNPacket -name "*.c"))))
-MQTTSNINCLUDES := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/MQTTSNPacket -name "*.h")))
-MQTTSNINCLUDES += $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/MQTTSNClient -name "*.h"))) 
+MQTTSNOBJECTS  := $(subst $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNPacket,,$(subst .c,.co,$(notdir $(shell find $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNPacket -name "*.c"))))
+MQTTSNINCLUDES := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNPacket -name "*.h")))
+MQTTSNINCLUDES += $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNClient -name "*.h"))) 
 MQTTSNTARGET   := libmqttsnPaho.a
 
 FPINCLUDES     := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/FP -name "*.h")))
@@ -145,8 +145,8 @@ $(MQTTSNTARGET): $(MQTTSNOBJECTS) $(MQTTSNINCLUDES)
 
 
 $(MQTTSNINCLUDES):
-	cp -f $(SRCDIR)/MQTTSNPacket/*.h $(INC)/.
-	cp -f $(SRCDIR)/MQTTSNClient/*.h $(INC)/.
+	cp -f $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNPacket/*.h $(INC)/.
+	cp -f $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNClient/*.h $(INC)/.
 
 
 $(STMTARGET): $(STMOBJECTS) $(STMINCLUDES)
