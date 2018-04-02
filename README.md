@@ -6,13 +6,13 @@ The repository contains the source code for the LibNbiot, which allows to access
 ## Building from command line
 
 The library relieas on [GNU Make](https://www.gnu.org/software/make/) as build system. After downloading it can
-be build by navigating into the toplevel directory and executing
+be build on any Unix by navigating into the toplevel directory and executing
 
     make
 
 This will envoke make in all subdirectories. Furthermore, the directories `lib` and `include` are created
 and the build results are copied into them. As the the build system supports multiple cross platform
-builds with a single invocation, the `lib` directory contains subdirectories which indicate the target
+builds with a single invocation (see below), the `lib` directory contains subdirectories which indicate the target
 platform.
 
 To cleanup up all build results perform:
@@ -22,6 +22,17 @@ To cleanup up all build results perform:
 The subdirectories contain dedicated makefiles which can be invoked individually. However, there are
 some cross dependencies which have to be met: `libNbiotCore` depends on `external` while `libNbiot` depends
 on both.
+
+### Building on Windows
+
+The makefiles supplied within the directory structure should work on Linux and MacOS. Additional versions
+for building on Windows can be found in the `utils` directory. To switch to Windows-makefiles, navigate to
+the utils folder and execute the `setup-win.bat` script. The script will exchange all makefiles in the directory
+tree by windows compatible versions. To switch back to the Unix-compliant versions, the bash script `setup-unix.sh`
+can be used (also in the `utils` directory).
+
+**Note:** A toolchain like MinGW or Cygwin needs to be installed to build on Windows. All the required programs
+(compiler, linker) need to be accessable by the system path.
 
 ### Cross platform builds
 
@@ -71,7 +82,7 @@ the section for building the debug version of the library for the ARM Cortex M3 
 It sets the compiler `(CXX)` and compiler flags `(CXXFLAGS)` to use for the build. These variables have to
 be set to values which suit the target enviroment. An important detail is the initial if-statement, where
 make checks the architecture. In this statement, `arm-cortex-m3-debug` defines the name of the target
-environment. If the very same name is added to the PLATFORMS entry at the beginning of the makefile, the
+environment. If the very same name is added to the `PLATFORMS` entry at the beginning of the makefile, the
 target is activated and the sources are build for this platform as well.
 
 The same statemant has to be added to all makefiles which actually compile and link code. This is necessary
@@ -113,7 +124,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
