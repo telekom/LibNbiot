@@ -1,4 +1,4 @@
-# LibNbiot - Cloud of Things by NB-IoT
+# LibNbiot - A non-blocking MQTT-SN Library for NB-IoT
 
 The repository contains the source code for the LibNbiot, which allows to access the
 **Telekom Cloud of Things** with **NB-IoT** radio modules.
