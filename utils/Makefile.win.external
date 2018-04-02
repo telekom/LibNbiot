@@ -1,5 +1,5 @@
 #############################################################################
-# LibNbiot: Makefile for building: libnbiot.a
+# LibNbiot: Makefile for building: libstm.a and libmqttsnpaho.a
 #
 # Copyright (c) 2018, Edgar Hindemith, Yassine Amraue, Thorsten
 # Krautscheid, Kolja Vornholt, T-Systems International GmbH
@@ -12,13 +12,14 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
 # See the License for the specific language governing permissions and
+# limitations under the License.
 #############################################################################
 
 # Define any target platforms here. Only targets defined here will be build.
 # Don't forget to add appropriate cases below.
-# PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug
+# PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortex-m3 arm-cortex-m3-debug
 PLATFORMS := default
 
 
@@ -43,8 +44,8 @@ VPATH     := $(SRCDIR) $(INC) $(addprefix $(SRCDIR)/,paho.mqtt-sn.embedded-c/MQT
 
 # Variable definitions.
 INCLUDES  := $(addprefix -I ,$(VPATH)) -I $(COREINC)
-AR        := ar cq
-ARFLAGS   := 
+AR        := ar
+ARFLAGS   := cq
 LINKER    := $(AR)
 LFLAGS    := $(ARFLAGS)
 
@@ -57,7 +58,7 @@ LISTINCLUDES   := $(subst src\List,include,$(shell dir /b/s "$(SRCDIR)\List\*.h"
 MQTTSNOBJECTS  := $(subst $(SRCDIR)\paho.mqtt-sn.embedded-c\MQTTSNPacket,,$(subst .c,.co,$(notdir $(shell dir /b "$(SRCDIR)\paho.mqtt-sn.embedded-c\MQTTSNPacket\*.c"))))
 MQTTSNINCLUDES := $(subst src\paho.mqtt-sn.embedded-c\MQTTSNPacket,include,$(shell dir /b/s "$(SRCDIR)\paho.mqtt-sn.embedded-c\MQTTSNPacket\*.h"))
 MQTTSNINCLUDES += $(subst src\paho.mqtt-sn.embedded-c\MQTTSNClient,include,$(shell dir /b/s "$(SRCDIR)\paho.mqtt-sn.embedded-c\MQTTSNClient\*.h")) 
-MQTTSNTARGET   := libmqttsnPaho.a
+MQTTSNTARGET   := libmqttsnpaho.a
 
 FPINCLUDES     := $(shell dir /b/s "$(SRCDIR)\FP\*.h"))
 
@@ -80,15 +81,13 @@ ifeq ($(ARCH),x86-shared)
 CXX       := g++
 CXXFLAGS  := -m32 -std=c++0x -Wall -Os -fPIC
 LINKER    := g++
-LFLAGS    := -shared -o
-TARGET    := libnbiot.so
+LFLAGS    := -shared -m32 -o
 endif
 ifeq ($(ARCH),x86-debug-shared)
 CXX       := g++
 CXXFLAGS  := -m32 -std=c++0x -Wall -D DEBUG -g -O0 -fPIC -ggdb
 LINKER    := g++
-LFLAGS    := -shared -o
-TARGET    := libnbiot.so
+LFLAGS    := -shared -m32 -o
 endif
 ifeq ($(ARCH),x86_64)
 CXX       := g++
@@ -98,26 +97,24 @@ ifeq ($(ARCH),x86_64-shared)
 CXX       := g++
 CXXFLAGS  := -m64 -std=c++0x -Wall -Os -fPIC
 LINKER    := g++
-LFLAGS    := -shared -o
-TARGET    := libnbiot.so
+LFLAGS    := -shared -m64 -o
 endif
 ifeq ($(ARCH),x86_64-shared-debug)
 CXX       := g++
 CXXFLAGS  := -m64 -std=c++0x -Wall -D DEBUG -g -O0 -fPIC -ggdb
 LINKER    := g++
-LFLAGS    := -shared -o
-TARGET    := libnbiot.so
+LFLAGS    := -shared -m64 -o
 endif
 ifeq ($(ARCH),x86_64-debug)
 CXX       := g++
 CXXFLAGS  := -m64 -std=c++0x -Wall -D DEBUG -g -O0 -ggdb
 endif
-ifeq ($(ARCH),arm-cortx-m3)
+ifeq ($(ARCH),arm-cortex-m3)
 CXX       := arm-none-eabi-gcc
 CXXFLAGS  := -mcpu=cortex-m3 -mthumb -Wa,-alh=nbiot_time.lst \
   -g -Wall -ffunction-sections -Os -ffat-lto-objects -std=c++0x
 endif
-ifeq ($(ARCH),arm-cortx-m3-debug)
+ifeq ($(ARCH),arm-cortex-m3-debug)
 CXX       := arm-none-eabi-gcc
 CXXFLAGS  := -mcpu=cortex-m3 -mthumb -Wa,-alh=nbiot_time.lst \
   -g -Wall -ffunction-sections -D DEBUG -g -O0 -ffat-lto-objects -std=c++0x -ggdb
