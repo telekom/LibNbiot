@@ -5,3 +5,5 @@ build/**
 external/build/**
 external/lib/**
 external/include/**
+examples/build/**
+examples/bin/**
