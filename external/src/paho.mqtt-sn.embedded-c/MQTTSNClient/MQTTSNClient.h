@@ -12,6 +12,7 @@
  *
  * Contributors:
  *    Ian Craggs - initial API and implementation and/or initial documentation
+ *    Edgar Hindemith - adjustments, code clean-up and removal of non used methods
  *******************************************************************************/
 
 #if !defined(MQTTSNCLIENT_H)

@@ -12,6 +12,7 @@
  *
  * Contributors:
  *    Ian Craggs - initial API and implementation and/or initial documentation
+ *    Kolja Vornholt - small bug fixed, missing dereference
  *******************************************************************************/
 
 #include "MQTTSNPacket.h"
@@ -116,7 +117,7 @@ int MQTTSNDeserialize_gwinfo(unsigned char* gatewayid, unsigned short* gatewayad
 	*gatewayid = readChar(&curdata);
 
 	*gatewayaddress_len = enddata - curdata;
-	*gatewayaddress = (gatewayaddress_len > 0) ? curdata : NULL;
+	*gatewayaddress = (*gatewayaddress_len > 0) ? curdata : NULL;
 
 	rc = 1;
 exit:
