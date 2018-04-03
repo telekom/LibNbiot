@@ -151,11 +151,14 @@ void subscriptionHandler(MessageData* msg)
 }
 
 
-void init()
+unsigned char init()
 {
+	unsigned int retCoreConf = CoreNoError;
+	unsigned int retConf = NoError;
+
     setDebugWriteFunction(dbgWrite);
 
-    pSerCom = new SerialCom("/dev/ttyUSB0");
+    pSerCom = new SerialCom("/dev/tty.usbserial-FTA34780");
     pSerCom->connect();
   
     NbiotCoreConf core_conf;
@@ -171,7 +174,7 @@ void init()
     core_conf.imsi = "111111111112345";
     core_conf.imsiPwd = "thorsten";
 
-    nbiotCoreConfig(&core_conf);
+    retCoreConf = nbiotCoreConfig(&core_conf);
 
     NbiotConf conf;
     conf.keepAliveInterval = 10000;
@@ -180,11 +183,21 @@ void init()
     conf.gateway = "172.25.102.151";
     conf.port = 1883;
     conf.notify_fu = notificationHandler;
+    conf.pollInterval = 1000;
     
-    nbiotConfig(&conf);
+    retConf = nbiotConfig(&conf);
 
-    // Setup the statemachine, initialize internal varibles.
-    nbiotStart();
+	if (retConf==0 && (retCoreConf==0 || (retCoreConf == CoreWarnApnPwd) || (retCoreConf == CoreWarnApnUser) || (retCoreConf == (CoreWarnApnPwd | CoreWarnApnUser))))
+	{
+		// Setup the statemachine, initialize internal varibles.
+		unsigned char ret = nbiotStart();
+		return ret;
+	}
+	else
+	{
+		return 0;
+	}
+
 }
 
 
@@ -194,10 +207,11 @@ int main(int argc, char** argv) {
     std::thread* ticker =  new std::thread(invokeTick);
 
     // Initialize library
-    init();
+    unsigned char retInit=init();
 
     std::atomic<NbiotResult> rc(LC_Pending);
-    while(true)
+
+    while(true && retInit)
     {
         if (isNbiotConnected())
 	{	  
