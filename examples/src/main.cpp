@@ -16,6 +16,7 @@ extern SerialCom *pSerCom;
 
 
 void dbgWrite(const unsigned char *data, unsigned short len) {
+
     for (int i = 0; i < len; ++i) {
         putchar(static_cast<int>(data[i]));
     }
@@ -66,7 +67,7 @@ void notificationHandler(const Notification *n)
     std::cout << std::setfill(' ');
 
     std::cout << std::setw(12)
-	      << "\033[0;32m[----------]\033[0m "
+	      << "\033[0;34m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "State:"
@@ -74,7 +75,7 @@ void notificationHandler(const Notification *n)
               << std::endl;
     
     std::cout << std::setw(12)
-	      << "\033[0;32m[----------]\033[0m "
+	      << "\033[0;34m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "Action:"
@@ -82,7 +83,7 @@ void notificationHandler(const Notification *n)
 	      << std::endl;
     
     std::cout << std::setw(12)
-	      << "\033[0;32m[----------]\033[0m "
+	      << "\033[0;34m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "ReturnCode:"
@@ -90,7 +91,7 @@ void notificationHandler(const Notification *n)
 	      << std::endl;
     
     std::cout << std::setw(12)
-	      << "\033[0;32m[----------]\033[0m "
+	      << "\033[0;34m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "ErrorNumber:"
@@ -118,7 +119,7 @@ void subscriptionHandler(MessageData* msg)
 
     std::cout << std::setfill(' ');
     std::cout << std::setw(12)
-	      << "\033[0;32m[----------]\033[0m "
+	      << "\033[0;33m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "QoS:"
@@ -126,7 +127,7 @@ void subscriptionHandler(MessageData* msg)
 	      << std::endl;
     
     std::cout << std::setw(12)
-	      << "\033[0;32m[----------]\033[0m "
+	      << "\033[0;33m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "Id:"
@@ -134,7 +135,7 @@ void subscriptionHandler(MessageData* msg)
 	      << std::endl;
     
     std::cout << std::setw(12)
-	      << "\033[0;32m[----------]\033[0m "
+	      << "\033[0;33m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "Payload:"
@@ -142,7 +143,7 @@ void subscriptionHandler(MessageData* msg)
 	      << std::endl;
     
     std::cout << std::setw(12)
-	      << "\033[0;32m[----------]\033[0m "
+	      << "\033[0;33m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "Topic:"
@@ -153,8 +154,6 @@ void subscriptionHandler(MessageData* msg)
 
 unsigned char init()
 {
-	unsigned int retCoreConf = CoreNoError;
-	unsigned int retConf = NoError;
 
     setDebugWriteFunction(dbgWrite);
 
@@ -174,7 +173,7 @@ unsigned char init()
     core_conf.imsi = "111111111112345";
     core_conf.imsiPwd = "thorsten";
 
-    retCoreConf = nbiotCoreConfig(&core_conf);
+    unsigned int retCoreConf = nbiotCoreConfig(&core_conf);
 
     NbiotConf conf;
     conf.keepAliveInterval = 10000;
@@ -185,18 +184,39 @@ unsigned char init()
     conf.notify_fu = notificationHandler;
     conf.pollInterval = 1000;
     
-    retConf = nbiotConfig(&conf);
+    unsigned int retConf = nbiotConfig(&conf);
+	unsigned char ret=0;
 
-	if (retConf==0 && (retCoreConf==0 || (retCoreConf == CoreWarnApnPwd) || (retCoreConf == CoreWarnApnUser) || (retCoreConf == (CoreWarnApnPwd | CoreWarnApnUser))))
+	if (retConf==NoError && !(~(CoreWarnApnUser | CoreWarnApnPwd) & retCoreConf))
 	{
 		// Setup the statemachine, initialize internal varibles.
-		unsigned char ret = nbiotStart();
-		return ret;
+		ret=pSerCom->isConnected()?nbiotStart():0;
 	}
 	else
 	{
-		return 0;
+		ret=0;
 	}
+
+	if (ret==1)
+	{
+		std::cout << std::setw(12)
+				  << "\033[0;32m[ Debug    ]\033[0m "
+				  << std::setw(14)
+				  << std::left
+				  << "\033[0;32mInit Successfull\033[0m "
+				  << std::endl;
+	} else
+	{
+		std::cout << std::setw(12)
+				  << "\033[0;31m[ Debug    ]\033[0m "
+				  << std::setw(14)
+				  << std::left
+				  << "\033[0;31mInit Error\033[0m "
+				  << std::endl;
+	}
+
+
+	return ret;
 
 }
 
