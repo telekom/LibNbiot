@@ -9,7 +9,12 @@
 #include <thread>
 #include <iostream>
 #include <iomanip>
-#include <atomic>
+#include <cstring>
+#include <cstdlib>
+
+// Unix
+#include <getopt.h>
+#include <unistd.h>
 
 
 extern SerialCom *pSerCom;
@@ -99,6 +104,7 @@ void notificationHandler(const Notification *n)
 	      << std::endl;
 }
 
+
 bool messageArrived = false;
 int message_counter = 0;
 void subscriptionHandler(MessageData* msg)
@@ -152,12 +158,11 @@ void subscriptionHandler(MessageData* msg)
 }
 
 
-unsigned char init()
+unsigned char init(char* imsi, char* pw, char* ser)
 {
-
     setDebugWriteFunction(dbgWrite);
 
-    pSerCom = new SerialCom("/dev/tty.usbserial-FTA34780");
+    pSerCom = new SerialCom(ser);
     pSerCom->connect();
   
     NbiotCoreConf core_conf;
@@ -170,8 +175,8 @@ unsigned char init()
     core_conf.apnUser = "";
     core_conf.apnPwd = "";
     core_conf.operMccMnc = "26201";
-    core_conf.imsi = "111111111112345";
-    core_conf.imsiPwd = "thorsten";
+    core_conf.imsi = imsi;
+    core_conf.imsiPwd = pw;
 
     unsigned int retCoreConf = nbiotCoreConfig(&core_conf);
 
@@ -221,15 +226,80 @@ unsigned char init()
 }
 
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
+
+    char* imsi = nullptr;
+    char* pw = nullptr;
+    char* ser = nullptr;
+
+    int c = -1;
+    while((c = getopt (argc, argv, "i:p:s:")) != -1)
+    {
+        switch(c)
+	{
+	    case 'i':
+	    {
+		imsi = optarg;
+		if(15 == strlen(imsi))
+		{
+		    std::cout << "imsi: " << imsi << std::endl;
+		}
+		else
+		{
+		    std::cerr << "imsi: invalid value (imsi has to be of length 15) - aborting" << std::endl;
+		    imsi = nullptr;
+		}
+		break;
+	    }
+	    case 'p':
+	    {
+		pw = optarg;
+		if(8 == strlen(pw))
+		{
+		    std::cout << "pw: " << pw << std::endl;
+		}
+		else
+		{
+		    std::cerr << "pw: invalid value (pw has to be of length 8) - aborting" << std::endl;
+		    pw = nullptr;
+		}
+		break;
+	    }
+	    case 's':
+	    {
+		ser = optarg;
+		if(-1 != access(ser, F_OK))
+		{
+		    std::cout << "serial: " << ser << std::endl;
+		}
+		else
+		{
+		    std::cerr << "serial: no device node with path \"" << ser << " exists - aborting" << std::endl;
+		    ser = nullptr;
+		}
+		break;
+	    }
+	    default:
+		std::cout << "skipping unsupported option: " << c << std::endl;
+	        break;
+	}
+    }
+
+    if(nullptr == imsi || nullptr == pw || nullptr == ser)
+    {
+	exit(EXIT_FAILURE);
+    }
+  
 
     // Start timer thread.
     std::thread* ticker =  new std::thread(invokeTick);
+    
 
     // Initialize library
-    unsigned char retInit=init();
+    unsigned char retInit=init(imsi, pw, ser);
 
-    std::atomic<NbiotResult> rc(LC_Pending);
+    NbiotResult rc = LC_Pending;
 
     while(true && retInit)
     {
