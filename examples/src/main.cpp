@@ -125,7 +125,7 @@ void subscriptionHandler(MessageData* msg)
 
     std::cout << std::setfill(' ');
     std::cout << std::setw(12)
-	      << "\033[0;33m[----------]\033[0m "
+	      << "\033[0;35m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "QoS:"
@@ -133,7 +133,7 @@ void subscriptionHandler(MessageData* msg)
 	      << std::endl;
     
     std::cout << std::setw(12)
-	      << "\033[0;33m[----------]\033[0m "
+	      << "\033[0;35m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "Id:"
@@ -141,7 +141,7 @@ void subscriptionHandler(MessageData* msg)
 	      << std::endl;
     
     std::cout << std::setw(12)
-	      << "\033[0;33m[----------]\033[0m "
+	      << "\033[0;35m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "Payload:"
@@ -149,7 +149,7 @@ void subscriptionHandler(MessageData* msg)
 	      << std::endl;
     
     std::cout << std::setw(12)
-	      << "\033[0;33m[----------]\033[0m "
+	      << "\033[0;35m[----------]\033[0m "
 	      << std::setw(14)
 	      << std::left
 	      << "Topic:"
