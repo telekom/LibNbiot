@@ -8,8 +8,6 @@
 
 bool SerialCom::connect() {
 
-    std::cout << "connecting" << std::endl;
-  
     if (!m_deviceName.empty()) {
         int flags = O_RDWR | O_NDELAY;// | O_NONBLOCK;
         m_fd = open(m_deviceName.c_str(), flags);
@@ -21,7 +19,6 @@ bool SerialCom::connect() {
             m_isConnected = false;
         }
     }
-    std::cout << "is connected: " << m_isConnected << std::endl;
     return m_isConnected;
 }
 
