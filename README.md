@@ -115,8 +115,59 @@ The reason for this is usually, that the GCC multilib feature is enabled, which 
 * SLES/OpenSUSE:  
 `zypper in glibc-devel-32bit`  
 
+## Example usage
 
-### License
+The library comes with an example for Unix-systems. It has been tested on Ubuntu 16.04+ and MacOS 10.13.1. It
+illustrates basic use cases for communication with the **Telekom Cloud of Things** by sending generated temperature
+values in an infinite loop.
+
+### Building
+
+To build the example, the library has to be compiled with `PLATFORM` containing the `default` architecture (see:
+*Cross platfrom builds*, above). After this navigate to the `examples` directory and execute:
+
+    make
+
+This creates the `bin` folder which contains the example executable.
+
+### Running the example
+
+The example requires three parameters to run:
+* -i ***IMSI***, a 15-digit IMSI which is registered for the Telekom Cloud of Things
+* -p ***password***, the 8-characters password distributed with IMSI for Telekom Cloud Things access
+* -s ***serial node***, path to the serial device node (e.g. /devttyACM0).
+
+The example can then be started from the `examples` folder by executing:
+
+    ./bin/examples -i "imsi" -p "pw" -s "path to serial node"
+
+**Note:** Access to serial device nodes may require special privileges, especially on Linux. You can
+either run the program as root, by using the above program with `sudo`, add your user to the group `dialout`
+or configure a `udev/hotplug` rule to add the serial device node to your users group. The best solution depends
+on the exact environment you are using.
+
+#### Sending downlink operations
+
+The example is prepared to receive downlink operations from your Telekom Cloud of Things account. For this, find
+your device in the Telekom Cloud of Things and send a shell-command. The command must have the structure:
+
+    topic:MyCmd;data:1234
+
+the topic `MyCmd` is configured in the example and should not be changed. The data `1234` can be changed to any string,
+however it should be short enough to fit into a MQTT-SN message. 
+
+The example program should be already running and the module should be in an attached state. So best wait, until some
+temperature measurements have arrived in the Cloud. The state of the operation should change from **Pending** to
+**Executing** to **Successful**. Before it changes from **Executing** to **Successful** a notification (new message)
+should be presented by the running example program, similar to this:
+
+    [ DEBUG    ] ----- New message 001 -----
+    [----------] QoS:          1
+    [----------] Id:           1
+    [----------] Payload:      1234
+    [----------] Topic:        NBIoT/111111111112345/CMD/MyCmd
+
+## License
 
 Copyright (C) 2018, Edgar Hindemith, Yassine Amraue, Thorsten Krautscheid, Kolja Vornholt, T-Systems International GmbH
 
