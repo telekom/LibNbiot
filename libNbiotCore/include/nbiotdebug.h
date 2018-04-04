@@ -21,7 +21,7 @@
 #ifndef NBIOTDEBUG_H
 #define NBIOTDEBUG_H
 
-#define DEBUG /*!< global debugging output on or off */
+//#define DEBUG /*!< global debugging output on or off */
 #define DEBUGLINE_LENGTH (256u) /*!< maximum length of a single debugging output line */
 #ifdef DEBUG
 
@@ -41,10 +41,10 @@
 #undef DEBUG_ATCOMMANDS
 
 #define DEBUG_MODEM /*!< debugging output for the classes NbiotModemTools and NbiotConnectivity */
-// #undef DEBUG_MODEM
+#undef DEBUG_MODEM
 
 #define DEBUG_MQTT /*!< debugging output for LibNbiot classes */
-// #undef DEBUG_MQTT
+//#undef DEBUG_MQTT
 
 #define DEBUG_STRING /*!< debugging output for the nbiot::string class */
 #undef DEBUG_STRING
