@@ -54,9 +54,9 @@ private:
     SerialSettings m_settings;
 };
 
-//#ifdef __cplusplus
-//extern "C" {
-//#endif
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 unsigned char readByte();
 
@@ -66,9 +66,9 @@ void writeByte(unsigned char byte);
 
 WriteStatus writeStatus();
 
-//#ifdef __cplusplus
-//}
-//#endif
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SERIALCOM_
 
