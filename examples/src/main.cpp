@@ -244,53 +244,53 @@ int main(int argc, char** argv)
   char* ser = nullptr;
 
   int c = -1;
-  while((c = getopt (argc, argv, "i:p:s:")) != -1)
+  while((c = getopt(argc, argv, "hi:p:s:")) != -1)
   {
       switch(c)
       {
       case 'i':
-	{
-	    imsi = optarg;
-	    if(15 == strlen(imsi))
-	    {
-		std::cout << std::setw(12)
-			  << "\033[0;32m[ Debug    ]\033[0m "
-			  << std::setw(14)
-			  << std::left		
-			  << "imsi: " << imsi << std::endl;
-	    }
-	    else
-	    {
-		std::cerr << std::setw(12)
-			  << "\033[0;31m[ Debug    ]\033[0m "
-			  << std::setw(14)
-			  << std::left << "imsi: invalid value (imsi has to be of length 15) - aborting" << std::endl;
-		imsi = nullptr;
-	    }
-	    break;
-	}
+      {
+	  imsi = optarg;
+	  if(15 == strlen(imsi))
+	  {
+	      std::cout << std::setw(12)
+			<< "\033[0;32m[ Debug    ]\033[0m "
+			<< std::setw(14)
+			<< std::left		
+			<< "imsi: " << imsi << std::endl;
+	  }
+	  else
+	  {
+	      std::cerr << std::setw(12)
+			<< "\033[0;31m[ Debug    ]\033[0m "
+			<< std::setw(14)
+			<< std::left << "imsi: invalid value (imsi has to be of length 15) - aborting" << std::endl;
+	      imsi = nullptr;
+	  }
+	  break;
+      }
       case 'p':
-	{
-	    pw = optarg;
-	    if(8 == strlen(pw))
-	    {
-		std::cout << std::setw(12)
-			  << "\033[0;32m[ Debug    ]\033[0m "
-			  << std::setw(14)
-			  << std::left				
-			  << "pw: " << pw << std::endl;
-	    }
-	    else
-	    {
-		std::cerr << std::setw(12)
-			  << "\033[0;31m[ Debug    ]\033[0m "
-			  << std::setw(14)
-			  << std::left		
-			  << "pw: invalid value (pw has to be of length 8) - aborting" << std::endl;
-		pw = nullptr;
-	    }
-	    break;
-	}
+      {
+	  pw = optarg;
+	  if(8 == strlen(pw))
+	  {
+	      std::cout << std::setw(12)
+			<< "\033[0;32m[ Debug    ]\033[0m "
+			<< std::setw(14)
+			<< std::left				
+			<< "pw: " << pw << std::endl;
+	  }
+	  else
+	  {
+	      std::cerr << std::setw(12)
+			<< "\033[0;31m[ Debug    ]\033[0m "
+			<< std::setw(14)
+			<< std::left		
+			<< "pw: invalid value (pw has to be of length 8) - aborting" << std::endl;
+	      pw = nullptr;
+	  }
+	  break;
+      }
       case 's':
       {
 	  ser = optarg;
