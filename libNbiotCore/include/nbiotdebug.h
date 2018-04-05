@@ -21,7 +21,8 @@
 #ifndef NBIOTDEBUG_H
 #define NBIOTDEBUG_H
 
-//#define DEBUG /*!< global debugging output on or off */
+#define DEBUG /*!< global debugging output on or off */
+#undef DEBUG
 #define DEBUGLINE_LENGTH (256u) /*!< maximum length of a single debugging output line */
 #ifdef DEBUG
 
