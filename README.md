@@ -135,7 +135,7 @@ This creates the `bin` folder which contains the example executable.
 The example requires three parameters to run:
 * -i ***IMSI***, a 15-digit IMSI which is registered for the Telekom Cloud of Things
 * -p ***password***, the 8-characters password distributed with IMSI for Telekom Cloud Things access
-* -s ***serial node***, path to the serial device node (e.g. /devttyACM0).
+* -s ***serial node***, path to the serial device node (e.g. /dev/ttyACM0).
 
 The example can then be started from the `examples` folder by executing:
 
