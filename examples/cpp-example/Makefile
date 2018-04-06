@@ -33,12 +33,12 @@ BINDIR   := bin
 CXX      := g++
 CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb
 LDFLAGS  := -lnbiot -lstm -lmqttsnpaho -lnbiotcore -pthread
-INCLUDES := ../include
-LIB      := $(CURDIR)/../lib/default
+INCLUDES := ../../include
+LIB      := $(CURDIR)/../../lib/default
 
 
 # Binary target
-TARGET   := $(BINDIR)/example
+TARGET   := $(BINDIR)/cpp-example
 
 
 # Targets
