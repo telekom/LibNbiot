@@ -1,3 +1,23 @@
+/* ========================================================================
+ * LibNbiot: main.cpp
+ *
+ * Copyright (c) 2018, Edgar Hindemith, Yassine Amraue, Thorsten
+ * Krautscheid, Kolja Vornholt, T-Systems International GmbH
+ * contact: libnbiot@t-systems.com, opensource@telekom.de
+ *
+ * This file is distributed under the conditions of the Apache License,
+ * Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * For details see the file LICENSE at the toplevel.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ========================================================================
+*/
+
 // Project 
 #include "libnbiot.h"
 #include "libnbiotcore.h"
@@ -244,53 +264,53 @@ int main(int argc, char** argv)
   char* ser = nullptr;
 
   int c = -1;
-  while((c = getopt (argc, argv, "i:p:s:")) != -1)
+  while((c = getopt(argc, argv, "hi:p:s:")) != -1)
   {
       switch(c)
       {
       case 'i':
-	{
-	    imsi = optarg;
-	    if(15 == strlen(imsi))
-	    {
-		std::cout << std::setw(12)
-			  << "\033[0;32m[ Debug    ]\033[0m "
-			  << std::setw(14)
-			  << std::left		
-			  << "imsi: " << imsi << std::endl;
-	    }
-	    else
-	    {
-		std::cerr << std::setw(12)
-			  << "\033[0;31m[ Debug    ]\033[0m "
-			  << std::setw(14)
-			  << std::left << "imsi: invalid value (imsi has to be of length 15) - aborting" << std::endl;
-		imsi = nullptr;
-	    }
-	    break;
-	}
+      {
+	  imsi = optarg;
+	  if(15 == strlen(imsi))
+	  {
+	      std::cout << std::setw(12)
+			<< "\033[0;32m[ Debug    ]\033[0m "
+			<< std::setw(14)
+			<< std::left		
+			<< "imsi: " << imsi << std::endl;
+	  }
+	  else
+	  {
+	      std::cerr << std::setw(12)
+			<< "\033[0;31m[ Debug    ]\033[0m "
+			<< std::setw(14)
+			<< std::left << "imsi: invalid value (imsi has to be of length 15) - aborting" << std::endl;
+	      imsi = nullptr;
+	  }
+	  break;
+      }
       case 'p':
-	{
-	    pw = optarg;
-	    if(8 == strlen(pw))
-	    {
-		std::cout << std::setw(12)
-			  << "\033[0;32m[ Debug    ]\033[0m "
-			  << std::setw(14)
-			  << std::left				
-			  << "pw: " << pw << std::endl;
-	    }
-	    else
-	    {
-		std::cerr << std::setw(12)
-			  << "\033[0;31m[ Debug    ]\033[0m "
-			  << std::setw(14)
-			  << std::left		
-			  << "pw: invalid value (pw has to be of length 8) - aborting" << std::endl;
-		pw = nullptr;
-	    }
-	    break;
-	}
+      {
+	  pw = optarg;
+	  if(8 == strlen(pw))
+	  {
+	      std::cout << std::setw(12)
+			<< "\033[0;32m[ Debug    ]\033[0m "
+			<< std::setw(14)
+			<< std::left				
+			<< "pw: " << pw << std::endl;
+	  }
+	  else
+	  {
+	      std::cerr << std::setw(12)
+			<< "\033[0;31m[ Debug    ]\033[0m "
+			<< std::setw(14)
+			<< std::left		
+			<< "pw: invalid value (pw has to be of length 8) - aborting" << std::endl;
+	      pw = nullptr;
+	  }
+	  break;
+      }
       case 's':
       {
 	  ser = optarg;

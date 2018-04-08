@@ -1,5 +1,5 @@
 #############################################################################
-# LibNbiot: Makefile for building Telekom nbiot libraries
+# LibNbiot: Makefile for building libnbiot examples
 #
 # Copyright (c) 2018, Edgar Hindemith, Yassine Amraue, Thorsten
 # Krautscheid, Kolja Vornholt, T-Systems International GmbH
@@ -12,54 +12,20 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #############################################################################
 
 
-# Prerequisites: Run "make" in the toplevel directory to build the libraries
-# first. The PLATFORM type "default" has to be enabled. See README.md for
-# further details.
+.PHONY: clean all
 
 
-# Directories
-SRCDIR   := src
-BUILDDIR := build
-BINDIR   := bin
-
-
-# Compiler and linker settings
-CXX      := g++
-CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb
-LDFLAGS  := -lnbiot -lstm -lmqttsnpaho -lnbiotcore -pthread
-INCLUDES := ../include
-LIB      := $(CURDIR)/../lib/default
-
-
-# Binary target
-TARGET   := $(BINDIR)/example
-
-
-# Targets
-.PHONY: clean directories
-
-
-all: $(TARGET)
-
-
-$(TARGET): directories $(BUILDDIR)/main.o $(BUILDDIR)/serialcom.o
-	$(CXX) $(BUILDDIR)/main.o $(BUILDDIR)/serialcom.o -L $(LIB) $(LDFLAGS) -o $(TARGET)
-
-
-$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) -c $(CXXFLAGS) -I $(INCLUDES) -I $(SRCDIR) $< -o $@
-
-
-directories:
-	mkdir -p build
-	mkdir -p bin
+all:
+	$(MAKE) -C c-example
+	$(MAKE) -C cpp-example
 
 clean:
-	rm -rf build
-	rm -rf bin
+	$(MAKE) clean -C c-example
+	$(MAKE) clean -C cpp-example
+

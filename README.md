@@ -117,29 +117,39 @@ The reason for this is usually, that the GCC multilib feature is enabled, which 
 
 ## Example usage
 
-The library comes with an example for Unix-systems. It has been tested on Ubuntu 16.04+ and MacOS 10.13.1. It
-illustrates basic use cases for communication with the **Telekom Cloud of Things** by sending generated temperature
-values in an infinite loop.
+The library comes with two examples for Unix-systems. More examples for different platforms will be added in the future.
+They have been tested on Ubuntu 16.04+ and MacOS 10.13.1.
+
+The examples are located at `examples\c-example` and `cpp-example`. The c-example
+illustrates the usage in a plain 'C' environment, while the cpp-example makes use of features unique to 'C++'. 
+
+Both examples illustrate basic use cases for communication with the **Telekom Cloud of Things**
+by sending generated temperature values in an infinite loop.
 
 ### Building
 
-To build the example, the library has to be compiled with `PLATFORM` containing the `default` architecture (see:
+To build the examples, the library has to be compiled with `PLATFORM` containing the `default` architecture (see:
 *Cross platfrom builds*, above). After this navigate to the `examples` directory and execute:
 
     make
 
-This creates the `bin` folder which contains the example executable.
+This creates the `c-example\bin` and `cpp-example\bin` directories which contain the example executables.
+
 
 ### Running the example
 
 The example requires three parameters to run:
 * -i ***IMSI***, a 15-digit IMSI which is registered for the Telekom Cloud of Things
 * -p ***password***, the 8-characters password distributed with IMSI for Telekom Cloud Things access
-* -s ***serial node***, path to the serial device node (e.g. /devttyACM0).
+* -s ***serial node***, path to the serial device node (e.g. /dev/ttyACM0).
 
 The example can then be started from the `examples` folder by executing:
 
-    ./bin/examples -i "imsi" -p "pw" -s "path to serial node"
+    ./c-example/bin/c-example -i "imsi" -p "pw" -s "path to serial node"
+
+similarly the cpp-example can be executed:
+
+    ./cpp-example/bin/cpp-example -i "imsi" -p "pw" -s "path to serial node"
 
 **Note:** Access to serial device nodes may require special privileges, especially on Linux. You can
 either run the program as root, by using the above program with `sudo`, add your user to the group `dialout`
@@ -179,6 +189,6 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
