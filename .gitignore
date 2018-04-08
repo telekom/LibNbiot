@@ -7,3 +7,7 @@ external/lib/**
 external/include/**
 examples/build/**
 examples/bin/**
+libNbiot/build/**
+libNbiot/lib/**
+libNbiotCore/build/**
+libNbiotCore/lib/**
