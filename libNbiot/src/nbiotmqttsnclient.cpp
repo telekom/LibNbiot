@@ -505,7 +505,7 @@ bool NbiotMqttSnClient::doPubLoop(int& loopTime)
 {
     bool ret = true;
 
-    if(QOS0 == m_qos)
+    if(QOS0 == static_cast<QoS>(m_qos))
     {
         ret = false;
     }
@@ -524,7 +524,7 @@ bool NbiotMqttSnClient::finishPubLoop(int& loopTime)
 {
     bool ret = true;
 
-    if((QOS0 != m_qos))
+    if((QOS0 != static_cast<QoS>(m_qos)))
     {
         if(0 == loopTime)
         {

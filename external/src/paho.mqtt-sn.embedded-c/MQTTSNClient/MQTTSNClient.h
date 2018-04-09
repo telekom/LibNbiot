@@ -195,7 +195,7 @@ public:
 
 protected:
 
-    constexpr int getMaxPacketSize(){
+    constexpr int getMaxPacketSize() const {
         return MAX_PACKET_SIZE;
     }
 
