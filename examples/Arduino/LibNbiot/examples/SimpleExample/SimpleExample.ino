@@ -189,9 +189,6 @@ unsigned char retInit=0;
 const char topicCmd[32];
 const char topicInf[32];
 const char topicTemp[32];
-const char topicVolt[32];
-const char topicAcc[32];
-const char topicLight[32];
 char payload[11];
 
 void setup() {
@@ -210,12 +207,6 @@ void setup() {
     sprintf(topicInf, "NBIoT/%s/INF/MyCmd", imsi);
 
     sprintf(topicTemp, "NBIoT/%s/MES/1", imsi);
-    
-    sprintf(topicVolt, "NBIoT/%s/MES/2", imsi);
-
-    sprintf(topicAcc, "NBIoT/%s/MES/3", imsi);
-
-    sprintf(topicLight, "NBIoT/%s/MES/4", imsi);
 
     // Initialize library
     retInit = init(imsi, pw);
@@ -245,35 +236,13 @@ while(retInit)
                 }
                 else
                 {
-                    int sensor = getSensorValue();
-                    sprintf(payload, "%d", sensor);
+
+                    sprintf(payload, "%d", getSensorValue());
 
                     debugPrintf("[ DEBUG    ] ");
                     debugPrintf("Publish: %s\r\n", payload);
-                    
-                    switch(sensor%4)
-                    {
-                      case 0: 
-                        debugPrintf("case0");
-                        nbiotPublish(topicTemp, payload, strlen(payload), QOS0);
-                        break;
-                      case 1:
-                        debugPrintf("case1");
-                        nbiotPublish(topicVolt, payload, strlen(payload), QOS0);
-                        break;
-                      case 2:
-                        debugPrintf("case2");
-                        nbiotPublish(topicAcc, payload, strlen(payload), QOS0);
-                        break;
-                      case 3:
-                        debugPrintf("case3");
-                        nbiotPublish(topicLight, payload, strlen(payload), QOS0);
-                        break;
-                    }
-                    //sprintf(payload, "%d", getSensorValue());
 
-                    
-
+                    nbiotPublish(topicTemp, payload, strlen(payload), QOS0);         
                     
                 }
             }
