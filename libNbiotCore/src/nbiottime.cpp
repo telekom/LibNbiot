@@ -100,35 +100,3 @@ void NbiotTime::tick()
         }
     }
 }
-
-#pragma GCC optimize ("0")
-void NbiotTime::delay(unsigned short ms)
-{
-    time_t expireSec = data->timestamp;
-    unsigned short expireMs = data->millis;
-    if(ONE_KHZ <= ms)
-    {
-        expireSec += ms / ONE_KHZ;
-        expireMs += (ms % ONE_KHZ);
-    }
-    else
-    {
-        expireMs += ms;
-    }
-    if(ONE_KHZ <= expireMs)
-    {
-        expireMs -= ONE_KHZ;
-        expireSec++;
-    }
-    while( expireSec >= data->timestamp )
-    {
-        if(data->timestamp > expireSec)
-        {
-            break;
-        }
-        if( (data->timestamp == expireSec) && (data->millis >= expireMs) )
-        {
-            break;
-        }
-    }
-}

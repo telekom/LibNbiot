@@ -29,11 +29,6 @@ void tick()
    NbiotCoreApp::getInstance().getTimeInstance().tick();
 }
 
-void delay(unsigned short ms)
-{
-    NbiotCoreApp::getInstance().getTimeInstance().delay(ms);
-}
-
 long long getMillis()
 {
     return NbiotCoreApp::getInstance().getTimeInstance().getMillis();
