@@ -1,5 +1,0 @@
-build/**
-lib/**
-vscde/**
-.vscode/c_cpp_properties.json
-.vscode/tasks.json
