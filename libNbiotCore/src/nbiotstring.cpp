@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h> // for va_list
+#include <ctype.h> // for tolower
 #include "nbiotstringlist.h"
 
 #include "nbiotdebug.h"
@@ -346,7 +347,7 @@ bool string::compareNoCase(const char* str) const
     bool ret = false;
     if(valid() && (nullptr != str))
     {
-        ret = (0 == strcasecmp(str, data));
+        ret = (0 == strcmp(string(str).toLower().c_str(), toLower().c_str()));
     }
     else
     {
@@ -473,6 +474,16 @@ bool string::check7bit() const
             break;
         }
         ++i;
+    }
+    return ret;
+}
+
+string string::toLower() const
+{
+    string ret;
+    for(size_t i = 0; i < sz; ++i)
+    {
+        ret.push_back(static_cast<char>(tolower(static_cast<int>(data[i]))));
     }
     return ret;
 }

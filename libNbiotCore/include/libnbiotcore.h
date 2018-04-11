@@ -51,12 +51,6 @@ extern "C" {
 void tick();
 
 /*!
- * \brief delay does nothing for a while
- * \param ms the waiting time in milliseconds
- */
-void delay(unsigned short ms);
-
-/*!
  * \brief getMillis
  * \returns the milliseconds counted by tick()
  */
