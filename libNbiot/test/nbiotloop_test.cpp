@@ -51,7 +51,6 @@ TEST(NbiotLoopTest, NullptrRegisterClearsLoop) {
     LoopClientMock lm;
     NbiotLoop nbl;
 
-    // Is busy only true if m_clienList.count() > 0
     EXPECT_FALSE(nbl.isBusy());
 
     nbl.registerLoopClient(&lm);

@@ -21,9 +21,9 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <nbiotlist.h>
+#include <list.h>
 
-using namespace nbiot;
+using namespace util;
 
 typedef int T;
 

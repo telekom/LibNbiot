@@ -107,17 +107,23 @@ void dbgWrite(const unsigned char *data, unsigned short len)
 
 unsigned char init(char* imsi, char* pw)
 {
-    unsigned char ret=1;
+    unsigned char ret=0;
 
     Serial.begin(115200);
     Serial1.begin(9600);
-    Timer1.initialize(100);
+    
+    Timer1.initialize(1000);
     Timer1.attachInterrupt(tick);
+
+    if(Serial1)
+    {
+      ret =1;
+    }
 
     if(1 == ret)
     {
         NbiotCoreConf core_conf;
-        core_conf.tickFrequency = 10000;
+        core_conf.tickFrequency = 1000;
         core_conf.readstatus_fu = readStatus;
         core_conf.readbyte_fu = readByte;
         core_conf.putchar_fu = writeByte;
@@ -185,6 +191,7 @@ int getSensorValue()
     return (reverseFlag) ? valueCounter-- : valueCounter++;
 }
 
+enum NbiotResult rc = LC_Pending;
 unsigned char retInit=0;
 const char topicCmd[32];
 const char topicInf[32];
@@ -197,8 +204,8 @@ void setup() {
     setDebugWriteFunction(dbgWrite);
 
     
-    const char *imsi = "901405800018809";
-    const char *pw = "y6xSFkmL";
+    const char *imsi = "";
+    const char *pw = "";
 
     // Set topics
     
@@ -211,13 +218,10 @@ void setup() {
     // Initialize library
     retInit = init(imsi, pw);
 
-    enum NbiotResult rc = LC_Pending; 
-
 }
 
 void loop() {
-enum NbiotResult rc = LC_Pending;
-while(retInit)
+  if(retInit)
     {
         if (isNbiotConnected())
         {
