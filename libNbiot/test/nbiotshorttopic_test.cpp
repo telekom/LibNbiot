@@ -51,8 +51,6 @@ TEST(NbiotShortTopicConstruction, TopicFromCharArray) {
 //    NbiotShortTopic *st = new NbiotShortTopic(bytes);
 //
 //    EXPECT_NE(st, nullptr);
-//    EXPECT_EQ(st->shortName[0], 'a');
-//    EXPECT_EQ(st->shortName[1], 'b');
 //
 //    delete st;
 //}
@@ -113,16 +111,11 @@ TEST(NbiotShortTopicOperator, AssignCharArrayToTopic) {
 //TEST(NbiotShortTopicOperator, NullptrAssignment) {
 //    char* bytes = nullptr;
 //
-//    NbiotShortTopic st1(bytes);
-//    NbiotShortTopic st2;
+//    NbiotShortTopic *st1 = new NbiotShortTopic(bytes);
 //
-//    EXPECT_EQ(st2.shortName[0], '\0');
-//    EXPECT_EQ(st2.shortName[1], '\0');
+//    *st1 = bytes;
 //
-//    st2 = st1;
-//
-//    EXPECT_EQ(st2.shortName[0], 'a');
-//    EXPECT_EQ(st2.shortName[1], 'b');
+//    EXPECT_NE(st1, nullptr);
 //}
 
 TEST(NbiotShortTopicOperator, EqualityOperator) {
