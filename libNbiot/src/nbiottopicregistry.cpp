@@ -19,7 +19,6 @@
 */
 
 #include <list.h>
-#include "nbiotdebug.h"
 #include "nbiottopicregistry.h"
 
 namespace nbiot {

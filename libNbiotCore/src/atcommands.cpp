@@ -182,7 +182,7 @@ bool AtCommands::readResponse(ExpectedReply expected, unsigned short timeout_ms)
         {
             nbiot::string resp;
             nbiot::Timer timer = nbiot::Timer(timeout_ms);
-            while(0 < serial.readLine(resp, timer.remaining(), Serial::Ignore))
+            while(0 < serial.readLine(resp, static_cast<unsigned short>(timer.remaining()), Serial::Ignore))
             {
                 if(Serial::NoError != serial.getError())
                 {

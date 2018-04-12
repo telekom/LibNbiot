@@ -38,6 +38,10 @@ void Timer::start(unsigned long end)
     end_ms = start_ms + end;
 }
 
+void Timer::start(unsigned short end) {
+    start(static_cast<unsigned long> (end));
+}
+
 void Timer::setTime(unsigned long end)
 {
     end_ms = end;

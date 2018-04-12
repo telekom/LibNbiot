@@ -22,7 +22,7 @@
 #define NBIOTTOPICREGISTRY_H
 
 #include "nbiotmessage.h"
-#include "MQTTSNClient.h"
+#include "nbiotmqttsnclient.h"
 
 #include "nbiotregistrylist.h"
 

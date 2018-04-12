@@ -21,7 +21,6 @@
 #include <eventdispatcher.h>
 
 #include <nbiottime.h>
-#include <nbiotdebug.h>
 #include <atcommands.h>
 #include <libnbiotcore.h>
 

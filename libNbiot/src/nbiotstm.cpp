@@ -24,7 +24,6 @@
 #include <eventdispatcher.h>
 #include <nbiotcoreapp.h>
 #include <nbiottimer.h>
-#include "nbiotdebug.h"
 
 #include "nbiotstm.h"
 
