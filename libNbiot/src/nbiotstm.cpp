@@ -1167,7 +1167,7 @@ bool NbiotStm::doCgattLoop(int& loopTime)
     }
     else
     {
-        Timer timer(static_cast<unsigned int>(interval));
+        Timer timer(interval);
 
         while(0 < timer.remaining())
         {

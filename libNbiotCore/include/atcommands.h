@@ -87,7 +87,7 @@ private:
     nbiot::string response;
 
     static const unsigned short defaultTimeout = 500;
-    static const unsigned int oneSecond = 1000;
+    static const unsigned long oneSecond = 1000;
     static const nbiot::string okReply;
     static const nbiot::string errReply;
     static const unsigned short replyMaxLen = 255;

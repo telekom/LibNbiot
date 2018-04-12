@@ -232,7 +232,7 @@ protected:
     bool isconnected;
 
     static const int minSendTime = 100;
-    static const unsigned long recomendedSendTime = 1000;
+    static const int recomendedSendTime = 1000;
     static const int oneSecond = 1000;
     
 
@@ -307,7 +307,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::sendPacket(int 
     if (sent == length)
     {
         if (this->duration > 0)
-            last_sent.countdown(static_cast<unsigned long>(this->duration)); // record the fact that we have successfully sent the packet
+            last_sent.countdown(this->duration); // record the fact that we have successfully sent the packet
         rc = SUCCESS;
     }
     else
@@ -461,7 +461,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
         
     rc = readbuf[lenlen];
     if (this->duration > 0)
-        last_received.countdown(static_cast<unsigned long>(this->duration)); // record the fact that we have successfully received a packet
+        last_received.countdown(this->duration); // record the fact that we have successfully received a packet
 exit:
         
 #if defined(DEBUG_MQTT)
@@ -658,7 +658,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::keepalive()
             if (!ping_outstanding)
             {
                 MQTTSNString clientid = MQTTSNString_initializer;
-                Timer timer = Timer(static_cast<unsigned long> (oneSecond));
+                Timer timer = Timer(oneSecond);
                 int len = MQTTSNSerialize_pingreq(sendbuf, MAX_PACKET_SIZE, clientid);
                 if (len > 0 && (rc = sendPacket(len, timer)) == SUCCESS) // send the ping packet
                     ping_outstanding = true;

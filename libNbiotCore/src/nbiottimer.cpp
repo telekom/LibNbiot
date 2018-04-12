@@ -42,21 +42,11 @@ void Timer::start(unsigned short end) {
     start(static_cast<unsigned long> (end));
 }
 
-void Timer::start(int end) {
-    start(static_cast<unsigned long> (end));
-}
-
-void Timer::start(unsigned int end) {
-    start(static_cast<unsigned long> (end));
-}
-
+    void Timer::start(int end) {
+        start(static_cast<unsigned long> (end));
+    }
 
 void Timer::setTime(unsigned long end)
-{
-    end_ms = static_cast<long long>(end);
-}
-
-void Timer::setTime(unsigned int end)
 {
     end_ms = static_cast<long long>(end);
 }

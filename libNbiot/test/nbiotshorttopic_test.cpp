@@ -116,6 +116,7 @@ TEST(NbiotShortTopicOperator, AssignCharArrayToTopic) {
 //    *st1 = bytes;
 //
 //    EXPECT_NE(st1, nullptr);
+//    EXPECT_TRUE(*st1 == bytes);
 //}
 
 TEST(NbiotShortTopicOperator, EqualityOperator) {

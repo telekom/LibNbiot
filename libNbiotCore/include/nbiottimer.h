@@ -30,19 +30,16 @@ class Timer:public ITimer
 public:
     Timer(): start_ms(0), end_ms(0) {}
     Timer(unsigned long end): start_ms(0), end_ms(0) { start(end); }
-    Timer(unsigned int end): start_ms(0), end_ms(0) { start(end); }
     Timer(int end): start_ms(0), end_ms(0) { start(end); }
     Timer(unsigned short end): start_ms(0), end_ms(0) { start(end); }
     virtual ~Timer() {}
 
     virtual void start();
     virtual void start(unsigned long end);
-    virtual void start(unsigned int end);
     virtual void start(int end);
     virtual void start(unsigned short end);
 
     virtual void setTime(unsigned long end);
-    virtual void setTime(unsigned int end);
     virtual void setTime(int end);
     virtual void setTime(unsigned short end);
 
@@ -54,9 +51,9 @@ public:
     bool _expired() { return (0 == remaining()); }
     void countdown_ms (unsigned long ms) { start(ms); }
     void countdown (unsigned long s) { start(ms_per_sec * s); }
-    int left_ms()
+    unsigned short left_ms()
     {
-        int ret = static_cast<unsigned short>(remaining());
+        unsigned short ret = static_cast<unsigned short>(remaining());
         return ret;
     }
 
