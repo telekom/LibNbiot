@@ -232,7 +232,7 @@ protected:
     bool isconnected;
 
     static const int minSendTime = 100;
-    static const int recomendedSendTime = 1000;
+    static const unsigned long recomendedSendTime = 1000;
     static const int oneSecond = 1000;
     
 
@@ -279,7 +279,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::sendPacket(int 
 
     if(minSendTime > timer.left_ms())
     {
-        timer.countdown_ms(static_cast<unsigned long>(recomendedSendTime)); // one timeout-second to send the packet
+        timer.countdown_ms(recomendedSendTime); // one timeout-second to send the packet
     }
 
     while (sent < length && !timer._expired())
@@ -392,7 +392,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
     }
     if(MIN_NO_OF_PACKET_LENGTH_BYTES > len)
     {
-        len = ipstack.read(readbuf, MIN_NO_OF_PACKET_LENGTH_BYTES, static_cast<unsigned short>(timer.remaining()));
+        len = ipstack.read(readbuf, MIN_NO_OF_PACKET_LENGTH_BYTES, timer.left_ms());
     }
     if (len < MIN_NO_OF_PACKET_LENGTH_BYTES)
     {
@@ -420,7 +420,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
         }
         if(MAX_NO_OF_PACKET_LENGTH_BYTES > len)
         {
-            len += ipstack.read(readbuf + MIN_NO_OF_PACKET_LENGTH_BYTES, (MAX_NO_OF_PACKET_LENGTH_BYTES-MIN_NO_OF_PACKET_LENGTH_BYTES), static_cast<unsigned short>(timer.remaining()));
+            len += ipstack.read(readbuf + MIN_NO_OF_PACKET_LENGTH_BYTES, (MAX_NO_OF_PACKET_LENGTH_BYTES-MIN_NO_OF_PACKET_LENGTH_BYTES), timer.left_ms());
         }
         if (len < MAX_NO_OF_PACKET_LENGTH_BYTES)
         {
@@ -449,7 +449,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
     }
     if (datalen > len)
     {
-        len += ipstack.read(&readbuf[len], (datalen-len), static_cast<unsigned short>(timer.remaining()));
+        len += ipstack.read(&readbuf[len], (datalen-len), timer.left_ms());
     }
     if (datalen != len)
     {

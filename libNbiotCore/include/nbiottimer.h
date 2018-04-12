@@ -56,7 +56,7 @@ public:
     void countdown (unsigned long s) { start(ms_per_sec * s); }
     int left_ms()
     {
-        int ret = static_cast<int>(remaining());
+        int ret = static_cast<unsigned short>(remaining());
         return ret;
     }
 
