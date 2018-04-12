@@ -117,7 +117,7 @@ private:
 
     int dbg_prefix;
 
-    static const long long txBufferWaitTimeout = 1000;
+    static const unsigned long txBufferWaitTimeout = 1000;
 };
 
 #endif // SERIAL_H

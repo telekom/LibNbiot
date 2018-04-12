@@ -279,7 +279,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::sendPacket(int 
 
     if(minSendTime > timer.left_ms())
     {
-        timer.countdown_ms(recomendedSendTime); // one timeout-second to send the packet
+        timer.countdown_ms(static_cast<unsigned long>(recomendedSendTime)); // one timeout-second to send the packet
     }
 
     while (sent < length && !timer._expired())
@@ -291,7 +291,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::sendPacket(int 
 #endif
             break;
         }
-        if(ipstack.write(&sendbuf[sent], length, timer.left_ms()))
+        if(ipstack.write(&sendbuf[sent], length, static_cast<unsigned short>(timer.remaining())))
         {
             rc = length;
         }
@@ -307,7 +307,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::sendPacket(int 
     if (sent == length)
     {
         if (this->duration > 0)
-            last_sent.countdown(this->duration); // record the fact that we have successfully sent the packet
+            last_sent.countdown(static_cast<unsigned long>(this->duration)); // record the fact that we have successfully sent the packet
         rc = SUCCESS;
     }
     else
@@ -382,7 +382,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
     #define MQTTSN_MIN_PACKET_LENGTH 2
 
     // 1. read the first byte
-    while(0xffff < timer.left_ms())
+    while(0xffff < timer.remaining())
     {
         len = ipstack.read(readbuf, MIN_NO_OF_PACKET_LENGTH_BYTES, 0xffff);
         if(MIN_NO_OF_PACKET_LENGTH_BYTES == len)
@@ -392,7 +392,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
     }
     if(MIN_NO_OF_PACKET_LENGTH_BYTES > len)
     {
-        len = ipstack.read(readbuf, MIN_NO_OF_PACKET_LENGTH_BYTES, timer.left_ms());
+        len = ipstack.read(readbuf, MIN_NO_OF_PACKET_LENGTH_BYTES, static_cast<unsigned short>(timer.remaining()));
     }
     if (len < MIN_NO_OF_PACKET_LENGTH_BYTES)
     {
@@ -406,7 +406,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
     if(1 == readbuf[0])
     {
         // read the next two bytes
-        while(0xffff < timer.left_ms())
+        while(0xffff < timer.remaining())
         {
             int rb = ipstack.read(readbuf + MIN_NO_OF_PACKET_LENGTH_BYTES, (MAX_NO_OF_PACKET_LENGTH_BYTES-MIN_NO_OF_PACKET_LENGTH_BYTES), 0xffff);
             if(-1 < rb)
@@ -420,7 +420,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
         }
         if(MAX_NO_OF_PACKET_LENGTH_BYTES > len)
         {
-            len += ipstack.read(readbuf + MIN_NO_OF_PACKET_LENGTH_BYTES, (MAX_NO_OF_PACKET_LENGTH_BYTES-MIN_NO_OF_PACKET_LENGTH_BYTES), timer.left_ms());
+            len += ipstack.read(readbuf + MIN_NO_OF_PACKET_LENGTH_BYTES, (MAX_NO_OF_PACKET_LENGTH_BYTES-MIN_NO_OF_PACKET_LENGTH_BYTES), static_cast<unsigned short>(timer.remaining()));
         }
         if (len < MAX_NO_OF_PACKET_LENGTH_BYTES)
         {
@@ -435,7 +435,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
     lenlen = MQTTSNPacket_decode(readbuf, len, &datalen);
 
     // 4. read the remaining bytes
-    while(0xffff < timer.left_ms())
+    while(0xffff < timer.remaining())
     {
         int rb = ipstack.read(&readbuf[len], (datalen-len), 0xffff);
         if(-1 < rb)
@@ -449,7 +449,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
     }
     if (datalen > len)
     {
-        len += ipstack.read(&readbuf[len], (datalen-len), timer.left_ms());
+        len += ipstack.read(&readbuf[len], (datalen-len), static_cast<unsigned short>(timer.remaining()));
     }
     if (datalen != len)
     {
@@ -461,7 +461,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
         
     rc = readbuf[lenlen];
     if (this->duration > 0)
-        last_received.countdown(this->duration); // record the fact that we have successfully received a packet
+        last_received.countdown(static_cast<unsigned long>(this->duration)); // record the fact that we have successfully received a packet
 exit:
         
 #if defined(DEBUG_MQTT)
@@ -658,7 +658,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::keepalive()
             if (!ping_outstanding)
             {
                 MQTTSNString clientid = MQTTSNString_initializer;
-                Timer timer = Timer(oneSecond);
+                Timer timer = Timer(static_cast<unsigned long> (oneSecond));
                 int len = MQTTSNSerialize_pingreq(sendbuf, MAX_PACKET_SIZE, clientid);
                 if (len > 0 && (rc = sendPacket(len, timer)) == SUCCESS) // send the ping packet
                     ping_outstanding = true;
@@ -778,7 +778,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::publish(MQTTSN_
         m_retained = message.retained;
         m_qos = message.qos;
 
-        static_cast<Derived*>(this)->loopPublish(id, static_cast<unsigned long>(timer.left_ms()));
+        static_cast<Derived*>(this)->loopPublish(id, timer.remaining());
         rc = SUCCESS;
     }
 

@@ -115,7 +115,7 @@ bool NbiotMqttSnClient::loopWait(int breakValue, int interval)
     }
     else
     {
-        nbiot::Timer timer(interval);
+        nbiot::Timer timer(static_cast<unsigned long>(interval));
 
         if(breakValue == cycle(timer))
         {
@@ -218,9 +218,9 @@ bool NbiotMqttSnClient::startConLoop(int& len)
     if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the connect packet
     {
         if (this->duration > 0)
-            last_received.countdown(this->duration);
+            last_received.countdown(static_cast<unsigned long>(this->duration));
 
-        m_conLoopClient.getTimer().start(timer.left_ms());
+        m_conLoopClient.getTimer().start(timer.remaining());
         ret = true;
     }
 
@@ -326,7 +326,7 @@ bool NbiotMqttSnClient::finishConLoop(int& loopTime)
     if (cleansession==0 && inflightMsgid>0)
     {
         memcpy(sendbuf, pubbuf, getMaxPacketSize());
-        nbiot::Timer connect_timer = nbiot::Timer(loopTime);
+        nbiot::Timer connect_timer = nbiot::Timer(static_cast<unsigned long>(loopTime));
         if(MQTTSN::SUCCESS != publish(inflightLen, connect_timer, inflightQoS))
             ret = false;
     }
@@ -353,7 +353,7 @@ bool NbiotMqttSnClient::startRegLoop(int& len)
     nbiot::Timer timer = nbiot::Timer(m_regLoopClient.getTimer().getTime());
     if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the register packet
     {
-        m_regLoopClient.getTimer().start(timer.left_ms());
+        m_regLoopClient.getTimer().start(timer.remaining());
         ret = true;
     }
 
@@ -415,7 +415,7 @@ bool NbiotMqttSnClient::startSubLoop(int& len)
     nbiot::Timer timer = nbiot::Timer(m_subLoopClient.getTimer().getTime());
     if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the register packet
     {
-        m_subLoopClient.getTimer().start(timer.left_ms());
+        m_subLoopClient.getTimer().start(timer.remaining());
         ret = true;
     }
 
@@ -493,7 +493,7 @@ bool NbiotMqttSnClient::startPubLoop(int& packetId)
         nbiot::Timer timer = nbiot::Timer(m_pubLoopClient.getTimer().getTime());
         if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the publish packet
         {
-            m_pubLoopClient.getTimer().start(timer.left_ms());
+            m_pubLoopClient.getTimer().start(timer.remaining());
             ret = true;
         }
     }
@@ -564,7 +564,7 @@ bool NbiotMqttSnClient::startUnsubLoop(int& len)
     nbiot::Timer timer = nbiot::Timer(m_unsubLoopClient.getTimer().getTime());
     if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the register packet
     {
-        m_unsubLoopClient.getTimer().start(timer.left_ms());
+        m_unsubLoopClient.getTimer().start(timer.remaining());
         ret = true;
     }
 
@@ -617,7 +617,7 @@ int NbiotMqttSnClient::pmPing(char *cID)
     {
         MQTTSNString clientid = MQTTSNString_initializer;
         clientid.cstring = cID;
-        nbiot::Timer timer = nbiot::Timer(1000);
+        nbiot::Timer timer = nbiot::Timer((unsigned) 1000);
         int len = MQTTSNSerialize_pingreq(sendbuf, getMaxPacketSize(), clientid);
         if (len > 0 && (rc = sendPacket(len, timer)) == MQTTSN::SUCCESS) // send the ping packet
             pmPingResp_outstanding = true;
@@ -633,7 +633,7 @@ bool NbiotMqttSnClient::startDisLoop(int& len)
     nbiot::Timer timer = nbiot::Timer(m_disLoopClient.getTimer().getTime());
     if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the disconnect packet
     {
-        m_disLoopClient.getTimer().start(timer.left_ms());
+        m_disLoopClient.getTimer().start(timer.remaining());
         ret = true;
     }
 

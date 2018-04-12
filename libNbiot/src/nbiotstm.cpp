@@ -1141,7 +1141,7 @@ bool NbiotStm::startCgattLoop(int& i)
     Timer timer = Timer(m_cgattLoopClient.getTimer().getTime());
     if (NbiotCoreApp::getInstance().getModemInstance().attach()) // start attachement
     {
-        m_cgattLoopClient.getTimer().start(timer.left_ms());
+        m_cgattLoopClient.getTimer().start(timer.remaining());
         m_dataPool.m_modemAttached = false;
         ret = true;
     }
@@ -1167,7 +1167,7 @@ bool NbiotStm::doCgattLoop(int& loopTime)
     }
     else
     {
-        Timer timer(interval);
+        Timer timer(static_cast<unsigned int>(interval));
 
         while(0 < timer.remaining())
         {

@@ -14,7 +14,3 @@ copy_tree('../../external/src/paho.mqtt-sn.embedded-c/MQTTSNClient','LibNbiot/sr
 copy_tree('../../external/src/paho.mqtt-sn.embedded-c/MQTTSNPacket','LibNbiot/src/.')
 
 make_archive('LibNbiot', 'zip', './LibNbiot')
-shutil.rmtree('./LibNbiot')
-
-
-

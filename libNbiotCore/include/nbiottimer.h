@@ -30,13 +30,22 @@ class Timer:public ITimer
 public:
     Timer(): start_ms(0), end_ms(0) {}
     Timer(unsigned long end): start_ms(0), end_ms(0) { start(end); }
+    Timer(unsigned int end): start_ms(0), end_ms(0) { start(end); }
+    Timer(int end): start_ms(0), end_ms(0) { start(end); }
     Timer(unsigned short end): start_ms(0), end_ms(0) { start(end); }
     virtual ~Timer() {}
 
     virtual void start();
     virtual void start(unsigned long end);
+    virtual void start(unsigned int end);
+    virtual void start(int end);
     virtual void start(unsigned short end);
+
     virtual void setTime(unsigned long end);
+    virtual void setTime(unsigned int end);
+    virtual void setTime(int end);
+    virtual void setTime(unsigned short end);
+
     virtual unsigned long getTime() const;
     virtual unsigned long expired() const;
     virtual unsigned long remaining() const;
