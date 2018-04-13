@@ -1,7 +1,7 @@
 # Arduino Example - An example how to use the LibNbiot on an Arduino
 
 This folder contains the python-script **create_arduino_lib.py** that creates a LibNbiot.zip that can be imported as 
-a library by the Arduino IDE (version 1.8.5. required). The imported library ships with an easy-to-us example called
+a library by the Arduino IDE (version 1.8.5. required). The imported library ships with an easy-to-use example called
 **SimpleExample**. 
 
 ## Hardware Prerequisites
@@ -15,12 +15,12 @@ The modem has to be equipped with a SIM card which is registered for the Telekom
 
 ## Software Prerequisites
 
-In additional to the LibNbiot, you will need the Serial as well as the TimerOne library. TimeOne can be imported by
+In additional to LibNbiot, you will need the Serial as well as the TimerOne library. TimeOne can be imported by
 the library mangement tool from the Arduino IDE.
 
 ## Starting the example
 
-Execute the python-script. Open the Arduino IDE and import the newly created LibNbiot.zip-library and open the 
+Execute the python-script. Open the Arduino IDE and import the newly created LibNbiot.zip-library. Open the 
 example **SimpleExample**.
 
     #define AUTH_IMSI "111111111111111"
