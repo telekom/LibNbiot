@@ -126,6 +126,16 @@ illustrates the usage in a plain 'C' environment, while the cpp-example makes us
 Both examples illustrate basic use cases for communication with the **Telekom Cloud of Things**
 by sending generated temperature values in an infinite loop.
 
+The above examples can be run on desktop systems hosting any Unix environments (cpp-example) or Linux
+environment (c-example), respectively. Meanwhile examples for
+
+* Cypress PSoC5
+* Arduino Mega
+
+were added. These examples can be found in the respective directories in the examples directory as well. However,
+as they require environment specific setups, they come with dedicated READMEs, which can be found in the respective
+directories.
+
 ### Building
 
 To build the examples, the library has to be compiled with `PLATFORM` containing the `default` architecture (see:
@@ -133,7 +143,7 @@ To build the examples, the library has to be compiled with `PLATFORM` containing
 
     make
 
-This creates the `c-example\bin` and `cpp-example' directories which contain the example executables.
+This creates the `c-example\bin` and `cpp-example\bin' directories which contain the example executables.
 
 ### Running the example
 
@@ -188,6 +198,6 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
