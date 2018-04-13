@@ -387,7 +387,7 @@ int main(int argc, char** argv)
         }
 
         rc = nbiotEventLoop(EventModeActive);
-        delay(50);
+        usleep(50000);
     }
 
     exit(EXIT_SUCCESS);

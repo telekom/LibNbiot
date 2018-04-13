@@ -187,7 +187,7 @@ private:
     notifyHandler m_notifyHandler;
     nbiot::LoopClient m_cgattLoopClient;
 
-    static const unsigned int fiftyFiveSeconds = 55000;
+    static const unsigned long fiftyFiveSeconds = 55000;
     static const unsigned long timeoutOneMinute = 60000;
 
     static const unsigned short restartModemThreshold = 5;

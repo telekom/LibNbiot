@@ -12,7 +12,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================================
@@ -38,9 +38,27 @@ void Timer::start(unsigned long end)
     end_ms = start_ms + end;
 }
 
+void Timer::start(unsigned short end) {
+    start(static_cast<unsigned long> (end));
+}
+
+    void Timer::start(int end) {
+        start(static_cast<unsigned long> (end));
+    }
+
 void Timer::setTime(unsigned long end)
 {
-    end_ms = end;
+    end_ms = static_cast<long long>(end);
+}
+
+void Timer::setTime(int end)
+{
+    end_ms = static_cast<long long>(end);
+}
+
+void Timer::setTime(unsigned short end)
+{
+    end_ms = static_cast<long long>(end);
 }
 
 unsigned long Timer::getTime() const
@@ -61,9 +79,10 @@ unsigned long Timer::expired() const
 
 unsigned long Timer::remaining() const
 {
-    return ((0 == end_ms) || (NbiotCoreApp::getInstance().getTimeInstance().getMillis() > end_ms))?
+    long long current_millis = NbiotCoreApp::getInstance().getTimeInstance().getMillis();
+    return ((0 == end_ms) || (current_millis >= end_ms))?
                 0 :
-                static_cast<unsigned long>(end_ms - NbiotCoreApp::getInstance().getTimeInstance().getMillis());
+                static_cast<unsigned long>(end_ms - current_millis);
 }
 
 void Timer::clear()

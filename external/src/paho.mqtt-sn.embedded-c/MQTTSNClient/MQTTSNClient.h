@@ -195,7 +195,7 @@ public:
 
 protected:
 
-    constexpr int getMaxPacketSize(){
+    constexpr int getMaxPacketSize() const {
         return MAX_PACKET_SIZE;
     }
 
@@ -291,7 +291,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::sendPacket(int 
 #endif
             break;
         }
-        if(ipstack.write(&sendbuf[sent], length, timer.left_ms()))
+        if(ipstack.write(&sendbuf[sent], length, static_cast<unsigned short>(timer.remaining())))
         {
             rc = length;
         }
@@ -382,7 +382,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
     #define MQTTSN_MIN_PACKET_LENGTH 2
 
     // 1. read the first byte
-    while(0xffff < timer.left_ms())
+    while(0xffff < timer.remaining())
     {
         len = ipstack.read(readbuf, MIN_NO_OF_PACKET_LENGTH_BYTES, 0xffff);
         if(MIN_NO_OF_PACKET_LENGTH_BYTES == len)
@@ -406,7 +406,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
     if(1 == readbuf[0])
     {
         // read the next two bytes
-        while(0xffff < timer.left_ms())
+        while(0xffff < timer.remaining())
         {
             int rb = ipstack.read(readbuf + MIN_NO_OF_PACKET_LENGTH_BYTES, (MAX_NO_OF_PACKET_LENGTH_BYTES-MIN_NO_OF_PACKET_LENGTH_BYTES), 0xffff);
             if(-1 < rb)
@@ -435,7 +435,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::readPacket(Time
     lenlen = MQTTSNPacket_decode(readbuf, len, &datalen);
 
     // 4. read the remaining bytes
-    while(0xffff < timer.left_ms())
+    while(0xffff < timer.remaining())
     {
         int rb = ipstack.read(&readbuf[len], (datalen-len), 0xffff);
         if(-1 < rb)
@@ -778,7 +778,7 @@ int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, b>::publish(MQTTSN_
         m_retained = message.retained;
         m_qos = message.qos;
 
-        static_cast<Derived*>(this)->loopPublish(id, static_cast<unsigned long>(timer.left_ms()));
+        static_cast<Derived*>(this)->loopPublish(id, timer.remaining());
         rc = SUCCESS;
     }
 

@@ -28,4 +28,3 @@ all:
 clean:
 	$(MAKE) clean -C c-example
 	$(MAKE) clean -C cpp-example
-

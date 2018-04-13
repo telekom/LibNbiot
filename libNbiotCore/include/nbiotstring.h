@@ -22,7 +22,6 @@
 #define STRING_H
 
 #include <string.h>
-#include <strings.h>
 
 namespace nbiot {
 
@@ -331,6 +330,12 @@ public:
      * \return
      */
     bool check7bit() const;
+
+    /*!
+     * \brief toLower
+     * \return
+     */
+    string toLower() const;
 
     /*!
      * \brief valid

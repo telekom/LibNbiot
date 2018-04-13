@@ -1,0 +1,127 @@
+########################################
+# Syntax Coloring Map
+########################################
+
+########################################
+# Class, Struct (KEYWORD1)
+########################################
+
+NbiotCoreConf					KEYWORD1
+NbiotConf						KEYWORD1
+libnbiot						KEYWORD1
+libnbiotcore					KEYWORD1
+nbiotstring						KEYWORD1
+nbiottimer						KEYWORD1
+
+########################################
+# Methods and Functions (KEYWORD2)
+########################################
+
+nbiotPublish					KEYWORD2
+nbiotConfig						KEYWORD2
+nbiotConnect					KEYWORD2
+nbiotSubscribe					KEYWORD2
+nbiotUnsubscribe				KEYWORD2
+nbiotDisconnect					KEYWORD2
+nbiotSleep						KEYWORD2
+isNbiotReady					KEYWORD2
+hasNbiotSubscription			KEYWORD2
+isNbiotSubscribedTo				KEYWORD2
+nbiotStart						KEYWORD2
+getNbiotState					KEYWORD2
+getNbiotError					KEYWORD2
+nbiotEventLoop					KEYWORD2
+getNbiotEventLoopStatus			KEYWORD2
+nbiotWakeup						KEYWORD2
+nbiotPoll						KEYWORD2
+isNbiotConnected				KEYWORD2
+
+nbiotCoreConfig					KEYWORD2
+
+debugPrintf						KEYWORD1
+
+########################################
+# Constants (LITERAL1)
+########################################
+
+AUTH_IMSI 						LITERAL1
+AUTH_PWD						LITERAL1
+RC_ACCEPTED						LITERAL1
+RC_REJECTED_CONGESTED			LITERAL1
+RC_REJECTED_INVALID_TOPIC_ID	LITERAL1
+RC_REJECTED_NOT_SUPPORTED		LITERAL1
+
+InvalidState					LITERAL1
+InitialState					LITERAL1
+DisconnectedState				LITERAL1
+ErrorState						LITERAL1
+ConnectedState					LITERAL1
+ConnectedSleepState				LITERAL1
+DeepSleepState					LITERAL1
+DisconnectedSleepState			LITERAL1
+ConnectedAwakeState				LITERAL1
+WaitForGprsState				LITERAL1
+WaitForConnectState				LITERAL1
+
+Success							LITERAL1
+InitializeError					LITERAL1
+GprsNotConnected				LITERAL1
+IpNotConnected					LITERAL1
+ConnectionError					LITERAL1
+NotStartedError					LITERAL1
+MaxTopicsExceeded				LITERAL1
+LoopCtrlBusyError				LITERAL1
+InvalidTopicID					LITERAL1
+
+Initialize						LITERAL1
+ReInitialize					LITERAL1
+Connect							LITERAL1
+RegisterTopic					LITERAL1
+Publish							LITERAL1
+Subscribe						LITERAL1
+Unsubscribe						LITERAL1
+RemoveTopic						LITERAL1
+Disconnect						LITERAL1
+Sleep							LITERAL1
+Hibernate						LITERAL1
+Wakeup							LITERAL1
+
+EventModeActive					LITERAL1
+EventModeAsleep					LITERAL1
+
+LC_Success						LITERAL1
+LC_Idle							LITERAL1
+LC_Pending						LITERAL1
+LC_Fail							LITERAL1
+
+LI_Unknown						LITERAL1
+LI_Cgatt						LITERAL1
+LI_Yield						LITERAL1
+LI_Connect						LITERAL1
+LI_Publish						LITERAL1
+LI_Register						LITERAL1
+LI_Subscribe					LITERAL1
+LI_Unsubscribe					LITERAL1
+LI_Disconnect					LITERAL1
+
+CoreNoError						LITERAL1
+CoreErrorTickFreq				LITERAL1
+CoreErrorReadStatusFu			LITERAL1
+CoreErrorReadByteFu				LITERAL1
+CoreErrorPutCharFu				LITERAL1
+CoreErrorWriteStatusFu			LITERAL1
+CoreErrorApn					LITERAL1
+CoreWarnApnUser					LITERAL1
+CoreWarnApnPwd					LITERAL1
+CoreErrorMultipleConfig			LITERAL1
+CoreErrorNoConfig				LITERAL1
+
+NoError							LITERAL1
+ErrorKeepAliveInt				LITERAL1
+ErrorAutoPollInt				LITERAL1
+ErrorMaxTopicCount				LITERAL1
+ErrorPollInterval				LITERAL1
+ErrorGateway					LITERAL1
+ErrorPort						LITERAL1
+ErrorMultipleConfig				LITERAL1
+ErrorNoConfig					LITERAL1

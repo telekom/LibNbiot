@@ -12,7 +12,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================================
@@ -87,7 +87,7 @@ private:
     nbiot::string response;
 
     static const unsigned short defaultTimeout = 500;
-    static const unsigned int oneSecond = 1000;
+    static const unsigned long oneSecond = 1000;
     static const nbiot::string okReply;
     static const nbiot::string errReply;
     static const unsigned short replyMaxLen = 255;

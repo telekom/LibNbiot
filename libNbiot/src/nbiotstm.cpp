@@ -12,7 +12,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================================
@@ -24,7 +24,6 @@
 #include <eventdispatcher.h>
 #include <nbiotcoreapp.h>
 #include <nbiottimer.h>
-#include "nbiotdebug.h"
 
 #include "nbiotstm.h"
 
@@ -1142,7 +1141,7 @@ bool NbiotStm::startCgattLoop(int& i)
     Timer timer = Timer(m_cgattLoopClient.getTimer().getTime());
     if (NbiotCoreApp::getInstance().getModemInstance().attach()) // start attachement
     {
-        m_cgattLoopClient.getTimer().start(timer.left_ms());
+        m_cgattLoopClient.getTimer().start(timer.remaining());
         m_dataPool.m_modemAttached = false;
         ret = true;
     }

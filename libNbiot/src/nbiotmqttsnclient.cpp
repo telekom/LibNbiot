@@ -12,7 +12,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================================
@@ -156,7 +156,7 @@ bool NbiotMqttSnClient::startYieldLoop(int& loopTime)
 #endif
     debugPrintf("MQTT::yield start %d\r\n", loopTime);
 #endif
-    m_yieldLoopClient.getTimer().start(static_cast<unsigned long>(loopTime));
+    m_yieldLoopClient.getTimer().start(loopTime);
     yieldRunning = true;
     return true;
 }
@@ -220,7 +220,7 @@ bool NbiotMqttSnClient::startConLoop(int& len)
         if (this->duration > 0)
             last_received.countdown(this->duration);
 
-        m_conLoopClient.getTimer().start(timer.left_ms());
+        m_conLoopClient.getTimer().start(timer.remaining());
         ret = true;
     }
 
@@ -353,7 +353,7 @@ bool NbiotMqttSnClient::startRegLoop(int& len)
     nbiot::Timer timer = nbiot::Timer(m_regLoopClient.getTimer().getTime());
     if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the register packet
     {
-        m_regLoopClient.getTimer().start(timer.left_ms());
+        m_regLoopClient.getTimer().start(timer.remaining());
         ret = true;
     }
 
@@ -415,7 +415,7 @@ bool NbiotMqttSnClient::startSubLoop(int& len)
     nbiot::Timer timer = nbiot::Timer(m_subLoopClient.getTimer().getTime());
     if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the register packet
     {
-        m_subLoopClient.getTimer().start(timer.left_ms());
+        m_subLoopClient.getTimer().start(timer.remaining());
         ret = true;
     }
 
@@ -493,7 +493,7 @@ bool NbiotMqttSnClient::startPubLoop(int& packetId)
         nbiot::Timer timer = nbiot::Timer(m_pubLoopClient.getTimer().getTime());
         if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the publish packet
         {
-            m_pubLoopClient.getTimer().start(timer.left_ms());
+            m_pubLoopClient.getTimer().start(timer.remaining());
             ret = true;
         }
     }
@@ -505,7 +505,7 @@ bool NbiotMqttSnClient::doPubLoop(int& loopTime)
 {
     bool ret = true;
 
-    if(QOS0 == m_qos)
+    if(QOS0 == static_cast<QoS>(m_qos))
     {
         ret = false;
     }
@@ -524,7 +524,7 @@ bool NbiotMqttSnClient::finishPubLoop(int& loopTime)
 {
     bool ret = true;
 
-    if((QOS0 != m_qos))
+    if((QOS0 != static_cast<QoS>(m_qos)))
     {
         if(0 == loopTime)
         {
@@ -564,7 +564,7 @@ bool NbiotMqttSnClient::startUnsubLoop(int& len)
     nbiot::Timer timer = nbiot::Timer(m_unsubLoopClient.getTimer().getTime());
     if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the register packet
     {
-        m_unsubLoopClient.getTimer().start(timer.left_ms());
+        m_unsubLoopClient.getTimer().start(timer.remaining());
         ret = true;
     }
 
@@ -633,7 +633,7 @@ bool NbiotMqttSnClient::startDisLoop(int& len)
     nbiot::Timer timer = nbiot::Timer(m_disLoopClient.getTimer().getTime());
     if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the disconnect packet
     {
-        m_disLoopClient.getTimer().start(timer.left_ms());
+        m_disLoopClient.getTimer().start(timer.remaining());
         ret = true;
     }
 

@@ -36,7 +36,6 @@ public:
         delete data;
     }
 
-    void delay(unsigned short ms);
     void setTickFrequency(unsigned long ticks);
     unsigned short getMinDelay() const { return ((0 == msPerTick)? 1 : msPerTick); }
     long long getMillis() const;

@@ -120,11 +120,21 @@ The reason for this is usually, that the GCC multilib feature is enabled, which 
 The library comes with two examples for Unix-systems. More examples for different platforms will be added in the future.
 They have been tested on Ubuntu 16.04+ and MacOS 10.13.1.
 
-The examples are located at `examples\c-example` and `cpp-example`. The c-example
+The examples are located at `examples\c-example` and `examples\cpp-example`. The c-example
 illustrates the usage in a plain 'C' environment, while the cpp-example makes use of features unique to 'C++'. 
 
 Both examples illustrate basic use cases for communication with the **Telekom Cloud of Things**
 by sending generated temperature values in an infinite loop.
+
+**Note:** The above examples can be run on desktop systems hosting any Unix environments (cpp-example) or Linux
+environment (c-example), respectively. Meanwhile examples for
+
+* Cypress PSoC5
+* Arduino Mega
+
+were added. These examples can be found in the respective directories in the examples directory as well. However,
+as they require environment specific setups, they come with dedicated READMEs, which can be found in the respective
+directories.
 
 ### Building
 
@@ -134,7 +144,6 @@ To build the examples, the library has to be compiled with `PLATFORM` containing
     make
 
 This creates the `c-example\bin` and `cpp-example\bin` directories which contain the example executables.
-
 
 ### Running the example
 
