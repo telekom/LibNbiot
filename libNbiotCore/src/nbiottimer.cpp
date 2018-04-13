@@ -79,9 +79,10 @@ unsigned long Timer::expired() const
 
 unsigned long Timer::remaining() const
 {
-    return ((0 == end_ms) || (NbiotCoreApp::getInstance().getTimeInstance().getMillis() > end_ms))?
+    long long current_millis = NbiotCoreApp::getInstance().getTimeInstance().getMillis();
+    return ((0 == end_ms) || (current_millis >= end_ms))?
                 0 :
-                static_cast<unsigned long>(end_ms - NbiotCoreApp::getInstance().getTimeInstance().getMillis());
+                static_cast<unsigned long>(end_ms - current_millis);
 }
 
 void Timer::clear()
