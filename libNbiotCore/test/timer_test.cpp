@@ -23,7 +23,7 @@
 #include <libnbiotcore.h>
 #include <nbiottimer.h>
 
-#include "callbacktimer.h"
+#include "repeatedtimer.h"
 
 using namespace nbiot;
 

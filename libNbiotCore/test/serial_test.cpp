@@ -20,7 +20,7 @@
 
 #include "serial_test.h"
 #include <libnbiotcore.h>
-#include "callbacktimer.h"
+#include "repeatedtimer.h"
 
 using ::testing::AtLeast;
 using ::testing::Return;
