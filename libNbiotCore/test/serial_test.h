@@ -21,8 +21,6 @@
 #ifndef LIBNBIOTCORE_SERIAL_TEST_H
 #define LIBNBIOTCORE_SERIAL_TEST_H
 
-#endif //LIBNBIOTCORE_SERIAL_TEST_H
-
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -102,3 +100,5 @@ public:
     MOCK_METHOD1(do_nothing, void(
             const char*));
 };
+
+#endif //LIBNBIOTCORE_SERIAL_TEST_H

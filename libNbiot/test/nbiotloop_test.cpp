@@ -27,6 +27,7 @@ using namespace nbiot;
 
 using ::testing::Return;
 using ::testing::Sequence;
+using ::testing::_;
 
 class LoopClientMock : public iLoopControlled {
 public:
@@ -48,16 +49,21 @@ TEST(NbiotLoopTest, ConstructEmptyLoop) {
 }
 
 TEST(NbiotLoopTest, NullptrRegisterClearsLoop) {
-    LoopClientMock lm;
+    LoopClientMock *lm = new LoopClientMock();
     NbiotLoop nbl;
+
+    EXPECT_CALL(*lm, getLoopId())
+            .WillRepeatedly(Return(LI_Unknown));
 
     EXPECT_FALSE(nbl.isBusy());
 
-    nbl.registerLoopClient(&lm);
+    nbl.registerLoopClient(lm);
     EXPECT_TRUE(nbl.isBusy());
 
     nbl.registerLoopClient(nullptr);
     EXPECT_FALSE(nbl.isBusy());
+
+    delete lm;
 }
 
 TEST(NbiotLoopTest, NbiotLoopEmptyClientList) {

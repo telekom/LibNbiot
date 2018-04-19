@@ -20,18 +20,55 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <libnbiotcore.h>
 #include <nbiottimer.h>
-#include <chrono>
+
+#include "callbacktimer.h"
 
 using namespace nbiot;
-using namespace std::chrono;
 
-TEST(TimerTest, StandardConstructor) {
+class TimerTest : public ::testing::Test {
+public:
+    void SetUp() {
+        tick_timer = new RepeatedTimer(1, tick);
+    }
+
+    void start_tick_timer() {
+        tick_timer->start();
+    }
+
+    void pass_ms(unsigned int ms) {
+        for (int i = 0; i < ms; ++i) {
+            tick();
+        }
+    }
+
+    void pass_sec(int s) {
+        for (int i = 0; i < 1000 * s; ++i) {
+            tick();
+        }
+    }
+
+    void pass_min(int min) {
+        for (int i = 0; i < 60 * 1000 * min; ++i) {
+            tick();
+        }
+    }
+
+    void TearDown() {
+        tick_timer->stop();
+        delete tick_timer;
+    }
+
+    RepeatedTimer *tick_timer;
+};
+
+TEST(TimerSetupTest, StandardConstructor) {
     Timer t;
     EXPECT_FALSE(t.valid());
 }
 
-TEST(TimerTest, SettingTime) {
+TEST(TimerSetupTest, SettingTime) {
     Timer t;
     t.setTime(10);
     EXPECT_EQ(10, t.getTime());
@@ -39,59 +76,53 @@ TEST(TimerTest, SettingTime) {
     EXPECT_EQ(0, t.getTime());
     t.setTime(-10);
     EXPECT_EQ(-10, t.getTime());
+    t.setTime((unsigned long) 0 - 1);
+    EXPECT_EQ((unsigned long) 0 - 1, t.getTime());
 }
 
-TEST(TimerTest, StartTimer) {
+TEST_F(TimerTest, StartTimer) {
     Timer t;
     t.setTime(100);
-    high_resolution_clock::time_point t1, t2;
-
     t.start();
-    t1 = high_resolution_clock::now();
-    while (t.remaining() > 0) {
-    }
-    t2 = high_resolution_clock::now();
-    EXPECT_NEAR(0.1, duration_cast<duration<double>>(t2 - t1).count(), 0.1);
+    EXPECT_NE(t.remaining(), 0);
+    pass_ms(100);
+    EXPECT_EQ(t.remaining(), 0);
 }
 
-TEST(TimerTest, StartTimerWithTimeSetting) {
+TEST_F(TimerTest, StartTimerWithTimeSetting) {
     Timer t;
     t.setTime(10);
 
-    high_resolution_clock::time_point t1, t2;
     t.start(100);
-    t1 = high_resolution_clock::now();
-    while (t.remaining() > 0) {
-    }
-    t2 = high_resolution_clock::now();
-    EXPECT_NEAR(0.1, duration_cast<duration<double>>(t2 - t1).count(), 0.1);
+    EXPECT_NE(t.remaining(), 0);
+    pass_ms(100);
+    EXPECT_EQ(t.remaining(), 0);
 }
 
-TEST(TimerTest, ConstructAndStart) {
-    high_resolution_clock::time_point t1, t2;
+TEST_F(TimerTest, ConstructAndStart) {
     Timer t(100);
-    t1 = high_resolution_clock::now();
-    while (t.remaining() > 0) {
-    }
-    t2 = high_resolution_clock::now();
-    EXPECT_NEAR(0.1, duration_cast<duration<double>>(t2 - t1).count(), 0.1);
+    EXPECT_NE(t.remaining(), 0);
+    pass_ms(100);
+    EXPECT_EQ(t.remaining(), 0);
 }
 
-TEST(TimerTest, ClearTime) {
+TEST_F(TimerTest, ClearTime) {
     Timer t;
 
     EXPECT_FALSE(t.valid());
     EXPECT_EQ(0, t.expired());
     EXPECT_EQ(0, t.remaining());
 
-    t.start(100);
+    t.start(1000);
 
-    EXPECT_GT(t.remaining(), 0);
     EXPECT_TRUE(t.valid());
+    EXPECT_EQ(0, t.expired());
     EXPECT_NE(0, t.remaining());
 
-    while (0 < t.remaining()) {};
+    pass_sec(1);
+
     EXPECT_NE(0, t.expired());
+    EXPECT_EQ(0, t.remaining());
 
     t.setTime(100);
     t.clear();
