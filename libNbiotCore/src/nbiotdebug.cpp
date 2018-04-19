@@ -29,6 +29,10 @@ unsigned long stringMem = 0;
 
 static void (*debugwrite)(const unsigned char*, unsigned short) = 0l;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void setDebugWriteFunction(void (*dbgwrite_fu)(const unsigned char*, unsigned short))
 {
     debugwrite = dbgwrite_fu;
@@ -49,3 +53,7 @@ void debugPrintf(const char* format, ...)
         }
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
