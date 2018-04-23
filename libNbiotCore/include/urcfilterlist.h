@@ -27,21 +27,48 @@
 
 namespace nbiot {
 
+/*!
+ * \brief urchandler
+ */
 typedef void (*urchandler)(const char*);
 
+/*!
+ * \brief The UrcFilter class
+ */
 class UrcFilter
 {
 public:
+    /*!
+     * \brief UrcFilter
+     */
     UrcFilter() : urc(), handler() {}
+    /*!
+     * \brief UrcFilter
+     * \param str
+     */
     UrcFilter(const char* str) : urc(str), handler() {}
+    /*!
+     * \brief UrcFilter
+     * \param str
+     * \param urch
+     */
     UrcFilter(const char* str, urchandler urch) : urc(str), handler()
     {
         handler.attach(urch);
     }
+    /*!
+     * \brief UrcFilter
+     * \param other
+     */
     UrcFilter(const UrcFilter& other) : urc(other.urc), handler(other.handler) {}
 
     virtual ~UrcFilter() {}
 
+    /*!
+     * \brief operator =
+     * \param other
+     * \return
+     */
     UrcFilter& operator = (const UrcFilter& other)
     {
         urc = other.urc;
@@ -49,10 +76,24 @@ public:
         return *this;
     }
 
+    /*!
+     * \brief operator ==
+     * \param str
+     * \return
+     */
     bool operator == (const char* str) { return (urc == str); }
+    /*!
+     * \brief operator ==
+     * \param str
+     * \return
+     */
     bool operator == (const nbiot::string& str) { return (0 == str.find(urc)); }
 
     template<class UHC>
+    /*!
+     * \brief setHandler
+     * \param uhc
+     */
     void setHandler(UHC* uhc, void (UHC::*urch)(const char*))
     {
         if(handler.attached())
@@ -62,6 +103,10 @@ public:
         handler.attach(uhc, urch);
     }
 
+    /*!
+     * \brief setHandler
+     * \param urch
+     */
     void setHandler(urchandler urch)
     {
         if(handler.attached())
@@ -71,23 +116,46 @@ public:
         handler.attach(urch);
     }
 
+    /*!
+     * \brief isValid
+     * \return
+     */
     bool isValid()
     {
         return ((!urc.empty()) && (handler.attached()));
     }
 
+    /*!
+     * \brief urc
+     */
     string urc;
+    /*!
+     * \brief handler
+     */
     FP<void, const char*> handler;
 };
 
+/*!
+ * \brief The UrcFilterList class
+ */
 class UrcFilterList : public util::list<UrcFilter>
 {
 public:
+    /*!
+     * \brief indexOf
+     * \param urcName
+     * \return
+     */
     int indexOf(const char* urcName) const
     {
         return util::list<UrcFilter>::indexOf(urcName);
     }
 
+    /*!
+     * \brief indexOf
+     * \param urcName
+     * \return
+     */
     int indexOf(const nbiot::string& urcName) const
     {
         return util::list<UrcFilter>::indexOf(urcName);

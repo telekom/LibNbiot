@@ -25,49 +25,112 @@
 
 class Serial;
 
+/*!
+ * \brief The ExpectedReply enum is used to define settings for the \fn readResponse method
+ */
 typedef enum expectedReply
 {
-    REPLY_OK,       /* just "OK" */
-    REPLY_ANY,      /* any response-line followed by "OK" */
-    REPLY_COPY,     /* all response-lines will be copied to 'response' */
-    REPLY_EXACT,    /* exactly one response-line that differs from "OK" */
-    REPLY_IGNORE,   /* every response will be ignored */
-    REPLY_NONE      /* there must be no response */
+    REPLY_OK,       /*!< just "OK" */
+    REPLY_ANY,      /*!< any response-line followed by "OK" */
+    REPLY_COPY,     /*!< all response-lines will be copied to 'response' */
+    REPLY_EXACT,    /*!< exactly one response-line that differs from "OK" */
+    REPLY_IGNORE,   /*!< every response will be ignored */
+    REPLY_NONE      /*!< there must be no response */
 } ExpectedReply;
 
+/*!
+ * \brief The AtCommands class
+ */
 class AtCommands
 {
 public:
+    /*!
+     * \brief AtCommands
+     * \param s
+     */
     explicit AtCommands(Serial& s);
+    /*!
+     * \brief ~AtCommands
+     */
     virtual ~AtCommands();
 
+    /*!
+     * \brief sendCommand
+     * \param command
+     * \return
+     */
     bool sendCommand(const char* command);
+    /*!
+     * \brief sendCommand
+     * \param cmd
+     * \return
+     */
     bool sendCommand(const nbiot::string& cmd);
+    /*!
+     * \brief readResponse
+     * \param expected
+     * \param timeout_ms
+     * \return
+     */
     bool readResponse(ExpectedReply expected, unsigned short timeout_ms=defaultTimeout);
+    /*!
+     * \brief readUntil
+     * \param expected
+     * \param timeout_ms
+     * \param exact
+     * \return
+     */
     bool readUntil(const char* expected, unsigned short timeout_ms=defaultTimeout, bool exact=false);
+    /*!
+     * \brief getResponse
+     * \return
+     */
     const char* getResponse() const { return response.c_str(); }
 
     template<class UHC>
+    /*!
+     * \brief addUrcFilter
+     * \param urc
+     * \param uhc
+     * \return
+     */
     bool addUrcFilter(const char* urc, UHC* uhc, void (UHC::*urc_handler)(const char*))
     {
         return serial.addUrcFilter(urc, uhc, urc_handler);
     }
 
+    /*!
+     * \brief addUrcFilter
+     * \param urc
+     * \return
+     */
     bool addUrcFilter(const char* urc, void (*urc_handler)(const char*))
     {
         return serial.addUrcFilter(urc, urc_handler);
     }
 
+    /*!
+     * \brief removeUrcFilter
+     * \param urc
+     * \return
+     */
     bool removeUrcFilter(const char* urc)
     {
         return serial.removeUrcFilter(urc);
     }
 
+    /*!
+     * \brief clearFilter
+     */
     void clearFilter()
     {
         serial.clearFilter();
     }
 
+    /*!
+     * \brief hasFilter
+     * \return
+     */
     bool hasFilter() const
     {
         return serial.hasFilter();

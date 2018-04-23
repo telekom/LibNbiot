@@ -26,6 +26,9 @@
 
 namespace nbiot
 {
+/*!
+ * \brief The StringList class
+ */
 class StringList : public util::list<nbiot::string>
 {
 };

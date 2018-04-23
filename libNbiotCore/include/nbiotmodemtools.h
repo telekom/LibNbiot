@@ -25,9 +25,16 @@
 #include "nbiotstring.h"
 #include "imodem.h"
 
+/*!
+ * \brief The NbiotModemTools class
+ */
 class NbiotModemTools : public IModem
 {
 public:
+    /*!
+     * \brief NbiotModemTools
+     * \param serial
+     */
     explicit NbiotModemTools(Serial& serial) :
         m_cmd(serial),
         apn(),
@@ -38,26 +45,100 @@ public:
         m_imsipwd(),
         m_deviceId()
     {}
+    /*!
+     * \brief ~NbiotModemTools
+     */
     virtual ~NbiotModemTools(){}
 
 
+    /*!
+     * \brief reboot
+     * \return
+     */
     virtual bool reboot();
+    /*!
+     * \brief initialize
+     * \return
+     */
     virtual bool initialize();
+    /*!
+     * \brief attach
+     * \return
+     */
     virtual bool attach();
+    /*!
+     * \brief detach
+     * \return
+     */
     virtual bool detach();
+    /*!
+     * \brief isAttached
+     * \return
+     */
     virtual bool isAttached();
+    /*!
+     * \brief sendAtCommand
+     * \param command
+     * \param response
+     * \param len
+     * \param timeout
+     * \return
+     */
     virtual bool sendAtCommand(const char* command, char* response, size_t len, unsigned short timeout);
+    /*!
+     * \brief getImsi
+     * \param imsi
+     * \param usePw
+     * \return
+     */
     virtual bool getImsi(nbiot::string& imsi, bool usePw = false);
+    /*!
+     * \brief getDeviceId
+     * \return
+     */
     virtual const char* getDeviceId();
+    /*!
+     * \brief switchModem
+     * \param state
+     * \return
+     */
     virtual ModemState switchModem(ModemState state);
+    /*!
+     * \brief isModemOn
+     * \return
+     */
     virtual ModemState isModemOn();
 
+    /*!
+     * \brief configSetApn
+     * \param confApn
+     */
     void configSetApn(const char* confApn) { apn = confApn; }
+    /*!
+     * \brief configSetApnUser
+     * \param confApnUser
+     */
     void configSetApnUser(const char* confApnUser) { apnuser = confApnUser; }
+    /*!
+     * \brief configSetApnPwd
+     * \param confApnPwd
+     */
     void configSetApnPwd(const char* confApnPwd) { apnpwd = confApnPwd; }
+    /*!
+     * \brief configSetOperMccMnc
+     * \param confOperMccMnc
+     */
     void configSetOperMccMnc(const char* confOperMccMnc) { operMccMnc = confOperMccMnc; }
 
+    /*!
+     * \brief configSetImsi
+     * \param confImsi
+     */
     void configSetImsi(const char* confImsi) { m_imsi = confImsi; }
+    /*!
+     * \brief configSetImsiPwd
+     * \param confImsiPwd
+     */
     void configSetImsiPwd(const char* confImsiPwd) { m_imsipwd = confImsiPwd; }
 
     //! @todo error struct and lastError() method

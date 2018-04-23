@@ -26,18 +26,60 @@
 #include "serial.h"
 #include "inetwork.h"
 
+/*!
+ * \brief The NbiotConnectivity class
+ */
 class NbiotConnectivity:public INetwork
 {
 public:
+    /*!
+     * \brief NbiotConnectivity
+     * \param serial
+     */
     explicit NbiotConnectivity(Serial& serial);
+    /*!
+     * \brief ~NbiotConnectivity
+     */
     virtual ~NbiotConnectivity() {}
 
+    /*!
+     * \brief connect
+     * \param hostname
+     * \param port
+     * \return
+     */
     virtual bool connect(const char* hostname, unsigned short port);
+    /*!
+     * \brief read
+     * \param buffer
+     * \param len
+     * \param timeout_ms
+     * \return
+     */
     virtual int read(unsigned char* buffer, int len, unsigned short timeout_ms);
+    /*!
+     * \brief write
+     * \param buffer
+     * \param len
+     * \param timeout
+     * \return
+     */
     virtual bool write(unsigned char* buffer, unsigned long len, unsigned short timeout);
+    /*!
+     * \brief disconnect
+     * \return
+     */
     virtual bool disconnect();
+    /*!
+     * \brief isConnected
+     * \return
+     */
     virtual bool isConnected() { return (0 <= m_connectionNumber); }
 
+    /*!
+     * \brief parseFilterResult
+     * \param strFilterResult
+     */
     void parseFilterResult(const char* strFilterResult);
 
 private:

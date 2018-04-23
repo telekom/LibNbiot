@@ -21,15 +21,36 @@
 #ifndef ITIMER_H
 #define ITIMER_H
 
+/*!
+ * \brief The ITimer class
+ */
 class ITimer
 {
 public:
     virtual ~ITimer() {}
 
+    /*!
+     * \brief start
+     */
     virtual void start(unsigned long) = 0;
+    /*!
+     * \brief expired
+     * \return
+     */
     virtual unsigned long expired() const = 0;
+    /*!
+     * \brief remaining
+     * \return
+     */
     virtual unsigned long remaining() const = 0;
+    /*!
+     * \brief clear
+     */
     virtual void clear() = 0;
+    /*!
+     * \brief valid
+     * \return
+     */
     virtual bool valid() const = 0;
 };
 

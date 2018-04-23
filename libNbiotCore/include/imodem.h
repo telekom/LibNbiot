@@ -26,9 +26,15 @@ namespace nbiot
 class string;
 }
 
+/*!
+ * \brief The IModem class
+ */
 class IModem
 {
 public:
+    /*!
+     * \brief The ModemState enum
+     */
     enum ModemState
     {
         MODEM_OFF = 0,
@@ -37,15 +43,62 @@ public:
 
     virtual ~IModem() {}
 
+    /*!
+     * \brief reboot
+     * \return
+     */
     virtual bool reboot() = 0;
+    /*!
+     * \brief initialize
+     * \return
+     */
     virtual bool initialize() = 0;
+    /*!
+     * \brief attach
+     * \return
+     */
     virtual bool attach() = 0;
+    /*!
+     * \brief detach
+     * \return
+     */
     virtual bool detach() = 0;
+    /*!
+     * \brief isAttached
+     * \return
+     */
     virtual bool isAttached() = 0;
+    /*!
+     * \brief sendAtCommand
+     * \param command
+     * \param response
+     * \param len
+     * \param timeout
+     * \return
+     */
     virtual bool sendAtCommand(const char* command, char* response, size_t len, unsigned short timeout) = 0;
+    /*!
+     * \brief getImsi
+     * \param imsi
+     * \param usePw
+     * \return
+     */
     virtual bool getImsi(nbiot::string& imsi, bool usePw = false) = 0;
+    /*!
+     * \brief getDeviceId
+     * \return
+     */
     virtual const char* getDeviceId() = 0;
+    /*!
+     * \brief switchModem
+     * \param state
+     * \return
+     */
     virtual ModemState switchModem(ModemState state) = 0;
+    /*!
+     * \brief isModemOn
+     * \return
+     */
     virtual ModemState isModemOn() = 0;
 
 };
