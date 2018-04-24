@@ -34,10 +34,15 @@ class EventDispatcher;
 namespace nbiot
 {
 
+/*!
+ * \brief The NbiotStm class
+ */
 class NbiotStm : public AbstractStateMachine
 {
 public:
-
+    /*!
+     * \brief The EventType enum
+     */
     enum EventType
     {
         InitializeEvent = StmEvent::CustomMin,
@@ -57,82 +62,331 @@ public:
         AttachedEvent
     };
 
+    /*!
+     * \brief NbiotStm
+     * \param dataPool
+     */
     explicit NbiotStm(NbiotStmDataPool& dataPool);
+    /*!
+     * \brief ~NbiotStm
+     */
     virtual ~NbiotStm();
 
+    /*!
+     * \brief startStateMachine
+     */
     virtual void startStateMachine();
+    /*!
+     * \brief setUpStateMachine
+     */
     virtual void setUpStateMachine();
 
+    /*!
+     * \brief currentStateToString
+     * \return
+     */
     const char* currentStateToString() const;
 
+    /*!
+     * \brief getCurrentStateId
+     * \return
+     */
     uint32_t getCurrentStateId() { return getCurrentState()->getId(); }
 
+    /*!
+     * \brief mqttDisconnect
+     */
     void mqttDisconnect();
+    /*!
+     * \brief mqttConnect
+     * \param cleanSession
+     * \return
+     */
     bool mqttConnect(unsigned char cleanSession = 0);
 
+    /*!
+     * \brief doDisconnect
+     */
     void doDisconnect();
+    /*!
+     * \brief finishDisconnect
+     */
     void finishDisconnect();
+    /*!
+     * \brief doReconnect
+     */
     void doReconnect();
+    /*!
+     * \brief sendEvent
+     * \param type
+     */
     void sendEvent(int type);
+    /*!
+     * \brief postEvent
+     * \param type
+     */
     void postEvent(int type);
 
+    /*!
+     * \brief doModemAttach
+     */
     void doModemAttach();
 
+    /*!
+     * \brief startCgattLoop
+     * \return
+     */
     bool startCgattLoop(int&);
+    /*!
+     * \brief doCgattLoop
+     * \return
+     */
     bool doCgattLoop(int&);
+    /*!
+     * \brief finishCgattLoop
+     * \return
+     */
     bool finishCgattLoop(int&);
 
+    /*!
+     * \brief setNotifyHandler
+     * \param nh
+     */
     void setNotifyHandler(notifyHandler nh) { m_notifyHandler = nh; }
 
+    /*!
+     * \brief eventDispatcher
+     * \return
+     */
     EventDispatcher* eventDispatcher() { return m_evDisp; }
 
 protected:
 #if defined(UNITTEST_MQTT) || defined (DEBUG_MQTT)
+    /*!
+     * \brief actionInitialize
+     * \param e
+     * \return
+     */
     bool actionInitialize(const StmEvent& e);
+    /*!
+     * \brief actionIsInitializedDisconnected
+     * \param e
+     * \return
+     */
     bool actionIsInitializedDisconnected(const StmEvent& e);
 #endif
+    /*!
+     * \brief actionIsInitializedError
+     * \param e
+     * \return
+     */
     bool actionIsInitializedError(const StmEvent& e);
+    /*!
+     * \brief actionConnect
+     * \param e
+     * \return
+     */
     bool actionConnect(const StmEvent& e);
+    /*!
+     * \brief actionIsGprsEnabledIpConnect
+     * \param e
+     * \return
+     */
     bool actionIsGprsEnabledIpConnect(const StmEvent& e);
+    /*!
+     * \brief actionIsGprsEnabledError
+     * \param e
+     * \return
+     */
     bool actionIsGprsEnabledError(const StmEvent& e);
+    /*!
+     * \brief actionIsIpConnectedError
+     * \param e
+     * \return
+     */
     bool actionIsIpConnectedError(const StmEvent& e);
+    /*!
+     * \brief actionIsConnectedConnected
+     * \param e
+     * \return
+     */
     bool actionIsConnectedConnected(const StmEvent& e);
+    /*!
+     * \brief actionWaitConnectIsConnected
+     * \param e
+     * \return
+     */
     bool actionWaitConnectIsConnected(const StmEvent& e);
+    /*!
+     * \brief actionIsConnectedError
+     * \param e
+     * \return
+     */
     bool actionIsConnectedError(const StmEvent& e);
+    /*!
+     * \brief actionSleep
+     * \param e
+     * \return
+     */
     bool actionSleep(const StmEvent& e);
+    /*!
+     * \brief actionWakeup
+     * \param e
+     * \return
+     */
     bool actionWakeup(const StmEvent& e);
 #if defined(UNITTEST_MQTT) || defined (DEBUG_MQTT)
+    /*!
+     * \brief actionSleepAwake
+     * \param e
+     * \return
+     */
     bool actionSleepAwake(const StmEvent& e);
+    /*!
+     * \brief actionAwakeSleep
+     * \param e
+     * \return
+     */
     bool actionAwakeSleep(const StmEvent& e);
 #endif
+    /*!
+     * \brief actionAwakeActive
+     * \param e
+     * \return
+     */
     bool actionAwakeActive(const StmEvent& e);
 #if defined(UNITTEST_MQTT) || defined (DEBUG_MQTT)
+    /*!
+     * \brief actionAwakeTimeout
+     * \param e
+     * \return
+     */
     bool actionAwakeTimeout(const StmEvent& e);
+    /*!
+     * \brief actionHibernate
+     * \param e
+     * \return
+     */
     bool actionHibernate(const StmEvent& e);
+    /*!
+     * \brief actionReInitialize
+     * \param e
+     * \return
+     */
     bool actionReInitialize(const StmEvent& e);
+    /*!
+     * \brief actionDisconnect
+     * \param e
+     * \return
+     */
     bool actionDisconnect(const StmEvent& e);
+    /*!
+     * \brief actionErrorDisconnect
+     * \param e
+     * \return
+     */
     bool actionErrorDisconnect(const StmEvent& e);
+    /*!
+     * \brief actionErrorReInitialize
+     * \param e
+     * \return
+     */
     bool actionErrorReInitialize(const StmEvent& e);
+    /*!
+     * \brief actionDisSleep
+     * \param e
+     * \return
+     */
     bool actionDisSleep(const StmEvent& e);
+    /*!
+     * \brief actionDisWakeup
+     * \param e
+     * \return
+     */
     bool actionDisWakeup(const StmEvent& e);
+    /*!
+     * \brief actionDisHibernate
+     * \param e
+     * \return
+     */
     bool actionDisHibernate(const StmEvent& e);
 #endif
+    /*!
+     * \brief actionIsInitialized
+     * \param e
+     * \return
+     */
     bool actionIsInitialized(const StmEvent& e);
+    /*!
+     * \brief actionIsIpConnected
+     * \param e
+     * \return
+     */
     bool actionIsIpConnected(const StmEvent& e);
 
+    /*!
+     * \brief actionInitialEntry
+     * \param e
+     * \return
+     */
     bool actionInitialEntry(const StmEvent& e);
+    /*!
+     * \brief actionDisconnectedEntry
+     * \param e
+     * \return
+     */
     bool actionDisconnectedEntry(const StmEvent& e);
+    /*!
+     * \brief actionErrorEntry
+     * \param e
+     * \return
+     */
     bool actionErrorEntry(const StmEvent& e);
+    /*!
+     * \brief actionConnectedEntry
+     * \param e
+     * \return
+     */
     bool actionConnectedEntry(const StmEvent& e);
 #if defined(UNITTEST_MQTT) || defined (DEBUG_MQTT)
+    /*!
+     * \brief actionConnectedSleepEntry
+     * \param e
+     * \return
+     */
     bool actionConnectedSleepEntry(const StmEvent& e);
 #endif
+    /*!
+     * \brief actionConnectedAwakeEntry
+     * \param e
+     * \return
+     */
     bool actionConnectedAwakeEntry(const StmEvent& e);
+    /*!
+     * \brief actionDeepSleepEntry
+     * \param e
+     * \return
+     */
     bool actionDeepSleepEntry(const StmEvent& e);
 #if defined(UNITTEST_MQTT) || defined (DEBUG_MQTT)
+    /*!
+     * \brief actionDisconnectedSleepEntry
+     * \param e
+     * \return
+     */
     bool actionDisconnectedSleepEntry(const StmEvent& e);
 #endif
+    /*!
+     * \brief actionWaitForGprsEntry
+     * \param e
+     * \return
+     */
     bool actionWaitForGprsEntry(const StmEvent& e);
+    /*!
+     * \brief actionWaitForConnectEntry
+     * \param e
+     * \return
+     */
     bool actionWaitForConnectEntry(const StmEvent& e);
 
 private:

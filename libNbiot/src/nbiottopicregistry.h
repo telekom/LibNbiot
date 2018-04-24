@@ -28,39 +28,129 @@
 
 namespace nbiot {
 
+/*!
+ * \brief The NbiotTopicRegistry class
+ */
 class NbiotTopicRegistry
 {
 public:
+    /*!
+     * \brief NbiotTopicRegistry
+     */
     NbiotTopicRegistry();
+    /*!
+     * \brief ~NbiotTopicRegistry
+     */
     virtual ~NbiotTopicRegistry();
 
+    /*!
+     * \brief messageDispatcher
+     * \param md
+     * \return
+     */
     int messageDispatcher(MQTTSN::MessageData& md);
 
+    /*!
+     * \brief operator []
+     * \param index
+     * \return
+     */
     const NbiotTopic& operator [](int index) const
     {
         return m_registry.at(index);
     }
 
+    /*!
+     * \brief insertTopic
+     * \param topic
+     */
     void insertTopic(const NbiotTopic& topic);
 
+    /*!
+     * \brief attachWildcardMessageHandler
+     * \param topic
+     * \return
+     */
     bool attachWildcardMessageHandler(NbiotTopic& topic) const;
+    /*!
+     * \brief updateWildcardMessageHandler
+     * \param topic
+     * \return
+     */
     bool updateWildcardMessageHandler(const NbiotTopic& topic);
+    /*!
+     * \brief attachMessageHandler
+     * \param index
+     * \param mh
+     * \return
+     */
     bool attachMessageHandler(int index, messageHandler mh);
 
+    /*!
+     * \brief findTopic
+     * \param bytes
+     * \return
+     */
     int findTopic(char bytes[2]) const;
+    /*!
+     * \brief findTopic
+     * \param topicId
+     * \return
+     */
     int findTopic(unsigned short topicId) const;
+    /*!
+     * \brief findTopic
+     * \param name
+     * \return
+     */
     int findTopic(const char* name) const;
 
+    /*!
+     * \brief setTopicFlag
+     * \param index
+     * \param topicFlag
+     */
     void setTopicFlag(int index, NbiotTopic::RegistrationFlag topicFlag);
+    /*!
+     * \brief unsetTopicFlag
+     * \param index
+     * \param topicFlag
+     */
     void unsetTopicFlag(int index, NbiotTopic::RegistrationFlag topicFlag);
 
+    /*!
+     * \brief arrivedMessages
+     * \return
+     */
     unsigned long arrivedMessages() const { return messageCount; }
+    /*!
+     * \brief hasAnyTopic
+     * \param topicFlag
+     * \return
+     */
     bool hasAnyTopic(NbiotTopic::RegistrationFlag topicFlag = NbiotTopic::REG_BOTH) const;
+    /*!
+     * \brief hasTopic
+     * \param topicFilter
+     * \param topicFlag
+     * \return
+     */
     bool hasTopic(const char *topicFilter, NbiotTopic::RegistrationFlag topicFlag = NbiotTopic::REG_BOTH) const;
+    /*!
+     * \brief topicCount
+     * \return
+     */
     int topicCount() const { return m_registry.count(); }
 
+    /*!
+     * \brief removeTopic
+     * \param index
+     */
     void removeTopic(int index);
 
+    /*!
+     * \brief clearRegistry
+     */
     void clearRegistry();
 
 private:

@@ -27,9 +27,16 @@
 
 namespace nbiot {
 
+/*!
+ * \brief The LoopClient class
+ */
 class LoopClient:public iLoopControlled
 {
 public:
+    /*!
+     * \brief LoopClient
+     * \param loopId
+     */
     explicit LoopClient(NbiotLoopId loopId):
         m_result(LC_Fail),
         m_loopCtrl(0),
@@ -37,6 +44,10 @@ public:
     {}
     virtual ~LoopClient() {}
 
+    /*!
+     * \brief preLoopStep
+     * \return
+     */
     virtual NbiotResult preLoopStep()
     {
         if(LC_Pending != m_result)
@@ -60,6 +71,10 @@ public:
         return m_result;
     }
 
+    /*!
+     * \brief loopStep
+     * \return
+     */
     virtual NbiotResult loopStep()
     {
         if(LC_Pending == m_result)
@@ -90,6 +105,10 @@ public:
         return m_result;
     }
 
+    /*!
+     * \brief postLoopStep
+     * \return
+     */
     virtual NbiotResult postLoopStep()
     {
         if(LC_Pending == m_result)
@@ -113,44 +132,76 @@ public:
         return m_result;
     }
 
+    /*!
+     * \brief getResult
+     * \return
+     */
     virtual NbiotResult getResult() const
     {
         return m_result;
     }
 
+    /*!
+     * \brief getValue
+     * \return
+     */
     virtual int getValue() const
     {
         return m_loopCtrl;
     }
 
+    /*!
+     * \brief setValue
+     * \param val
+     */
     virtual void setValue(int val)
     {
         m_loopCtrl = val;
     }
 
     template<class LHC>
+    /*!
+     * \brief setLoopStartHandler
+     * \param lhc
+     */
     void setLoopStartHandler(LHC* lhc, bool (LHC::*loopstartHandler)(int&))
     {
         loopStartHandler.attach(lhc, loopstartHandler);
     }
 
     template<class LHC>
+    /*!
+     * \brief setLoopStepHandler
+     * \param lhc
+     */
     void setLoopStepHandler(LHC* lhc, bool (LHC::*loopstepHandler)(int&))
     {
         loopStepHandler.attach(lhc, loopstepHandler);
     }
 
     template<class LHC>
+    /*!
+     * \brief setLoopStopHandler
+     * \param lhc
+     */
     void setLoopStopHandler(LHC* lhc, bool (LHC::*loopstopHandler)(int&))
     {
         loopStopHandler.attach(lhc, loopstopHandler);
     }
 
+    /*!
+     * \brief getTimer
+     * \return
+     */
     Timer& getTimer()
     {
         return m_timer;
     }
 
+    /*!
+     * \brief getLoopId
+     * \return
+     */
     virtual NbiotLoopId getLoopId() const
     {
         return id;

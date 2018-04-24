@@ -31,48 +31,179 @@
 
 #include "nbiotstm.h"
 
+/*!
+ * \brief The NbiotMQTT class
+ */
 class NbiotMQTT
 {
 public:
+    /*!
+     * \brief NbiotMQTT
+     */
     NbiotMQTT();
+    /*!
+     * \brief ~NbiotMQTT
+     */
     virtual ~NbiotMQTT();
 
+    /*!
+     * \brief startStateMachine
+     */
     void startStateMachine() { m_stm.startStateMachine(); }
+    /*!
+     * \brief setUpStateMachine
+     */
     void setUpStateMachine() { m_stm.setUpStateMachine(); }
 
+    /*!
+     * \brief eventLoop
+     * \param mode
+     * \return
+     */
     NbiotResult eventLoop(NbiotEventMode mode);
 
+    /*!
+     * \brief currentStateToString
+     * \return
+     */
     const char* currentStateToString() const { return m_stm.currentStateToString(); }
 
+    /*!
+     * \brief validState
+     * \return
+     */
     bool validState() { return (nullptr != m_stm.getCurrentState()); }
+    /*!
+     * \brief getCurrentStateId
+     * \return
+     */
     uint32_t getCurrentStateId() { return m_stm.getCurrentStateId(); }
+    /*!
+     * \brief getErrorNumber
+     * \return
+     */
     unsigned int getErrorNumber() { return m_dataPool.m_errno; }
 
+    /*!
+     * \brief connect
+     * \param cleanSession
+     * \return
+     */
     int connect(unsigned char cleanSession);
+    /*!
+     * \brief publish
+     * \param topic
+     * \param data
+     * \param len
+     * \param qos
+     * \return
+     */
     int publish(const char* topic, const char* data, size_t len, QoS qos);
+    /*!
+     * \brief subscribe
+     * \param topic
+     * \param mh
+     * \return
+     */
     int subscribe(const char* topic, messageHandler mh);
+    /*!
+     * \brief unsubscribe
+     * \param topic
+     * \return
+     */
     int unsubscribe(const char* topic);
+    /*!
+     * \brief disconnect
+     */
     void disconnect();
+    /*!
+     * \brief sleep
+     * \param duration
+     */
     void sleep(unsigned short duration);
+    /*!
+     * \brief hibernate
+     * \param duration
+     */
     void hibernate(unsigned short duration);
+    /*!
+     * \brief wakeup
+     */
     void wakeup();
 
+    /*!
+     * \brief poll
+     * \param pollInterval
+     */
     void poll(unsigned short pollInterval = 0);
 
+    /*!
+     * \brief getMessageCount
+     * \return
+     */
     unsigned long getMessageCount() const;
 
+    /*!
+     * \brief connected
+     * \return
+     */
     bool connected() { return m_dataPool.client.isConnected(); }
+    /*!
+     * \brief hasSubscription
+     * \return
+     */
     bool hasSubscription() const;
+    /*!
+     * \brief hasSubscription
+     * \param topic
+     * \return
+     */
     bool hasSubscription(const char* topic) const;
 
+    /*!
+     * \brief setGateway
+     * \param hostname
+     */
     void setGateway(const char* hostname) { m_dataPool.gateway = hostname; }
+    /*!
+     * \brief getGateway
+     * \return
+     */
     const char* getGateway() const { return m_dataPool.gateway.c_str(); }
+    /*!
+     * \brief setPort
+     * \param port
+     */
     void setPort(unsigned short port) { m_dataPool.mqttPort = port; }
+    /*!
+     * \brief setKeepAlive
+     * \param keepAlive
+     */
     void setKeepAlive(unsigned int keepAlive) { m_dataPool.keepAliveInterval = keepAlive; }
+    /*!
+     * \brief setAutoPoll
+     * \param autoPoll
+     */
     void setAutoPoll(unsigned int autoPoll) { m_dataPool.autoPollInterval = autoPoll; }
+    /*!
+     * \brief setTimerCallback
+     * \param tcInterval
+     */
     void setTimerCallback(unsigned long tcInterval) { m_dataPool.eventLoopExecInterval = tcInterval; }
+    /*!
+     * \brief setMaxTopics
+     * \param maxTopics
+     */
     void setMaxTopics(unsigned short maxTopics) { m_dataPool.m_maxTopics = maxTopics; }
+    /*!
+     * \brief getClientId
+     * \return
+     */
     const char* getClientId() const { return m_dataPool.imsi.c_str(); }
+    /*!
+     * \brief setPollInterval
+     * \param pollInterval
+     */
     void setPollInterval(unsigned short pollInterval) { m_pollInterval = pollInterval; }
 
     /*!
@@ -80,24 +211,73 @@ public:
      */
     bool ready() const { return m_dataPool.initialized; }
 
+    /*!
+     * \brief isConnected
+     * \return
+     */
     bool isConnected() { return (ConnectedState == m_stm.getCurrentStateId()); }
+    /*!
+     * \brief isDisconnected
+     * \return
+     */
     bool isDisconnected() { return (DisconnectedState == m_stm.getCurrentStateId()); }
+    /*!
+     * \brief isConSleeping
+     * \return
+     */
     bool isConSleeping() { return (ConnectedSleepState == m_stm.getCurrentStateId()); }
+    /*!
+     * \brief isConAwake
+     * \return
+     */
     bool isConAwake() { return (ConnectedAwakeState == m_stm.getCurrentStateId()); }
+    /*!
+     * \brief isDisSleeping
+     * \return
+     */
     bool isDisSleeping() { return (DisconnectedSleepState == m_stm.getCurrentStateId()); }
+    /*!
+     * \brief isSleeping
+     * \return
+     */
     bool isSleeping() { return ( isConSleeping() || isConAwake() || isDisSleeping() ); }
 
+    /*!
+     * \brief pubackNotify
+     * \param topic
+     */
     void pubackNotify(nbiot::NbiotTopic& topic);
+    /*!
+     * \brief registerNotify
+     * \param topic
+     * \return
+     */
     int registerNotify(nbiot::NbiotTopic& topic);
+    /*!
+     * \brief disconnectNotify
+     * \param duration
+     */
     void disconnectNotify(int duration);
+    /*!
+     * \brief pingRespNotify
+     * \param duration
+     */
     void pingRespNotify(int duration);
 
+    /*!
+     * \brief setNotifyHandler
+     * \param nh
+     */
     void setNotifyHandler(notifyHandler nh)
     {
         m_notifyHandler = nh;
         m_stm.setNotifyHandler(nh);
     }
 
+    /*!
+     * \brief eventLoopStatus
+     * \return
+     */
     NbiotResult eventLoopStatus() { return ((LC_Pending == m_evLoopRc) || m_loopController.isBusy())?LC_Pending:LC_Idle; }
 
 

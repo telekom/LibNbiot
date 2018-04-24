@@ -22,6 +22,9 @@
 #define NBIOTNOTIFY_H
 #include "nbiotdef.h"
 
+/*!
+ * \brief The Notification struct
+ */
 struct Notification
 {
     enum StateIds state;
@@ -32,6 +35,9 @@ struct Notification
 
 typedef struct Notification Notification;
 
+/*!
+ * \brief notifyHandler
+ */
 typedef void (*notifyHandler)(const Notification*);
 
 #endif // NBIOTNOTIFY_H
