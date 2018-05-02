@@ -19,7 +19,7 @@
 
 # Define any target platforms here. Only targets defined here will be build.
 # Don't forget to add appropriate cases below.
-# PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug
+# PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortx-m3 arm-cortx-m3-debug msp432-debug
 PLATFORMS := default
 
 
@@ -57,7 +57,7 @@ LFLAGS    := $(ARFLAGS)
 # forget to activate them by adding an entry to PLATFORMS above:
 ifeq ($(ARCH),default)
 CXX      := g++
-CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb
+CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb -D DEBUG
 endif
 ifeq ($(ARCH),x86)
 CXX       := g++
@@ -123,15 +123,14 @@ endif
 first: all
 
 
-all: $(TARGET)
+all: $(TARGET) $(APPLIB)
 
 
 $(APPLIB): $(TARGET)
-	   $(AR) -x $(EXTLIB)/libmqttsnpaho.a
-	   $(AR) -x $(EXTLIB)/libstm.a
-	   $(AR) -r $(APPLIB) *.o
-	   $(AR) -r $(APPLIB) *.co
-	   xcopy /y $(APPLIB) $(subst /,\\,$(LIB)/$(APPLIB))
+	@echo $(CURDIR)
+	$(AR) -r $(APPLIB) $(shell dir /b "*.o")
+	$(AR) -r $(APPLIB) $(shell dir /b "*.co")
+	xcopy /y $(APPLIB) $(subst /,\\,$(LIB)/$(APPLIB)*)
 
 
 $(TARGET): $(OBJECTS)
