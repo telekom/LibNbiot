@@ -40,9 +40,7 @@ public:
         apn(),
         apnuser(),
         apnpwd(),
-        operMccMnc(),
-        m_imsi(),
-        m_imsipwd(),
+        plmn(),
         m_deviceId()
     {}
     /*!
@@ -91,7 +89,7 @@ public:
      * \param usePw
      * \return
      */
-    virtual bool getImsi(nbiot::string& imsi, bool usePw = false);
+    virtual bool getImsi(nbiot::string& imsi);
     /*!
      * \brief getDeviceId
      * \return
@@ -128,18 +126,7 @@ public:
      * \brief configSetOperMccMnc
      * \param confOperMccMnc
      */
-    void configSetOperMccMnc(const char* confOperMccMnc) { operMccMnc = confOperMccMnc; }
-
-    /*!
-     * \brief configSetImsi
-     * \param confImsi
-     */
-    void configSetImsi(const char* confImsi) { m_imsi = confImsi; }
-    /*!
-     * \brief configSetImsiPwd
-     * \param confImsiPwd
-     */
-    void configSetImsiPwd(const char* confImsiPwd) { m_imsipwd = confImsiPwd; }
+    void configSetPlmn(const char* confPlmn) { plmn = confPlmn; }
 
     //! @todo error struct and lastError() method
 
@@ -155,10 +142,8 @@ private:
     nbiot::string apn;
     nbiot::string apnuser;
     nbiot::string apnpwd;
-    nbiot::string operMccMnc;
+    nbiot::string plmn;
 
-    nbiot::string m_imsi;
-    nbiot::string m_imsipwd;
     nbiot::string m_deviceId;
 
     static const unsigned int oneSecond = 1000;

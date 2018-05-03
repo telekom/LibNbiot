@@ -775,11 +775,18 @@ bool NbiotStm::actionInitialEntry(const StmEvent& e)
     }
     if(ok && !reInitialize)
     {
-        NbiotCoreApp::getInstance().getModemInstance().getImsi(m_dataPool.imsi);
-        NbiotCoreApp::getInstance().getModemInstance().getImsi(m_dataPool.imsiAuth, true);
-        if(m_dataPool.imsi.empty())
+        if(m_dataPool.authLogin.empty())
+        {
+            NbiotCoreApp::getInstance().getModemInstance().getImsi(m_dataPool.authLogin);
+        }
+        if(m_dataPool.authLogin.empty())
         {
             ok = false;
+        }
+        else
+        {
+            m_dataPool.authentication = m_dataPool.authLogin;
+            m_dataPool.authentication += m_dataPool.authPasswd;
         }
     }
     // if it's ReInitialze we need to go out of here in any case
@@ -1050,7 +1057,7 @@ bool NbiotStm::mqttConnect(unsigned char cleanSession)
         MQTTSNPacket_connectData data = MQTTSNPacket_connectData_initializer;
         data.duration = m_dataPool.keepAliveInterval;
         data.cleansession = cleanSession;
-        data.clientID.cstring = m_dataPool.imsiAuth.getData();
+        data.clientID.cstring = m_dataPool.authentication.getData();
         int rc = m_dataPool.client.connect(data);
         if (rc != 0)
         {

@@ -75,7 +75,7 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                         debugPrintf("eventLoop (sleep): handle wakeup and ping\r\n");
 #endif
                         sendEvent(NbiotStm::ConnectedAwakeEvent);
-                        m_dataPool.client.pmPing(m_dataPool.imsi.getData());
+                        m_dataPool.client.pmPing(m_dataPool.authLogin.getData());
                         m_dataPool.client.yield(/*tenSecondsMs*/); // since default is 15 sec. use default
                         m_dataPool.lastPollMs = getMillis();
                     }

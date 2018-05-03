@@ -20,7 +20,7 @@
 
 #include "nbiotcoreapp.h"
 
-static NbiotCoreApp* nbiotCoreAppInstance = 0l;
+static NbiotCoreApp* nbiotCoreAppInstance = nullptr;
 
 NbiotCoreApp::NbiotCoreApp():
     m_time(),
@@ -34,7 +34,7 @@ NbiotCoreApp::~NbiotCoreApp() {}
 
 NbiotCoreApp& NbiotCoreApp::getInstance()
 {
-    if(0l == nbiotCoreAppInstance)
+    if(nullptr == nbiotCoreAppInstance)
     {
         nbiotCoreAppInstance = new NbiotCoreApp();
     }
@@ -43,10 +43,10 @@ NbiotCoreApp& NbiotCoreApp::getInstance()
 
 void NbiotCoreApp::destroy()
 {
-    if(0l != nbiotCoreAppInstance)
+    if(nullptr != nbiotCoreAppInstance)
     {
         delete nbiotCoreAppInstance;
-        nbiotCoreAppInstance = 0l;
+        nbiotCoreAppInstance = nullptr;
     }
 }
 
@@ -128,19 +128,9 @@ unsigned int NbiotCoreApp::nbiotCoreConfig(NbiotCoreConf* conf)
             result |= CoreWarnApnPwd;
         }
 
-        if((nullptr != conf->operMccMnc) && (0 < strlen(conf->operMccMnc)))
+        if((nullptr != conf->plmn) && (0 < strlen(conf->plmn)))
         {
-            m_modem.configSetOperMccMnc(conf->operMccMnc);
-        }
-
-        if((nullptr != conf->imsi) && (0 < strlen(conf->imsi)))
-        {
-            m_modem.configSetImsi(conf->imsi);
-        }
-
-        if((nullptr != conf->imsiPwd) && (0 < strlen(conf->imsiPwd)))
-        {
-            m_modem.configSetImsiPwd(conf->imsiPwd);
+            m_modem.configSetPlmn(conf->plmn);
         }
 
         coreConfigError = result;

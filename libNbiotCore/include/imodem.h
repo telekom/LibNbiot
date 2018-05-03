@@ -83,7 +83,7 @@ public:
      * \param usePw
      * \return
      */
-    virtual bool getImsi(nbiot::string& imsi, bool usePw = false) = 0;
+    virtual bool getImsi(nbiot::string& imsi) = 0;
     /*!
      * \brief getDeviceId
      * \return

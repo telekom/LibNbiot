@@ -55,8 +55,9 @@ public:
         m_topicRegistry(new NbiotTopicRegistry()),
         initialized(false),
         m_hasSubscription(false),
-        imsi(),
-        imsiAuth(),
+        authLogin(),
+        authPasswd(),
+        authentication(),
         gateway(),
         mqttPort(defaultMqttPort),
         keepAliveInterval(minKeepAlive),
@@ -111,13 +112,17 @@ public:
      */
     bool m_hasSubscription;
     /*!
-     * \brief imsi
+     * \brief authLogin
      */
-    nbiot::string imsi;
+    nbiot::string authLogin;
     /*!
-     * \brief imsiAuth
+     * \brief authPasswd
      */
-    nbiot::string imsiAuth;
+    nbiot::string authPasswd;
+    /*!
+     * \brief authentication
+     */
+    nbiot::string authentication;
     /*!
      * \brief gateway
      */

@@ -150,7 +150,7 @@ bool NbiotModemTools::attach()
 {
     bool ret = true;
 
-    if(m_cmd.sendCommand(nbiot::string::Printf(cmdCOPS_arg, operMccMnc.c_str())))
+    if(m_cmd.sendCommand(nbiot::string::Printf(cmdCOPS_arg, plmn.c_str())))
     {
         if(!m_cmd.readResponse(REPLY_OK, tenSeconds))
         {
@@ -264,38 +264,26 @@ int NbiotModemTools::getAttachState()
     return ret;
 }
 
-bool NbiotModemTools::getImsi(nbiot::string& imsi, bool usePw)
+bool NbiotModemTools::getImsi(nbiot::string& imsi)
 {
     bool ret = false;
 
-    if(m_imsi.empty())
+    // get IMSI
+    if(m_cmd.sendCommand(cmdCIMI))
     {
-        // get IMSI
-        if(m_cmd.sendCommand(cmdCIMI))
+        if(m_cmd.readResponse(REPLY_ANY, threeSeconds))
         {
-            if(m_cmd.readResponse(REPLY_ANY, threeSeconds))
-            {
-                imsi = m_cmd.getResponse();
-                ret = true;
-                #ifdef DEBUG_MODEM
+            imsi = m_cmd.getResponse();
+            ret = true;
+#ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
-                debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+            debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
 #endif
-                debugPrintf("IMSI: %s\r\n", imsi.c_str());
-                #endif
-            }
+            debugPrintf("IMSI: %s\r\n", imsi.c_str());
+#endif
         }
-        m_cmd.readResponse(REPLY_IGNORE, oneSecond);
     }
-    else
-    {
-        imsi = m_imsi;
-        ret = true;
-    }
-    if(usePw)
-    {
-        imsi += m_imsipwd;
-    }
+    m_cmd.readResponse(REPLY_IGNORE, oneSecond);
     return ret;
 }
 

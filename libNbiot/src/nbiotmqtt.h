@@ -199,12 +199,22 @@ public:
      * \brief getClientId
      * \return
      */
-    const char* getClientId() const { return m_dataPool.imsi.c_str(); }
+    const char* getClientId() const { return m_dataPool.authLogin.c_str(); }
     /*!
      * \brief setPollInterval
      * \param pollInterval
      */
     void setPollInterval(unsigned short pollInterval) { m_pollInterval = pollInterval; }
+    /*!
+     * \brief setLogin
+     * \param login
+     */
+    void setLogin(const char* login) { m_dataPool.authLogin = login; }
+    /*!
+     * \brief setPassword
+     * \param password
+     */
+    void setPassword(const char* password) { m_dataPool.authPasswd = password; }
 
     /*!
      * \deprecated only used in deprecated function of public "C" interface

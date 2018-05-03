@@ -79,6 +79,8 @@ struct NbiotConf
     unsigned short pollInterval; /*!< The interval in msec. to poll for subscribed messages after publish */
     const char* gateway; /*!< IP-address of the nbIOT gateway server */
     unsigned short port; /*!< (MQTT-)port of the nbIOT gateway server */
+    const char* login; /*!< login string for authentication. If left empty, the IMSI will be used */
+    const char* password; /*!< password string for authentication */
 };
 
 typedef struct NbiotConf NbiotConf;

@@ -46,9 +46,7 @@ struct NbiotCoreConf
     const char* apn; /*!< The name of the used APN */
     const char* apnUser; /*!< The APN username */
     const char* apnPwd; /*!< The APN password */
-    const char* operMccMnc;
-    const char* imsi;
-    const char* imsiPwd;
+    const char* plmn;
 };
 
 typedef struct NbiotCoreConf NbiotCoreConf;
