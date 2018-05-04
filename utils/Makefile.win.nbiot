@@ -12,7 +12,7 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #############################################################################
@@ -127,15 +127,19 @@ all: $(TARGET) $(APPLIB)
 
 
 $(APPLIB): $(TARGET)
-	@echo $(CURDIR)
-	$(AR) -r $(APPLIB) $(shell dir /b "*.o")
-	$(AR) -r $(APPLIB) $(shell dir /b "*.co")
+	$(AR) x $(subst /,\\,$(EXTLIB)\libmqttsnpaho.a)
+	$(AR) x $(subst /,\\,$(EXTLIB)\libstm.a)
+	$(AR) r $(APPLIB) $(shell $(AR) t $(subst /,\\,$(EXTLIB)\libmqttsnpaho.a))
+	$(AR) r $(APPLIB) $(shell $(AR) t $(subst /,\\,$(EXTLIB)\libstm.a))
+	$(AR) r $(APPLIB) $(shell $(AR) t $(TARGET))
 	xcopy /y $(APPLIB) $(subst /,\\,$(LIB)/$(APPLIB)*)
 
 
 $(TARGET): $(OBJECTS)
-	$(LINKER) $(LFLAGS) $(TARGET) $(OBJECTS)
+	$(LINKER) $(LFLAGS)v $(TARGET) $(OBJECTS)
 	xcopy /y $(TARGET) $(subst /,\\,$(LIB)/$(TARGET)*)
+	$(AR) x $(subst /,\\,$(EXTLIB)/libmqttsnpaho.a)
+	$(AR) x $(subst /,\\,$(EXTLIB)/libstm.a)
 
 
 %.o: %.cpp
