@@ -46,12 +46,12 @@ struct NbiotCoreConf
     const char* apn; /*!< The name of the used APN */
     const char* apnUser; /*!< The APN username */
     const char* apnPwd; /*!< The APN password */
-    const char* plmn;
+    const char* plmn; /*!< The PLMN is identified by the Mobile Country Code (MCC) and the Mobile Network Code (MNC) */
 };
 
 typedef struct NbiotCoreConf NbiotCoreConf;
 
-#define NbiotCoreConf_initializer {1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define NbiotCoreConf_initializer {1000, 0, 0, 0, 0, 0, 0, 0, 0}
 
 /*!
  * \brief The NbiotConfigError enum enumerates the possible errors of the configuration ( nbiotConfig returns an OR'ed result )
