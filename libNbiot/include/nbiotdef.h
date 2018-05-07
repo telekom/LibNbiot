@@ -46,7 +46,7 @@ enum StateIds
     DeepSleepState,
     DisconnectedSleepState,
     ConnectedAwakeState,
-    WaitForGprsState,
+    WaitForAttachState,
     WaitForConnectState
 };
 

@@ -36,8 +36,9 @@ NbiotStm::NbiotStm(NbiotStmDataPool &dataPool) :
     m_isInitializedDisconnected(new Transition()),
     m_isInitializedError(new Transition()),
     m_connect(new Transition()),
-    m_isGprsEnabledIpConnect(new Transition()),
-    m_isGprsEnabledError(new Transition()),
+    m_isNotAttached(new Transition()),
+    m_isAttachedIpConnect(new Transition()),
+    m_isAttachedError(new Transition()),
     m_isIpConnectedError(new Transition()),
     m_isConnectedConnected(new Transition()),
     m_waitConnectIsConnected(new Transition()),
@@ -58,6 +59,7 @@ NbiotStm::NbiotStm(NbiotStmDataPool &dataPool) :
     m_disWakeup(new Transition()),
     m_disHibernate(new Transition()),
     m_isInitialized(new Choice()),
+    m_isAttached(new Choice()),
     m_isIpConnected(new Choice()),
     m_Initial(new State(this)),
     m_Disconnected(new State(this)),
@@ -67,16 +69,16 @@ NbiotStm::NbiotStm(NbiotStmDataPool &dataPool) :
     m_ConnectedAwake(new State(this)),
     m_DeepSleep(new State(this)),
     m_DisconnectedSleep(new State(this)),
-    m_WaitForGprs(new State(this)),
+    m_WaitForAttach(new State(this)),
     m_WaitForConnect(new State(this)),
     m_dataPool(dataPool),
     m_evDisp(new EventDispatcher(this)),
     m_notifyHandler(nullptr),
-    m_cgattLoopClient(LI_Cgatt)
+    m_attachLoopClient(LI_Cgatt)
 {
-    m_cgattLoopClient.setLoopStartHandler(this, &NbiotStm::startCgattLoop);
-    m_cgattLoopClient.setLoopStepHandler(this, &NbiotStm::doCgattLoop);
-    m_cgattLoopClient.setLoopStopHandler(this, &NbiotStm::finishCgattLoop);
+    m_attachLoopClient.setLoopStartHandler(this, &NbiotStm::startAttachLoop);
+    m_attachLoopClient.setLoopStepHandler(this, &NbiotStm::doAttachLoop);
+    m_attachLoopClient.setLoopStopHandler(this, &NbiotStm::finishAttachLoop);
 }
 
 NbiotStm::~NbiotStm()
@@ -88,8 +90,9 @@ NbiotStm::~NbiotStm()
     delete m_isInitializedDisconnected;
     delete m_isInitializedError;
     delete m_connect;
-    delete m_isGprsEnabledIpConnect;
-    delete m_isGprsEnabledError;
+    delete m_isNotAttached;
+    delete m_isAttachedIpConnect;
+    delete m_isAttachedError;
     delete m_isIpConnectedError;
     delete m_isConnectedConnected;
     delete m_waitConnectIsConnected;
@@ -111,6 +114,7 @@ NbiotStm::~NbiotStm()
     delete m_disHibernate;
 
     delete m_isInitialized;
+    delete m_isAttached;
     delete m_isIpConnected;
 
     delete m_Initial;
@@ -121,7 +125,7 @@ NbiotStm::~NbiotStm()
     delete m_ConnectedAwake;
     delete m_DeepSleep;
     delete m_DisconnectedSleep;
-    delete m_WaitForGprs;
+    delete m_WaitForAttach;
     delete m_WaitForConnect;
 }
 
@@ -159,17 +163,20 @@ void NbiotStm::setUpStateMachine()
     m_isInitializedError->setAction(this, &NbiotStm::actionIsInitializedError);
 
 
-    m_connect->setTarget(m_WaitForGprs);
+    m_connect->setTarget(m_isAttached);
     m_connect->setAction(this, &NbiotStm::actionConnect);
     m_connect->setEventType(ConnectEvent);
 
-    m_isGprsEnabledIpConnect->setTarget(m_isIpConnected);
-    m_isGprsEnabledIpConnect->setAction(this, &NbiotStm::actionIsGprsEnabledIpConnect);
-    m_isGprsEnabledIpConnect->setEventType(AttachedEvent);
+    m_isNotAttached->setTarget(m_WaitForAttach);
+    m_isNotAttached->setAction(this, &NbiotStm::actionIsNotAttached);
 
-    m_isGprsEnabledError->setTarget(m_Error);
-    m_isGprsEnabledError->setAction(this, &NbiotStm::actionIsGprsEnabledError);
-    m_isGprsEnabledError->setEventType(StmEvent::Timer);
+    m_isAttachedIpConnect->setTarget(m_isIpConnected);
+    m_isAttachedIpConnect->setAction(this, &NbiotStm::actionIsAttachedIpConnect);
+    m_isAttachedIpConnect->setEventType(AttachedEvent);
+
+    m_isAttachedError->setTarget(m_Error);
+    m_isAttachedError->setAction(this, &NbiotStm::actionIsAttachedError);
+    m_isAttachedError->setEventType(StmEvent::Timer);
 
 
     m_isIpConnectedError->setTarget(m_Error);
@@ -272,6 +279,9 @@ void NbiotStm::setUpStateMachine()
     m_isInitialized->setCondition(this, &NbiotStm::actionIsInitialized);
     m_isInitialized->setTransitions(m_isInitializedDisconnected, m_isInitializedError);
 
+    m_isAttached->setCondition(this, &NbiotStm::actionIsAttached);
+    m_isAttached->setTransitions(m_isAttachedIpConnect, m_isNotAttached);
+
     m_isIpConnected->setCondition(this, &NbiotStm::actionIsIpConnected);
     m_isIpConnected->setTransitions(m_waitConnectIsConnected, m_isIpConnectedError);
 
@@ -321,14 +331,14 @@ void NbiotStm::setUpStateMachine()
     m_DisconnectedSleep->addTransition(m_disWakeup);
     m_DisconnectedSleep->setId(DisconnectedSleepState);
 
-    m_WaitForGprs->setAction(this, &NbiotStm::actionWaitForGprsEntry);
+    m_WaitForAttach->setAction(this, &NbiotStm::actionWaitForAttachEntry);
     // ---
     //m_WaitForGprs->addTransition(m_checkGprsEnabled);
     // +++
-    m_WaitForGprs->addTransition(m_isGprsEnabledIpConnect);
+    m_WaitForAttach->addTransition(m_isAttachedIpConnect);
     // +++
-    m_WaitForGprs->addTransition(m_isGprsEnabledError);
-    m_WaitForGprs->setId(WaitForGprsState);
+    m_WaitForAttach->addTransition(m_isAttachedError);
+    m_WaitForAttach->setId(WaitForAttachState);
 
     m_WaitForConnect->setAction(this, &NbiotStm::actionWaitForConnectEntry);
     // ---
@@ -418,24 +428,34 @@ bool NbiotStm::actionIsInitializedError(const StmEvent& e)
     return false;
 }
 
-//! @brief starts a one minute timer and a loop to check the attchement state of the modem
-//! an outer state, transition and choice loop checks for timeout
 bool NbiotStm::actionConnect(const StmEvent& e)
 {
     (void)e;
     m_dataPool.m_errno = Success;
-    m_dataPool.m_waitTimer.start(timeoutOneMinute);
 #ifdef DEBUG_MQTT
 #ifdef DEBUG_COLOR
         debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
 #endif
         debugPrintf("STM:actionConnect\r\n");
 #endif
+    return false;
+}
+
+bool NbiotStm::actionIsNotAttached(const StmEvent& e)
+{
+    (void)e;
+    m_dataPool.m_waitTimer.start(timeoutOneMinute);
+#ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
+        debugPrintf("STM:actionIsNotAttached\r\n");
+#endif
     doModemAttach();
     return false;
 }
 
-bool NbiotStm::actionIsGprsEnabledIpConnect(const StmEvent& e)
+bool NbiotStm::actionIsAttachedIpConnect(const StmEvent& e)
 {
     (void)e;
 
@@ -478,7 +498,7 @@ bool NbiotStm::actionIsGprsEnabledIpConnect(const StmEvent& e)
     return NbiotCoreApp::getInstance().getNetworkInstance().isConnected();
 }
 
-bool NbiotStm::actionIsGprsEnabledError(const StmEvent& e)
+bool NbiotStm::actionIsAttachedError(const StmEvent& e)
 {
     (void)e;
     m_dataPool.m_errno = GprsNotConnected;
@@ -735,6 +755,18 @@ bool NbiotStm::actionIsInitialized(const StmEvent& e)
     debugPrintf("STM:actionIsInitialized %d\r\n",m_dataPool.initialized);
 #endif
     return m_dataPool.initialized;
+}
+
+bool NbiotStm::actionIsAttached(const StmEvent& e)
+{
+    (void)e;
+#ifdef DEBUG_MQTT
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
+#endif
+    debugPrintf("STM:actionIsAttached %s\r\n", (NbiotCoreApp::getInstance().getModemInstance().isAttached()?"true":"false"));
+#endif
+    return NbiotCoreApp::getInstance().getModemInstance().isAttached();
 }
 
 bool NbiotStm::actionIsIpConnected(const StmEvent& e)
@@ -1005,7 +1037,7 @@ bool NbiotStm::actionDisconnectedSleepEntry(const StmEvent& e)
 }
 #endif
 
-bool NbiotStm::actionWaitForGprsEntry(const StmEvent& e)
+bool NbiotStm::actionWaitForAttachEntry(const StmEvent& e)
 {
     (void)e;
     // ---
@@ -1091,13 +1123,14 @@ void NbiotStm::finishDisconnect()
     {
         NbiotCoreApp::getInstance().getNetworkInstance().disconnect();
     }
-    if(NbiotCoreApp::getInstance().getModemInstance().isAttached())
-    {
-        if(NbiotCoreApp::getInstance().getModemInstance().detach())
-        {
-            m_dataPool.m_modemAttached = false;
-        }
-    }
+//! \todo remove the following if decoupling is successful
+//    if(NbiotCoreApp::getInstance().getModemInstance().isAttached())
+//    {
+//        if(NbiotCoreApp::getInstance().getModemInstance().detach())
+//        {
+//            m_dataPool.m_modemAttached = false;
+//        }
+//    }
     if(m_dataPool.m_loopCtrl.isBusy())
     {
         // clear the loop-controller
@@ -1129,12 +1162,12 @@ void NbiotStm::doModemAttach()
     debugPrintf("register CGATT loop client\r\n");
 #endif
     m_dataPool.m_modemAttached = false;
-    m_cgattLoopClient.getTimer().setTime(fiftyFiveSeconds);
-    m_dataPool.m_loopCtrl.registerLoopClient(&m_cgattLoopClient);
+    m_attachLoopClient.getTimer().setTime(fiftyFiveSeconds);
+    m_dataPool.m_loopCtrl.registerLoopClient(&m_attachLoopClient);
 }
 
 
-bool NbiotStm::startCgattLoop(int& i)
+bool NbiotStm::startAttachLoop(int& i)
 {
     (void) i;
     bool ret = false;
@@ -1145,10 +1178,10 @@ bool NbiotStm::startCgattLoop(int& i)
 #endif
     debugPrintf("start CGATT loop\r\n");
 #endif
-    Timer timer = Timer(m_cgattLoopClient.getTimer().getTime());
+    Timer timer = Timer(m_attachLoopClient.getTimer().getTime());
     if (NbiotCoreApp::getInstance().getModemInstance().attach()) // start attachement
     {
-        m_cgattLoopClient.getTimer().start(timer.remaining());
+        m_attachLoopClient.getTimer().start(timer.remaining());
         m_dataPool.m_modemAttached = false;
         ret = true;
     }
@@ -1156,7 +1189,7 @@ bool NbiotStm::startCgattLoop(int& i)
     return ret;
 }
 
-bool NbiotStm::doCgattLoop(int& loopTime)
+bool NbiotStm::doAttachLoop(int& loopTime)
 {
     bool ret = true;
 
@@ -1164,9 +1197,9 @@ bool NbiotStm::doCgattLoop(int& loopTime)
 #ifdef DEBUG_COLOR
     debugPrintf("\033[0;32m[ MQTT     ]\033[0m ");
 #endif
-    debugPrintf("CGATT loop: step T = %d\r\n", m_cgattLoopClient.getTimer().remaining());
+    debugPrintf("CGATT loop: step T = %d\r\n", m_attachLoopClient.getTimer().remaining());
 #endif
-    loopTime = static_cast<int>(m_cgattLoopClient.getTimer().remaining());
+    loopTime = static_cast<int>(m_attachLoopClient.getTimer().remaining());
     int interval = (loopInterval < loopTime)?loopInterval:loopTime;
     if(0 == interval)
     {
@@ -1190,7 +1223,7 @@ bool NbiotStm::doCgattLoop(int& loopTime)
     return ret;
 }
 
-bool NbiotStm::finishCgattLoop(int& loopTime)
+bool NbiotStm::finishAttachLoop(int& loopTime)
 {
     bool ret = true;
 
