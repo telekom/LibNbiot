@@ -12,7 +12,7 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #############################################################################
@@ -43,11 +43,9 @@ VPATH     := $(SRCDIR) $(INC) $(addprefix $(SRCDIR)/,paho.mqtt-sn.embedded-c/MQT
 
 
 # Variable definitions.
-INCLUDES  := $(addprefix -I ,$(VPATH)) -I $(COREINC) -I $(INC)
-AR        := ar 
-ARFLAGS   := cq
-LINKER    := $(AR)
-LFLAGS    := $(ARFLAGS)
+INCLUDES  := $(addprefix -I ,$(VPATH) $(INC))
+LINKER    := ar
+LFLAGS    := cq
 
 STMOBJECTS     := $(subst $(SRCDIR)/StateMachine,,$(subst .cpp,.o,$(notdir $(shell find $(SRCDIR)/StateMachine -name "*.cpp"))))
 STMINCLUDES    := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/StateMachine -name "*.h")))
@@ -55,7 +53,7 @@ STMTARGET      := libstm.a
 
 LISTINCLUDES   := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/List -name "*.h")))
 
-MQTTSNOBJECTS  := $(subst $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNPacket,,$(subst .c,.co,$(notdir $(shell find $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNPacket -name "*.c"))))
+MQTTSNOBJECTS  := $(subst $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNPacket,,$(subst .c,.o,$(notdir $(shell find $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNPacket -name "*.c"))))
 MQTTSNINCLUDES := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNPacket -name "*.h")))
 MQTTSNINCLUDES += $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/paho.mqtt-sn.embedded-c/MQTTSNClient -name "*.h"))) 
 MQTTSNTARGET   := libmqttsnpaho.a
@@ -66,8 +64,8 @@ FPINCLUDES     := $(addprefix $(INC)/,$(notdir $(shell find $(SRCDIR)/FP -name "
 # Add special definitions and compile options for target platforms here. Don't
 # forget to activate them by adding an entry to PLATFORMS above:
 ifeq ($(ARCH),default)
-CXX      := g++
-CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb
+CXX       := g++
+CXXFLAGS  := -std=c++11 -Wall -g -O0 -ggdb
 endif
 ifeq ($(ARCH),x86)
 CXX       := g++
@@ -127,6 +125,16 @@ CXX       := arm-none-eabi-gcc
 CXXFLAGS  := -I /usr/lib/arm-none-eabi/include -mcpu=cortex-m3 -mthumb -Wa,-alh=nbiot_time.lst \
   -g -Wall -ffunction-sections -D DEBUG -g -O0 -ffat-lto-objects -std=c++0x -ggdb
 endif
+ifeq ($(ARCH),msp432-debug)
+CXX       := armcl
+CXXFLAGS  := -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me \
+  --define=__MSP432P401R__ --define=ccs -g --gcc --diag_warning=225 --diag_wrap=off \
+  --display_error_number --abi=eabi --c++14 -eo=o
+LINKER    := armar
+LFLAGS    := r
+# Add ti specific files to include search path - adjust this accordingly to your installation
+INCLUDES  += -I /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include
+endif
 
 
 # Build targets, usually these don't need to be modified.
@@ -164,11 +172,11 @@ $(STMINCLUDES):
 
 
 %.o: %.cpp $(LISTINCLUDES)
-	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $< -o $@
+	$(CXX) -c $< $(INCLUDES) $(CXXFLAGS)
 
 
-%.co: %.c
-	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $< -o $@
+%.o: %.c $(LISTINCLUDES)
+	$(CXX) -c $< $(INCLUDES) $(CXXFLAGS)
 
 
 $(LISTINCLUDES):
