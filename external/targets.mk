@@ -12,7 +12,7 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #############################################################################
@@ -36,8 +36,7 @@ $(BUILDDIR)/$(P): $(INCDIR)
 	[ -d $(LIBDIR)/$(P) ] || mkdir -p $(LIBDIR)/$(P)
 	+@$(MAKE) -C $$@ -f $(CURDIR)/Makefile \
             SRCDIR=$(CURDIR)/src INC=$(CURDIR)/$$< \
-            ARCH=$(P) LIB=$(CURDIR)/$(LIBDIR)/$(P) \
-            COREINC=$(CURDIR)/$(CORE)/include $(MAKECMDGOALS)
+            ARCH=$(P) LIB=$(CURDIR)/$(LIBDIR)/$(P) $(MAKECMDGOALS)
 endef
 $(foreach P,$(PLATFORMS),$(eval $(PLATFORMRULE)))
 
