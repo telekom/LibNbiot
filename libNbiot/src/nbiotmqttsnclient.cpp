@@ -497,7 +497,6 @@ bool NbiotMqttSnClient::sendPubPacket(int packetId, unsigned char dup, unsigned 
         nbiot::Timer timer = nbiot::Timer(timeout);
         if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the publish packet
         {
-            m_pubLoopClient.getTimer().start(timer.remaining());
             ret = true;
         }
     }
@@ -553,7 +552,7 @@ bool NbiotMqttSnClient::doPubLoop(int& loopTime)
             m_pubRetryCount--;
             int packetId = m_pubLoopClient.getValue();
             nbiot::Timer timer = nbiot::Timer(m_pubRetryTimeout);
-            if(sendPubPacket(packetId, 1, timer.remaining()))
+            if(sendPubPacket(packetId, 1, timer.remaining())) // re-transmit the packet and reset the timer until the counter is zero
             {
                 m_pubLoopClient.getTimer().start(timer.remaining());
             }

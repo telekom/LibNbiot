@@ -71,7 +71,6 @@ public:
         m_duration(0),
         m_modemRestartOnError(0),
         m_maxTopics(defaultMaxTopics),
-        m_maxResend(0),
         m_modemAttached(false),
         m_waitTimer(),
         m_loopCtrl(lc)
@@ -176,10 +175,6 @@ public:
      * \brief m_maxTopics
      */
     unsigned short m_maxTopics;
-    /*!
-     * \brief m_maxResend
-     */
-    unsigned short m_maxResend;
     /*!
      * \brief m_modemAttached
      */
