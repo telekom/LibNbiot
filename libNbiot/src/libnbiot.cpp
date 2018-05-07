@@ -95,6 +95,15 @@ unsigned int nbiotConfig(NbiotConf* conf)
             result |= ErrorPort;
         }
 
+        if(MAX_RESEND_LIMIT >= conf->maxResend)
+        {
+            nbiotMqtt.setMaxResend(conf->maxResend);
+        }
+        else
+        {
+            result |= ErrorMaxResend;
+        }
+
         if(nullptr != conf->login)
         {
             nbiotMqtt.setLogin(conf->login);

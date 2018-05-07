@@ -30,6 +30,9 @@ NbiotMqttSnClient::NbiotMqttSnClient(nbiot::NbiotLoop& lc, MQTTSN_topicid& topic
         m_unsubLoopClient(LI_Unsubscribe),
         m_yieldLoopClient(LI_Yield),
         m_disLoopClient(LI_Disconnect),
+        m_pubRetryTimeout(0),
+        m_pubRetryCount(0),
+        m_pubMaxRetry(0),
         yieldRunning(false)
 {
     m_conLoopClient.setLoopStartHandler(this, &NbiotMqttSnClient::startConLoop);
@@ -251,6 +254,8 @@ void NbiotMqttSnClient::loopYield(unsigned long timeout_ms)
 
 void NbiotMqttSnClient::loopPublish(unsigned short id, unsigned long timer_left)
 {
+    m_pubRetryTimeout = timer_left;
+    m_pubRetryCount = m_pubMaxRetry;
     m_pubLoopClient.getTimer().setTime(timer_left);
     m_pubLoopClient.setValue(id);
     m_loopController.registerLoopClient(&m_pubLoopClient);
@@ -472,14 +477,13 @@ bool NbiotMqttSnClient::finishSubLoop(int& loopTime)
     return ret;
 }
 
-
-bool NbiotMqttSnClient::startPubLoop(int& packetId)
+bool NbiotMqttSnClient::sendPubPacket(int packetId, unsigned char dup, unsigned long timeout)
 {
     bool ret = false;
     int len = 0;
     unsigned short id = static_cast<unsigned short>(packetId);
 
-    len = MQTTSNSerialize_publish(sendbuf, getMaxPacketSize(), 0, m_qos, m_retained, id,
+    len = MQTTSNSerialize_publish(sendbuf, getMaxPacketSize(), dup, m_qos, m_retained, id,
               m_topicName, (unsigned char*)m_payload, m_payloadlen);
     if (0 < len)
     {
@@ -490,12 +494,45 @@ bool NbiotMqttSnClient::startPubLoop(int& packetId)
         inflightQoS = m_qos;
 
 
-        nbiot::Timer timer = nbiot::Timer(m_pubLoopClient.getTimer().getTime());
+        nbiot::Timer timer = nbiot::Timer(timeout);
         if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the publish packet
         {
             m_pubLoopClient.getTimer().start(timer.remaining());
             ret = true;
         }
+    }
+    return ret;
+}
+
+bool NbiotMqttSnClient::startPubLoop(int& packetId)
+{
+//    bool ret = false;
+//    int len = 0;
+//    unsigned short id = static_cast<unsigned short>(packetId);
+
+//    len = MQTTSNSerialize_publish(sendbuf, getMaxPacketSize(), 0, m_qos, m_retained, id,
+//              m_topicName, (unsigned char*)m_payload, m_payloadlen);
+//    if (0 < len)
+//    {
+
+//        memcpy(pubbuf, sendbuf, len);
+//        inflightLen = len;
+//        inflightMsgid = id;
+//        inflightQoS = m_qos;
+
+
+//        nbiot::Timer timer = nbiot::Timer(m_pubLoopClient.getTimer().getTime());
+//        if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the publish packet
+//        {
+//            m_pubLoopClient.getTimer().start(timer.remaining());
+//            ret = true;
+//        }
+//    }
+    nbiot::Timer timer = nbiot::Timer(m_pubLoopClient.getTimer().getTime());
+    bool ret = sendPubPacket(packetId, 0, timer.remaining());
+    if(ret)
+    {
+        m_pubLoopClient.getTimer().start(timer.remaining());
     }
     return ret;
 }
@@ -511,6 +548,16 @@ bool NbiotMqttSnClient::doPubLoop(int& loopTime)
     }
     else
     {
+        if((0 == m_pubLoopClient.getTimer().remaining()) && (0 < m_pubRetryCount))
+        {
+            m_pubRetryCount--;
+            int packetId = m_pubLoopClient.getValue();
+            nbiot::Timer timer = nbiot::Timer(m_pubRetryTimeout);
+            if(sendPubPacket(packetId, 1, timer.remaining()))
+            {
+                m_pubLoopClient.getTimer().start(timer.remaining());
+            }
+        }
         loopTime = static_cast<int>(m_pubLoopClient.getTimer().remaining());
         int interval = (loopInterval < loopTime)?loopInterval:loopTime;
         ret = loopWait(MQTTSN_PUBACK, interval);

@@ -196,6 +196,11 @@ public:
      */
     void setMaxTopics(unsigned short maxTopics) { m_dataPool.m_maxTopics = maxTopics; }
     /*!
+     * \brief setMaxResend
+     * \param maxResend
+     */
+    void setMaxResend(unsigned short maxResend) { m_dataPool.m_maxResend = maxResend; }
+    /*!
      * \brief getClientId
      * \return
      */
