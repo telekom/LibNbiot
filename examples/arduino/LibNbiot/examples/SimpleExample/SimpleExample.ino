@@ -154,9 +154,7 @@ unsigned char init(char* imsi, char* pw)
         core_conf.apn = "nb-cloud.ic.m2mportal.de";
         core_conf.apnUser = "";
         core_conf.apnPwd = "";
-        core_conf.operMccMnc = "26201";
-        core_conf.imsi = imsi;
-        core_conf.imsiPwd = pw;
+        core_conf.plmn = "26201";
 
         unsigned int retCoreConf = nbiotCoreConfig(&core_conf);
 
@@ -168,6 +166,8 @@ unsigned char init(char* imsi, char* pw)
         conf.port = 1883;
         conf.notify_fu = notificationHandler;
         conf.pollInterval = 1000;
+        conf.login = imsi;
+        conf.password = pw;
 
         unsigned int retConf = nbiotConfig(&conf);
 
