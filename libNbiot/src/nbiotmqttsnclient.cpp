@@ -325,7 +325,9 @@ bool NbiotMqttSnClient::finishConLoop(int& loopTime)
             }
         }
         else
+        {
             ret = false;
+        }
     }
 
     if (cleansession==0 && inflightMsgid>0)
@@ -404,10 +406,14 @@ bool NbiotMqttSnClient::finishRegLoop(int& loopTime)
                 m_topicName.data.id = topicid;
             }
             else
+            {
                 ret = false;
+            }
         }
         else
+        {
             ret = false;
+        }
     }
     return ret;
 }
@@ -463,10 +469,14 @@ bool NbiotMqttSnClient::finishSubLoop(int& loopTime)
                 }
             }
             else
+            {
                 ret = false;
+            }
         }
         else
+        {
             ret = false;
+        }
     }
 #if defined(DEBUG_MQTT)
 #ifdef DEBUG_COLOR
@@ -505,28 +515,6 @@ bool NbiotMqttSnClient::sendPubPacket(int packetId, unsigned char dup, unsigned 
 
 bool NbiotMqttSnClient::startPubLoop(int& packetId)
 {
-//    bool ret = false;
-//    int len = 0;
-//    unsigned short id = static_cast<unsigned short>(packetId);
-
-//    len = MQTTSNSerialize_publish(sendbuf, getMaxPacketSize(), 0, m_qos, m_retained, id,
-//              m_topicName, (unsigned char*)m_payload, m_payloadlen);
-//    if (0 < len)
-//    {
-
-//        memcpy(pubbuf, sendbuf, len);
-//        inflightLen = len;
-//        inflightMsgid = id;
-//        inflightQoS = m_qos;
-
-
-//        nbiot::Timer timer = nbiot::Timer(m_pubLoopClient.getTimer().getTime());
-//        if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the publish packet
-//        {
-//            m_pubLoopClient.getTimer().start(timer.remaining());
-//            ret = true;
-//        }
-//    }
     nbiot::Timer timer = nbiot::Timer(m_pubLoopClient.getTimer().getTime());
     bool ret = sendPubPacket(packetId, 0, timer.remaining());
     if(ret)
