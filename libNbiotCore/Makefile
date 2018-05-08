@@ -115,6 +115,7 @@ LINKER   := armar
 LFLAGS   := r
 # Add ti specific files to include search path - adjust this according to your installation
 INCLUDES += -I /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include
+TARGET   := libnbiotcore.lib
 endif
 
 

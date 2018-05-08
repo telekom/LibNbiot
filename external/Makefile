@@ -81,6 +81,7 @@ CXXFLAGS  := -m32 -std=c++0x -Wall -Os -fPIC
 LINKER    := g++
 LFLAGS    := -shared -m32 -o
 STMTARGET := libstm.so
+
 MQTTSNTARGET := libmqttsnpaho.so
 endif
 ifeq ($(ARCH),x86-debug-shared)
@@ -134,6 +135,8 @@ LINKER    := armar
 LFLAGS    := r
 # Add ti specific files to include search path - adjust this accordingly to your installation
 INCLUDES  += -I /opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include
+MQTTSNTARGET := libmqttsnpaho.lib
+STMTARGET    := libstm.lib
 endif
 
 
