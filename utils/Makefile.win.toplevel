@@ -12,7 +12,7 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #############################################################################
@@ -26,7 +26,7 @@
 #
 # Currently these platforms are supported.
 # export PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortex-m3 arm-cortex-m3-debug msp432-debug
-export PLATFORMS := default 
+export PLATFORMS := default
 
 
 # Internal variables
@@ -79,11 +79,11 @@ directories:
 	$(shell if not exist $(INCDIR) mkdir $(INCDIR))
 	$(shell if not exist $(LIBDIR) mkdir $(LIBDIR)) 
 
-	
+
 clean:
 	$(shell if exist $(LIBDIR) rmdir /s/q $(LIBDIR))	
 	$(shell if exist $(INCDIR) rmdir /s/q $(INCDIR))
 	$(MAKE) clean -C $(EXTERNAL)
 	$(MAKE) clean -C $(CORELIB)
 	$(MAKE) clean -C $(APPLIB)
-	
+

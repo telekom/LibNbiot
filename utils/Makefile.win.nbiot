@@ -45,12 +45,9 @@ VPATH     := $(SRCDIR) $(INCDIR)
 # Variable definitions.
 INCLUDES  := $(addprefix -I ,$(VPATH)) -I $(COREINC) -I  $(EXTINC)
 OBJECTS   := $(subst .cpp,.o,$(shell dir /b "$(SRCDIR)\*.cpp"))
-AR        := ar
-ARFLAGS   := cq
 TARGET    := libnbiot.a
-APPLIB    := libnbiotapp.a
-LINKER    := $(AR)
-LFLAGS    := $(ARFLAGS)
+LINKER    := ar
+LFLAGS    := cq
 
 
 # Add special definitions and compile options for target platforms here. Don't
@@ -93,7 +90,6 @@ CXXFLAGS  := -m64 -std=c++0x -Wall -Os -fPIC
 LINKER    := g++
 LFLAGS    := -shared -m64 -o
 TARGET    := libnbiot.so
-APPLIB    :=
 endif
 ifeq ($(ARCH),x86_64-shared-debug)
 CXX       := g++
@@ -101,7 +97,6 @@ CXXFLAGS  := -m64 -std=c++0x -Wall -D DEBUG -g -O0 -fPIC -ggdb
 LINKER    := g++
 LFLAGS    := -shared -m64 -o
 TARGET    := libnbiot.so
-APPLIB    :=
 endif
 ifeq ($(ARCH),x86_64-debug)
 CXX       := g++
@@ -117,33 +112,33 @@ CXX       := arm-none-eabi-gcc
 CXXFLAGS  := -mcpu=cortex-m3 -mthumb -Wa,-alh=nbiot_time.lst \
   -g -Wall -ffunction-sections -D DEBUG -g -O0 -ffat-lto-objects -std=c++0x -ggdb
 endif
+ifeq ($(ARCH),msp432-debug)
+CXX       := armcl
+CXXFLAGS  := -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me \
+  --define=__MSP432P401R__ --define=ccs -g --gcc --diag_warning=225 --diag_wrap=off \
+  --display_error_number --abi=eabi --c++14 -eo=o
+LINKER    := armar
+LFLAGS    := r
+# Add ti specific files to include search path - adjust this accordingly to your installation
+INCLUDES  += -I C:\ti\ccsv8\tools\compiler\ti-cgt-arm_18.1.1.LTS\include
+TARGET    := libnbiot.lib
+endif
 
 
 # Build targets, usually these don't need to be modified.
 first: all
 
 
-all: $(TARGET) $(APPLIB)
-
-
-$(APPLIB): $(TARGET)
-	$(AR) x $(subst /,\\,$(EXTLIB)\libmqttsnpaho.a)
-	$(AR) x $(subst /,\\,$(EXTLIB)\libstm.a)
-	$(AR) r $(APPLIB) $(shell $(AR) t $(subst /,\\,$(EXTLIB)\libmqttsnpaho.a))
-	$(AR) r $(APPLIB) $(shell $(AR) t $(subst /,\\,$(EXTLIB)\libstm.a))
-	$(AR) r $(APPLIB) $(shell $(AR) t $(TARGET))
-	xcopy /y $(APPLIB) $(subst /,\\,$(LIB)/$(APPLIB)*)
+all: $(TARGET)
 
 
 $(TARGET): $(OBJECTS)
 	$(LINKER) $(LFLAGS)v $(TARGET) $(OBJECTS)
 	xcopy /y $(TARGET) $(subst /,\\,$(LIB)/$(TARGET)*)
-	$(AR) x $(subst /,\\,$(EXTLIB)/libmqttsnpaho.a)
-	$(AR) x $(subst /,\\,$(EXTLIB)/libstm.a)
 
 
 %.o: %.cpp
-	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $< -o $@
+	$(CXX) -c $< $(CXXFLAGS) $(INCLUDES) 
 
 
 endif
