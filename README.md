@@ -53,9 +53,10 @@ Currently the following platforms are supported:
 * **x86_64-shared-debug** (64-bit, shared library, debug settings enabled)
 * **arm-cortex-m3** (ARM Cortex M3 bare metal, static library, optimized for size)
 * **arm-cortex-m3-debug** (ARM Cortex M3 bare metal, static library, debug settings enabled)
+* **msp432-debug** (TI MSP432 ARM Cortex M3, compiled with TI-ARM compiler, static library, debug settings enabled)
 
 By default the only target platform enabled is **default**. To enable another/additional one, just open
-the makefile and add it to the PLATFORMS variable. For example the variable should look like this
+the makefile and add it to the `PLATFORMS` variable. For example the variable should look like this
 
     export PLATFORMS := arm-cortex-m3 arm-cortex-m3-debug
 
@@ -131,10 +132,10 @@ environment (c-example), respectively. Meanwhile examples for
 
 * Cypress PSoC5
 * Arduino Mega
+* TI MSP432
 
-were added. These examples can be found in the respective directories in the examples directory as well. However,
-as they require environment specific setups, they come with dedicated READMEs, which can be found in the respective
-directories.
+were added. These examples can be found in the respective subfolders in the examples directory as well. However,
+as they require environment specific setups, they come with dedicated READMEs, which explain their setup and usage.
 
 ### Building
 
@@ -185,6 +186,28 @@ should be presented by the running example program, similar to this:
     [----------] Id:           1
     [----------] Payload:      1234
     [----------] Topic:        NBIoT/111111111112345/CMD/MyCmd
+
+## Building custom applications
+
+As explained in the sections above, the makefiles distributed with the library allow compilation for several target
+platforms. The result is usually a set of for libraries:
+
+* libnbiot
+* libnbiotcore
+* libnbiotstm
+* libmqttsnpaho
+
+which provide the functions from the different packages. There are some dependencies which have to be taken into
+account during compilation: **libnbiot** depends on the three libraries. This means, hat **libnbiot** is usually
+required to be the first listed library for most compilers/linkers.
+
+For compilation/linkage with the **gcc** toolchain, a linker call would look similiar to this:
+
+    gcc main.o libnbiot.a libnbiotcore.a libstm.a libmqttsnpaho.a
+
+If you don't want to care about providing the proper ordering of the libraries, you can add `-Wl,--no-as-needed` to the linker
+invocation (see [gcc](https://gcc.gnu.org/) and [ld](https://sourceware.org/binutils/docs-2.27/ld/index.html) manuals for further information).
+
 
 ## License
 
