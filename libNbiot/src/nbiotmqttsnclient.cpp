@@ -32,7 +32,9 @@ NbiotMqttSnClient::NbiotMqttSnClient(nbiot::NbiotLoop& lc, MQTTSN_topicid& topic
         m_disLoopClient(LI_Disconnect),
         m_pubRetryTimeout(0),
         m_pubRetryCount(0),
-        m_pubMaxRetry(0),
+        m_subRetryTimeout(0),
+        m_subRetryCount(0),
+        m_maxRetry(0),
         yieldRunning(false)
 {
     m_conLoopClient.setLoopStartHandler(this, &NbiotMqttSnClient::startConLoop);
@@ -231,10 +233,12 @@ bool NbiotMqttSnClient::startConLoop(int& len)
 }
 
 
-void NbiotMqttSnClient::loopSubscribe(int length)
+void NbiotMqttSnClient::loopSubscribe(unsigned short id, unsigned long timer_left)
 {
-    m_subLoopClient.setValue(length);
-    m_subLoopClient.getTimer().setTime(command_timeout_ms);
+    m_subRetryTimeout = timer_left;
+    m_subRetryCount = m_maxRetry;
+    m_subLoopClient.setValue(id);
+    m_subLoopClient.getTimer().setTime(timer_left);
     m_loopController.registerLoopClient(&m_subLoopClient);
 }
 
@@ -255,7 +259,7 @@ void NbiotMqttSnClient::loopYield(unsigned long timeout_ms)
 void NbiotMqttSnClient::loopPublish(unsigned short id, unsigned long timer_left)
 {
     m_pubRetryTimeout = timer_left;
-    m_pubRetryCount = m_pubMaxRetry;
+    m_pubRetryCount = m_maxRetry;
     m_pubLoopClient.getTimer().setTime(timer_left);
     m_pubLoopClient.setValue(id);
     m_loopController.registerLoopClient(&m_pubLoopClient);
@@ -418,18 +422,32 @@ bool NbiotMqttSnClient::finishRegLoop(int& loopTime)
     return ret;
 }
 
-
-bool NbiotMqttSnClient::startSubLoop(int& len)
+bool NbiotMqttSnClient::sendSubPacket(int packetId, unsigned char dup, unsigned long timeout)
 {
     bool ret = false;
+    int len = 0;
+    unsigned short id = static_cast<unsigned short>(packetId);
 
+    len = MQTTSNSerialize_subscribe(sendbuf, getMaxPacketSize(), dup, m_qos, id, &m_topicName);
+    if (0 < len)
+    {
+        nbiot::Timer timer = nbiot::Timer(timeout);
+        if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the subscribe packet
+        {
+            ret = true;
+        }
+    }
+    return ret;
+}
+
+bool NbiotMqttSnClient::startSubLoop(int& packetId)
+{
     nbiot::Timer timer = nbiot::Timer(m_subLoopClient.getTimer().getTime());
-    if (MQTTSN::SUCCESS == sendPacket(len, timer)) // send the register packet
+    bool ret = sendSubPacket(packetId, 0, timer.remaining());
+    if(ret)
     {
         m_subLoopClient.getTimer().start(timer.remaining());
-        ret = true;
     }
-
     return ret;
 }
 
@@ -438,6 +456,16 @@ bool NbiotMqttSnClient::doSubLoop(int& loopTime)
 {
     bool ret = true;
 
+    if((0 == m_subLoopClient.getTimer().remaining()) && (0 < m_subRetryCount))
+    {
+        m_subRetryCount--;
+        int packetId = m_subLoopClient.getValue();
+        nbiot::Timer timer = nbiot::Timer(m_subRetryTimeout);
+        if(sendSubPacket(packetId, 1, timer.remaining())) // re-transmit the packet and reset the timer until the counter is zero
+        {
+            m_subLoopClient.getTimer().start(timer.remaining());
+        }
+    }
     loopTime = static_cast<int>(m_subLoopClient.getTimer().remaining());
     int interval = (loopInterval < loopTime)?loopInterval:loopTime;
     ret = loopWait(MQTTSN_SUBACK, interval);

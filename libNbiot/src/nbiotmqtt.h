@@ -199,7 +199,7 @@ public:
      * \brief setMaxResend
      * \param maxResend
      */
-    void setMaxResend(unsigned short maxResend) { m_dataPool.client.setPubMaxRetry(maxResend); }
+    void setMaxResend(unsigned short maxResend) { m_dataPool.client.setMaxRetry(maxResend); }
     /*!
      * \brief getClientId
      * \return

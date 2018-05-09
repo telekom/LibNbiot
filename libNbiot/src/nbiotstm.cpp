@@ -1123,14 +1123,6 @@ void NbiotStm::finishDisconnect()
     {
         NbiotCoreApp::getInstance().getNetworkInstance().disconnect();
     }
-//! \todo remove the following if decoupling is successful
-//    if(NbiotCoreApp::getInstance().getModemInstance().isAttached())
-//    {
-//        if(NbiotCoreApp::getInstance().getModemInstance().detach())
-//        {
-//            m_dataPool.m_modemAttached = false;
-//        }
-//    }
     if(m_dataPool.m_loopCtrl.isBusy())
     {
         // clear the loop-controller
