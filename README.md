@@ -205,8 +205,8 @@ For compilation/linkage with the **gcc** toolchain, a linker call would look sim
 
     gcc main.o libnbiot.a libnbiotcore.a libstm.a libmqttsnpaho.a
 
-If you don't want to care about providing the proper ordering of the libraries, you can add `-Wl,--no-as-needed` to the linker
-invocation (see [gcc](https://gcc.gnu.org/) and [ld](https://sourceware.org/binutils/docs-2.27/ld/index.html) manuals for further information).
+If you don't want to care about providing the proper ordering of the libraries, you can add `-Wl,--no-as-needed` to the linker options
+(see [gcc](https://gcc.gnu.org/) and [ld](https://sourceware.org/binutils/docs-2.27/ld/index.html) manuals for further information).
 
 
 ## License
