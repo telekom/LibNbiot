@@ -17,6 +17,13 @@ to install an USB-Serial driver to your system.
 
 The TI-RTOS operating system need to be installed in **CCS** using the **Resource Explorer**.
 
+It is necessary to import the project 'tirtos_builds_MSP_EXP432P401R_release_ccs' to the **CCS Workspace**. Therefore select
+"Project->Import CCS Projects..." in CCS-menu. Then 
+
+	select search-directory: "C:\ti\simplelink_msp432_sdk_1_XX_XX_XX\kernel\tirtos\builds"
+
+and choose 'tirtos_builds_MSP_EXP432P401R_release_ccs' from the 'Discovered projects' to be imported to the workspace.
+
 The binaries of `LibNbiot` and `LibNbiotCore` need to be available before building the example.
 
 Edit the toplevel makefile to compile the libraries for `msp432` (TI arm compiler 18.x is needed, which can be installed via CCS):

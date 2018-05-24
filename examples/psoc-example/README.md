@@ -25,10 +25,14 @@ Edit the toplevel makefile to compile the libraries for `arm cortex m3` (GCC cro
 Build the libraries by calling **make** at the toplevel.
 Copy the resulting binaries to the corresponding folders in PSoC5 example:
 
-    lib/arm-cortex-m3/libnbiotapp.a        to NBIoTLibPSoC5Example/LibNbiot/release/
-    lib/arm-cortex-m3/libnbiotcore.a       to NBIoTLibPSoC5Example/LibNbiotCore/release/
-    lib/arm-cortex-m3-debug/libnbiotapp.a  to NBIoTLibPSoC5Example/LibNbiot/debug/
-    lib/arm-cortex-m3-debug/libnbiotcore.a to NBIoTLibPSoC5Example/LibNbiotCore/debug/
+    lib/arm-cortex-m3/libmqttsnpaho.a       to NBIoTLibPSoC5Example/LibNbiot/release/
+    lib/arm-cortex-m3/libstm.a              to NBIoTLibPSoC5Example/LibNbiot/release/
+    lib/arm-cortex-m3/libnbiot.a            to NBIoTLibPSoC5Example/LibNbiot/release/
+    lib/arm-cortex-m3/libnbiotcore.a        to NBIoTLibPSoC5Example/LibNbiotCore/release/
+    lib/arm-cortex-m3-debug/libmqttsnpaho.a to NBIoTLibPSoC5Example/LibNbiot/debug/
+    lib/arm-cortex-m3-debug/libstm.a        to NBIoTLibPSoC5Example/LibNbiot/debug/
+    lib/arm-cortex-m3-debug/libnbiot.a      to NBIoTLibPSoC5Example/LibNbiot/debug/
+    lib/arm-cortex-m3-debug/libnbiotcore.a  to NBIoTLibPSoC5Example/LibNbiotCore/debug/
 
 
 ## Building the example
@@ -39,7 +43,7 @@ Open the workspace file **NBIoTLibPSoC5Example.cywrk** with the **PSoC Creator**
     #define AUTH_PWD "PASSWORD"
 
 Replace `111111111111111` by a 15-digit IMSI which is registered for the Telekom Cloud of Things and
-replace `PASSWORD` by the 8-characters password distributed with IMSI for Telekom Cloud Things access.
+replace `PASSWORD` by the 8-characters password distributed with IMSI for Telekom Cloud of Things access.
 
 Build the PSoC 5LP firmware from within the **PSoC Creator** and programm it via the USB connection to
 the **KitProg Onboard Programmer and Debugger**.

@@ -56,7 +56,7 @@ public:
         ReInitializeEvent,
         DisconnectEvent,
         ErrorDisconnectEvent,
-        CheckGprsEvent,
+        CheckAttachmentEvent,
         CheckConnectedEvent,
         ConnectedEvent,
         AttachedEvent
@@ -133,20 +133,20 @@ public:
     void doModemAttach();
 
     /*!
-     * \brief startCgattLoop
+     * \brief startAttachLoop
      * \return
      */
-    bool startCgattLoop(int&);
+    bool startAttachLoop(int&);
     /*!
-     * \brief doCgattLoop
+     * \brief doAttachLoop
      * \return
      */
-    bool doCgattLoop(int&);
+    bool doAttachLoop(int&);
     /*!
-     * \brief finishCgattLoop
+     * \brief finishAttachLoop
      * \return
      */
-    bool finishCgattLoop(int&);
+    bool finishAttachLoop(int&);
 
     /*!
      * \brief setNotifyHandler
@@ -188,17 +188,23 @@ protected:
      */
     bool actionConnect(const StmEvent& e);
     /*!
-     * \brief actionIsGprsEnabledIpConnect
-     * \param e
-     * \return
+     * \brief actionIsNotAttached starts the attachment-loop and a one minute timeout-timer before moving to the WaitForAttach state
+     * \param e not used
+     * \return false
      */
-    bool actionIsGprsEnabledIpConnect(const StmEvent& e);
+    bool actionIsNotAttached(const StmEvent& e);
     /*!
-     * \brief actionIsGprsEnabledError
+     * \brief actionIsAttachedIpConnect
      * \param e
      * \return
      */
-    bool actionIsGprsEnabledError(const StmEvent& e);
+    bool actionIsAttachedIpConnect(const StmEvent& e);
+    /*!
+     * \brief actionIsAttachedError
+     * \param e
+     * \return
+     */
+    bool actionIsAttachedError(const StmEvent& e);
     /*!
      * \brief actionIsIpConnectedError
      * \param e
@@ -318,6 +324,12 @@ protected:
      */
     bool actionIsInitialized(const StmEvent& e);
     /*!
+     * \brief actionIsAttached
+     * \param e
+     * \return
+     */
+    bool actionIsAttached(const StmEvent& e);
+    /*!
      * \brief actionIsIpConnected
      * \param e
      * \return
@@ -377,11 +389,11 @@ protected:
     bool actionDisconnectedSleepEntry(const StmEvent& e);
 #endif
     /*!
-     * \brief actionWaitForGprsEntry
+     * \brief actionWaitForAttachEntry
      * \param e
      * \return
      */
-    bool actionWaitForGprsEntry(const StmEvent& e);
+    bool actionWaitForAttachEntry(const StmEvent& e);
     /*!
      * \brief actionWaitForConnectEntry
      * \param e
@@ -400,8 +412,9 @@ private:
     Transition* m_isInitializedDisconnected;
     Transition* m_isInitializedError;
     Transition* m_connect;
-    Transition* m_isGprsEnabledIpConnect;
-    Transition* m_isGprsEnabledError;
+    Transition* m_isNotAttached;
+    Transition* m_isAttachedIpConnect;
+    Transition* m_isAttachedError;
     Transition* m_isIpConnectedError;
     Transition* m_isConnectedConnected;
     Transition* m_waitConnectIsConnected;
@@ -423,6 +436,7 @@ private:
     Transition* m_disHibernate;
 
     Choice* m_isInitialized;
+    Choice* m_isAttached;
     Choice* m_isIpConnected;
 
     State* m_Initial;
@@ -433,13 +447,13 @@ private:
     State* m_ConnectedAwake;
     State* m_DeepSleep;
     State* m_DisconnectedSleep;
-    State* m_WaitForGprs;
+    State* m_WaitForAttach;
     State* m_WaitForConnect;
 
     NbiotStmDataPool& m_dataPool;
     EventDispatcher* m_evDisp;
     notifyHandler m_notifyHandler;
-    nbiot::LoopClient m_cgattLoopClient;
+    nbiot::LoopClient m_attachLoopClient;
 
     static const unsigned long fiftyFiveSeconds = 55000;
     static const unsigned long timeoutOneMinute = 60000;

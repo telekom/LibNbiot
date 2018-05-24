@@ -61,7 +61,7 @@ public:
      * \brief loopSubscribe
      * \param length
      */
-    void loopSubscribe(int length);
+    void loopSubscribe(unsigned short id, unsigned long timer_left);
     /*!
      * \brief loopUnsubscribe
      * \param length
@@ -166,12 +166,19 @@ public:
         pingRespNotifyHandler.attach(nhc, pingrespNotifyHandler);
     }
 
+    /*!
+     * \brief setPubMaxRetry
+     * \param maxRetry
+     */
+    void setMaxRetry(unsigned short maxRetry) { m_maxRetry = maxRetry; }
+
 private:
 
     bool startConLoop(int&);
     bool doConLoop(int&);
     bool finishConLoop(int&);
 
+    bool sendPubPacket(int packetId, unsigned char dup, unsigned long timeout);
     bool startPubLoop(int&);
     bool doPubLoop(int&);
     bool finishPubLoop(int&);
@@ -180,6 +187,7 @@ private:
     bool doRegLoop(int&);
     bool finishRegLoop(int&);
 
+    bool sendSubPacket(int packetId, unsigned char dup, unsigned long timeout);
     bool startSubLoop(int&);
     bool doSubLoop(int&);
     bool finishSubLoop(int&);
@@ -207,6 +215,12 @@ private:
     nbiot::LoopClient m_unsubLoopClient;
     nbiot::LoopClient m_yieldLoopClient;
     nbiot::LoopClient m_disLoopClient;
+
+    unsigned long m_pubRetryTimeout;
+    unsigned short m_pubRetryCount;
+    unsigned long m_subRetryTimeout;
+    unsigned short m_subRetryCount;
+    unsigned short m_maxRetry;
 
     FP<void, nbiot::NbiotTopic&> pubackNotifyHandler;
     FP<int, nbiot::NbiotTopic&> registerNotifyHandler;
