@@ -1,5 +1,5 @@
 /* ========================================================================
- * LibNbiot: nbiotloop_test.cpp
+ * LibNbiot: nbiottopic_test.cpp
  *
  * Copyright (c) 2018, Edgar Hindemith, Yassine Amraue, Thorsten
  * Krautscheid, Kolja Vornholt, T-Systems International GmbH
@@ -325,21 +325,19 @@ TEST(NbiotTopicTest, ConvertToSNTopic) {
 }
 
 TEST(NbiotTopicTest, IsTopicMatched) {
-    unsigned short id = 0x001F;
-    NbiotTopic nt_predefined(id);
-    NbiotTopic nt_predefined_copy;
-    nt_predefined_copy = nt_predefined;
+    NbiotTopic nt_hash("MyTopic/Test/#");
+    NbiotTopic nt_plus("MyTopic/Test/+");
 
-    char bytes[2] = "a";
-    NbiotTopic nt_short(bytes);
-    NbiotTopic nt_short_copy;
-    nt_short_copy = nt_short;
+    EXPECT_FALSE(nt_hash.isTopicMatched(NbiotTopic("MyTopic/Test")));
+    EXPECT_FALSE(nt_hash.isTopicMatched(NbiotTopic("MyTopic/Test/")));
+    EXPECT_FALSE(nt_hash.isTopicMatched(NbiotTopic("MyTopic/#/Test")));
+    EXPECT_FALSE(nt_hash.isTopicMatched(NbiotTopic("MyTopic/#")));
+    EXPECT_FALSE(nt_hash.isTopicMatched(NbiotTopic("MyTopic/#/Test")));
 
-    NbiotTopic nt_normal;
-    NbiotTopic nt_normal_copy;
-    nt_normal_copy = nt_normal;
+    EXPECT_TRUE(nt_hash.isTopicMatched(NbiotTopic("MyTopic/Test/Test")));
+    EXPECT_TRUE(nt_hash.isTopicMatched(NbiotTopic("MyTopic/Test/#")));
 
-    EXPECT_TRUE(nt_predefined.isTopicMatched(nt_predefined_copy));
-    EXPECT_TRUE(nt_predefined.isTopicMatched(nt_short_copy));
-    EXPECT_TRUE(nt_predefined.isTopicMatched(nt_normal_copy));
+    EXPECT_TRUE(nt_plus.isTopicMatched(NbiotTopic("MyTopic/Test/Test")));
+    EXPECT_TRUE(nt_plus.isTopicMatched(NbiotTopic("MyTopic/Test/#")));
+    EXPECT_TRUE(nt_plus.isTopicMatched(NbiotTopic("MyTopic/Test/+")));
 }
