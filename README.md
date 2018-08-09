@@ -3,7 +3,7 @@
 The repository contains the source code for the LibNbiot, which allows to access the
 **Telekom Cloud of Things** with **NB-IoT** radio modules.
 
-**NOTICE**: The newest commit only supports the new syntax of firmware **B657SP3** and greater. If your module has the older firmware **B656**, please update the firmware of your module or revert to commit #ed399bb3073868019978e2174a9599301f5a2771.
+**NOTICE**: The newest commit only supports the new syntax of firmware **B657SP3** and greater. If your module has the older firmware **B656**, please update the firmware of your module or revert to commit [ed399bb](https://github.com/telekom/LibNbiot/commit/ed399bb3073868019978e2174a9599301f5a2771).
 
 
 ## Building from command line
