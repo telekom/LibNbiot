@@ -26,10 +26,10 @@
 
 #include "nbiotconnectivity.h"
 
-const char* NbiotConnectivity::cmdNSOCR_arg = "AT+NSOCR=DGRAM,17,%d\r";
-const char* NbiotConnectivity::respNSONMI_arg = "+NSONMI:%d,";
+const char* NbiotConnectivity::cmdNSOCR_arg = "AT+NSOCR=\"DGRAM\",17,%d\r";
+const char* NbiotConnectivity::respNSONMI_arg = "+NSONMI: %d,";
 const char* NbiotConnectivity::cmdNSORF_arg = "AT+NSORF=%d,%d\r";
-const char* NbiotConnectivity::cmdNSOST_arg = "AT+NSOST=%d,%s,%d,%d,";
+const char* NbiotConnectivity::cmdNSOST_arg = "AT+NSOST=%d,\"%s\",%d,%d,\"";
 const char* NbiotConnectivity::cmdNSOCL_arg = "AT+NSOCL=%d\r";
 
 NbiotConnectivity::NbiotConnectivity(Serial& serial) :
@@ -216,7 +216,7 @@ int NbiotConnectivity::ipRead(nbiot::string& data, int len, unsigned short timeo
                         avail = atoi(list[nsorfRespIdx_bytesAvail].c_str());
                         if((0 < avail) && (avail <= len))
                         {
-                            data.append(nbiot::string::fromHex(list[nsorfRespIdx_data].c_str()));
+                            data.append(nbiot::string::fromHex(list[nsorfRespIdx_data].strip('"').c_str()));
                             m_bytesAvail = static_cast<size_t>(atoi(list[nsorfRespIdx_bytesRem].c_str()));
                         }
                     }
@@ -239,7 +239,8 @@ bool NbiotConnectivity::write(unsigned char* buffer, unsigned long len, unsigned
         nbiot::string data = nbiot::string::Printf(cmdNSOST_arg, m_connectionNumber, m_hostname.c_str(), m_port, len);
         nbiot::string hex = nbiot::string((char*)(buffer), len).toHex();
         data += hex;
-        #ifdef DEBUG_MODEM
+        data += "\"";
+#ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
         debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
 #endif
