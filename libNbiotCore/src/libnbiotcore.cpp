@@ -12,15 +12,15 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================================
 */
 
 #include "nbiottime.h"
-#include "nbiotmodemtools.h"
 #include "nbiotcoreapp.h"
+#include "imodem.h"
 
 #include "libnbiotcore.h"
 
@@ -154,18 +154,18 @@ const char* getNbiotDeviceId()
 
 unsigned char nbiotSwitchModem(unsigned char state)
 {
-    NbiotModemTools::ModemState ms = NbiotModemTools::MODEM_OFF;
+    IModem::ModemState ms = IModem::MODEM_OFF;
     unsigned char ret = 0;
 
     if(state)
     {
-        ms = NbiotCoreApp::getInstance().getModemInstance().switchModem(NbiotModemTools::MODEM_ON);
+        ms = NbiotCoreApp::getInstance().getModemInstance().switchModem(IModem::MODEM_ON);
     }
     else
     {
-        ms = NbiotCoreApp::getInstance().getModemInstance().switchModem(NbiotModemTools::MODEM_OFF);
+        ms = NbiotCoreApp::getInstance().getModemInstance().switchModem(IModem::MODEM_OFF);
     }
-    if(NbiotModemTools::MODEM_ON == ms)
+    if(IModem::MODEM_ON == ms)
     {
         ret = 1;
     }
@@ -175,9 +175,9 @@ unsigned char nbiotSwitchModem(unsigned char state)
 unsigned char isNbiotModemOn()
 {
     unsigned char ret = 0;
-    NbiotModemTools::ModemState ms = NbiotCoreApp::getInstance().getModemInstance().isModemOn();
+    IModem::ModemState ms = NbiotCoreApp::getInstance().getModemInstance().isModemOn();
 
-    if(NbiotModemTools::MODEM_ON == ms)
+    if(IModem::MODEM_ON == ms)
     {
         ret = 1;
     }

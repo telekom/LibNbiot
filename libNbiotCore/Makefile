@@ -23,6 +23,13 @@
 PLATFORMS := default
 
 
+# MODULE, define the module and firmware combination to be used in compilation.
+# Only one module must be chosen. These modules are currently supported:
+# SARA-N2XX-B656
+MODULE    := SARA-N2XX-B657SP3
+#MODULE    := SARA-N2XX-B656
+
+
 # Build and target lib directory (relative paths)
 BUILDDIR  := build
 LIBDIR    := lib
@@ -34,13 +41,14 @@ ifneq ($(notdir $(realpath $(CURDIR)/..)),build)
 include targets.mk
 else
 
-VPATH     := $(SRCDIR) $(INCDIR) $(EXTINC)
+VPATH     := $(SRCDIR) $(SRCDIR)/modems/ $(SRCDIR)/modems/$(MODULE) $(INCDIR) $(EXTINC)
 # ... to here, unless you know what you are doing.
 
 
 # Variable definitions.
 INCLUDES  := $(addprefix -I ,$(VPATH))
-OBJECTS   := $(subst $(SRCDIR)/,,$(subst .cpp,.o,$(shell find $(SRCDIR) -name "*.cpp")))
+OBJECTS   := $(notdir $(subst .cpp,.o,$(shell find $(SRCDIR) -maxdepth 2 -name "*.cpp")))
+OBJECTS   += $(notdir $(subst .cpp,.o,$(shell find $(SRCDIR)/modems/$(MODULE) -name "*.cpp")))
 TARGET    := libnbiotcore.a
 LINKER    := ar
 LFLAGS    := cq
@@ -132,6 +140,7 @@ $(TARGET): $(OBJECTS)
 
 
 %.o: %.cpp
+	@echo $(OBJECTS)
 	$(CXX) -c $< $(CXXFLAGS) $(INCLUDES)
 
 

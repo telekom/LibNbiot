@@ -1,79 +1,51 @@
 /* ========================================================================
- * LibNbiot: nbiotmodemtools.h
- *
+ * LibNbiot: modembase.h
+ * 
  * Copyright (c) 2018, Edgar Hindemith, Yassine Amraue, Thorsten
  * Krautscheid, Kolja Vornholt, T-Systems International GmbH
  * contact: libnbiot@t-systems.com, opensource@telekom.de
- *
+ * 
  * This file is distributed under the conditions of the Apache License,
- * Version 2.0 (the "License");
+ * Version 2.0 (the ",License");
  * you may not use this file except in compliance with the License.
  * For details see the file LICENSE at the toplevel.
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================================
 */
 
-#ifndef NBIOTMODEMTOOLS_H
-#define NBIOTMODEMTOOLS_H
+#ifndef MODEMBASE_H
+#define MODEMBASE_H
 
+#include <cstdlib>
+
+#include "imodem.h"
 #include "atcommands.h"
 #include "nbiotstring.h"
-#include "imodem.h"
+
+
 
 /*!
- * \brief The NbiotModemTools class
+ * \brief The ModemBase class
  */
-class NbiotModemTools : public IModem
+class ModemBase : public IModem
 {
 public:
-    /*!
-     * \brief NbiotModemTools
-     * \param serial
-     */
-    explicit NbiotModemTools(Serial& serial) :
-        m_cmd(serial),
-        apn(),
-        apnuser(),
-        apnpwd(),
-        plmn(),
-        m_deviceId()
-    {}
-    /*!
-     * \brief ~NbiotModemTools
-     */
-    virtual ~NbiotModemTools(){}
-
 
     /*!
-     * \brief reboot
-     * \return
+     * \brief C'tor
      */
-    virtual bool reboot();
+    explicit ModemBase(Serial& serial);
+
     /*!
-     * \brief initialize
-     * \return
-     */
-    virtual bool initialize();
-    /*!
-     * \brief attach
-     * \return
-     */
-    virtual bool attach();
-    /*!
-     * \brief detach
-     * \return
-     */
-    virtual bool detach();
-    /*!
-     * \brief isAttached
-     * \return
-     */
-    virtual bool isAttached();
+     * \brief D'tor
+     */  
+    virtual ~ModemBase() noexcept {}
+
     /*!
      * \brief sendAtCommand
      * \param command
@@ -83,67 +55,81 @@ public:
      * \return
      */
     virtual bool sendAtCommand(const char* command, char* response, size_t len, unsigned short timeout);
+
     /*!
-     * \brief getImsi
-     * \param imsi
-     * \param usePw
+     * \brief attach
+     * \return
+     */   
+    virtual bool attach();
+
+    /*!
+     * \brief detach
+     * \return
+     */
+
+    virtual bool detach();
+
+    /*!
+     * \brief isAttached
+     * \return
+     */
+    virtual bool isAttached();
+
+    /*!
+     * \brief Return the International Mobile Subscription Identifier (IMSI) of the device.
      * \return
      */
     virtual bool getImsi(nbiot::string& imsi);
+
+
     /*!
-     * \brief getDeviceId
+     * \brief Return the DeviceId.
      * \return
-     */
+     */ 
     virtual const char* getDeviceId();
+
     /*!
-     * \brief switchModem
+     * \brief switchModule
      * \param state
      * \return
      */
-    virtual ModemState switchModem(ModemState state);
+    virtual ModemBase::ModemState switchModem(IModem::ModemState state);
+
     /*!
      * \brief isModemOn
      * \return
      */
-    virtual ModemState isModemOn();
+    virtual ModemBase::ModemState isModemOn();
 
     /*!
      * \brief configSetApn
      * \param confApn
      */
-    void configSetApn(const char* confApn) { apn = confApn; }
+    void configSetApn(const char* confApn) { m_apn = confApn; }
     /*!
      * \brief configSetApnUser
      * \param confApnUser
      */
-    void configSetApnUser(const char* confApnUser) { apnuser = confApnUser; }
+    void configSetApnUser(const char* confApnUser) { m_apnUser = confApnUser; }
     /*!
      * \brief configSetApnPwd
      * \param confApnPwd
      */
-    void configSetApnPwd(const char* confApnPwd) { apnpwd = confApnPwd; }
+    void configSetApnPwd(const char* confApnPwd) { m_apnPwd = confApnPwd; }
     /*!
      * \brief configSetOperMccMnc
      * \param confOperMccMnc
      */
-    void configSetPlmn(const char* confPlmn) { plmn = confPlmn; }
+    void configSetPlmn(const char* confPlmn) { m_plmn = confPlmn; }    
 
-    //! @todo error struct and lastError() method
+protected:
 
-private:
-    NbiotModemTools();
-    NbiotModemTools(const NbiotModemTools&);
-    NbiotModemTools& operator=(const NbiotModemTools&);
+    AtCommands m_cmd;    
 
-    int getAttachState();
-
-    AtCommands m_cmd;
-
-    nbiot::string apn;
-    nbiot::string apnuser;
-    nbiot::string apnpwd;
-    nbiot::string plmn;
-
+    nbiot::string m_plmn;
+    nbiot::string m_apn;
+    nbiot::string m_apnUser;
+    nbiot::string m_apnPwd;
     nbiot::string m_deviceId;
 
     static const unsigned int oneSecond = 1000;
@@ -152,7 +138,6 @@ private:
     static const unsigned int tenSeconds = 10000;
     static const unsigned int sixtyfiveSeconds = 65000;
 
-    static const char* cmdNRB;
     static const char* cmdCFUN1;
     static const char* cmdCGDCONT_arg;
     static const char* cmdCOPS_arg;
@@ -163,8 +148,16 @@ private:
     static const char* respCGATTquery;
     static const char* cmdCIMI;
     static const char* respOK;
-    static const char* cmdCGMIquery;
+    static const char* cmdCGMIquery; 
+    static const char* respCFUNquery;       
+
+private:
+
+    ModemBase() = delete;
+    ModemBase(const ModemBase&) = delete;
+    ModemBase& operator=(const ModemBase&) = delete;
+
+    int getAttachState();
+
 };
-
-#endif // NBIOTMODEMTOOLS_H
-
+#endif // MODEMBASE_H

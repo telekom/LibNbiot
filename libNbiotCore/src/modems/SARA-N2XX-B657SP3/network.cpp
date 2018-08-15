@@ -12,27 +12,28 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================================
 */
 
 #include <stdlib.h>
+
 #include "atcommands.h"
 #include "nbiottimer.h"
 #include "nbiotstringlist.h"
 #include "nbiotdebug.h"
 
-#include "nbiotconnectivity.h"
+#include "network.h"
 
-const char* NbiotConnectivity::cmdNSOCR_arg = "AT+NSOCR=DGRAM,17,%d\r";
-const char* NbiotConnectivity::respNSONMI_arg = "+NSONMI:%d,";
-const char* NbiotConnectivity::cmdNSORF_arg = "AT+NSORF=%d,%d\r";
-const char* NbiotConnectivity::cmdNSOST_arg = "AT+NSOST=%d,%s,%d,%d,";
-const char* NbiotConnectivity::cmdNSOCL_arg = "AT+NSOCL=%d\r";
+const char* Network::cmdNSOCR_arg = "AT+NSOCR=\"DGRAM\",17,%d\r";
+const char* Network::respNSONMI_arg = "+NSONMI: %d,";
+const char* Network::cmdNSORF_arg = "AT+NSORF=%d,%d\r";
+const char* Network::cmdNSOST_arg = "AT+NSOST=%d,\"%s\",%d,%d,\"";
+const char* Network::cmdNSOCL_arg = "AT+NSOCL=%d\r";
 
-NbiotConnectivity::NbiotConnectivity(Serial& serial) :
+Network::Network(Serial& serial) :
     m_cmd(serial),
     m_connectionNumber(-1),
     m_hostname(),
@@ -45,7 +46,7 @@ NbiotConnectivity::NbiotConnectivity(Serial& serial) :
 }
 
 
-bool NbiotConnectivity::connect(const char* hostname, unsigned short port)
+bool Network::connect(const char* hostname, unsigned short port)
 {
     bool ret = true;
 
@@ -88,7 +89,7 @@ bool NbiotConnectivity::connect(const char* hostname, unsigned short port)
     if(ret)
     {
         m_nsonmi = nbiot::string::Printf(respNSONMI_arg, m_connectionNumber);
-        m_cmd.addUrcFilter(m_nsonmi.c_str(), this, &NbiotConnectivity::parseFilterResult);
+        m_cmd.addUrcFilter(m_nsonmi.c_str(), this, &Network::parseFilterResult);
     }
 #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
@@ -100,7 +101,7 @@ bool NbiotConnectivity::connect(const char* hostname, unsigned short port)
 }
 
 #define MQTTSN_MIN_PACKET_LEN 1
-int NbiotConnectivity::read(unsigned char* buffer, int len, unsigned short timeout_ms)
+int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
 {
     int rc = -1;
     int dgmLen = 0;
@@ -187,12 +188,12 @@ int NbiotConnectivity::read(unsigned char* buffer, int len, unsigned short timeo
     return rc;
 }
 
-unsigned short NbiotConnectivity::ipAvailable()
+unsigned short Network::ipAvailable()
 {
     return static_cast<unsigned short>((m_bytesAvail & byteCountMask));
 }
 
-int NbiotConnectivity::ipRead(nbiot::string& data, int len, unsigned short timeout_ms)
+int Network::ipRead(nbiot::string& data, int len, unsigned short timeout_ms)
 {
     int avail = -1;
 
@@ -216,7 +217,7 @@ int NbiotConnectivity::ipRead(nbiot::string& data, int len, unsigned short timeo
                         avail = atoi(list[nsorfRespIdx_bytesAvail].c_str());
                         if((0 < avail) && (avail <= len))
                         {
-                            data.append(nbiot::string::fromHex(list[nsorfRespIdx_data].c_str()));
+                            data.append(nbiot::string::fromHex(list[nsorfRespIdx_data].substr(1, list[nsorfRespIdx_data].size() - 2).c_str()));
                             m_bytesAvail = static_cast<size_t>(atoi(list[nsorfRespIdx_bytesRem].c_str()));
                         }
                     }
@@ -230,7 +231,7 @@ int NbiotConnectivity::ipRead(nbiot::string& data, int len, unsigned short timeo
     return avail;
 }
 
-bool NbiotConnectivity::write(unsigned char* buffer, unsigned long len, unsigned short timeout)
+bool Network::write(unsigned char* buffer, unsigned long len, unsigned short timeout)
 {
     bool ret = false;
 
@@ -239,6 +240,7 @@ bool NbiotConnectivity::write(unsigned char* buffer, unsigned long len, unsigned
         nbiot::string data = nbiot::string::Printf(cmdNSOST_arg, m_connectionNumber, m_hostname.c_str(), m_port, len);
         nbiot::string hex = nbiot::string((char*)(buffer), len).toHex();
         data += hex;
+        data += "\"";
         #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
         debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
@@ -259,7 +261,7 @@ bool NbiotConnectivity::write(unsigned char* buffer, unsigned long len, unsigned
     return ret;
 }
 
-void NbiotConnectivity::parseFilterResult(const char *strFilterResult)
+void Network::parseFilterResult(const char *strFilterResult)
 {
     nbiot::string response = strFilterResult;
     size_t pos = response.find(',');
@@ -276,7 +278,7 @@ void NbiotConnectivity::parseFilterResult(const char *strFilterResult)
     }
 }
 
-bool NbiotConnectivity::disconnect()
+bool Network::disconnect()
 {
     bool ret = true;
 

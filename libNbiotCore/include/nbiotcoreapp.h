@@ -12,7 +12,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================================
@@ -25,8 +25,8 @@
 
 #include "nbiottime.h"
 #include "serial.h"
-#include "nbiotmodemtools.h" /*!< implements IModem */
-#include "nbiotconnectivity.h" /*!< implements INetwork (was LibModem before) */
+//#include "modem.h" /*!< implements IModem */
+//#include "network.h" /*!< implements INetwork (was LibModem before) */
 
 #include "inetwork.h"
 #include "imodem.h"
@@ -53,12 +53,12 @@ public:
      * \brief getNetworkInstance
      * \return INetwork as reference to NbiotConnectivity instance
      */
-    INetwork& getNetworkInstance() { return m_network; }
+    INetwork& getNetworkInstance() { return *m_network; }
     /*!
      * \brief getModemInstance
      * \return IModem as reference to NbiotModemTools instance
      */
-    IModem& getModemInstance() { return m_modem; }
+    IModem& getModemInstance() { return *m_modem; }
     /*!
      * \brief getTimeInstance The only instance of the former singleton NbiotTime is now a member of NbiotCoreApp
      * \return reference to NbiotTime instance
@@ -94,8 +94,8 @@ private:
 
     NbiotTime m_time;
     Serial m_serial;
-    NbiotModemTools m_modem;
-    NbiotConnectivity m_network;
+    IModem* m_modem;
+    INetwork* m_network;
 
     unsigned int coreConfigError;
 

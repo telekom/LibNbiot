@@ -41,7 +41,7 @@
 #undef DEBUG_SERIAL_RAW
 
 #define DEBUG_ATCOMMANDS /*!< debugging output for the class AtCommands */
-#undef DEBUG_ATCOMMANDS
+// #undef DEBUG_ATCOMMANDS
 
 #define DEBUG_MODEM /*!< debugging output for the classes NbiotModemTools and NbiotConnectivity */
 #undef DEBUG_MODEM

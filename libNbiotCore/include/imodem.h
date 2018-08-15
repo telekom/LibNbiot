@@ -12,7 +12,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================================
@@ -32,6 +32,7 @@ class string;
 class IModem
 {
 public:
+
     /*!
      * \brief The ModemState enum
      */
@@ -46,6 +47,8 @@ public:
     /*!
      * \brief reboot
      * \return
+     * 
+     * TODO: has to be removed/exchanged. Not all modules can be rebooted by AT-Commands.
      */
     virtual bool reboot() = 0;
     /*!
@@ -100,6 +103,28 @@ public:
      * \return
      */
     virtual ModemState isModemOn() = 0;
+    /*!
+     * \brief configSetApn
+     * \param confApn
+     */
+    virtual void configSetApn(const char* confApn) = 0;
+    /*!
+     * \brief configSetApnUser
+     * \param confApnUser
+     */
+    virtual void configSetApnUser(const char* confApnUser) = 0;
+    /*!
+     * \brief configSetApnPwd
+     * \param confApnPwd
+     */
+    virtual void configSetApnPwd(const char* confApnPwd) = 0;
+    /*!
+     * \brief configSetOperMccMnc
+     * \param confOperMccMnc
+     */
+    virtual void configSetPlmn(const char* confPlmn) = 0;
+
+protected:
 
 };
 #endif // IMODEM_H

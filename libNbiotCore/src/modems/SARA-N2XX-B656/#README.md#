@@ -1,0 +1,3 @@
+# u-Blox SARA-NXX
+
+This module configurations is intended for usage with u-Blox modules of the SARA-NXX series. The library assumes that the module is already properly configured for the target network. This usually means that scrambling has to be enabled and the appropriate has already been configured. Checking and for proper configuration and adjusting it if required may be part of future releases.
