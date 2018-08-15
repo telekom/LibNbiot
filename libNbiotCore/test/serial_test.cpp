@@ -335,7 +335,7 @@ TEST(SerialTest, ReadLineIgnoresCarriageReturn) {
 
 // Tests that URC filters can be added and removed.
 
-TEST(SerialTest, AddingAndRemovingUrcFilter) {
+TEST_F(SerialFixture, AddingAndRemovingUrcFilter) {
     Serial s;
     MockUrcCallback UHC;
     ASSERT_TRUE(s.addUrcFilter("+NSOMNI", do_nothing))
@@ -356,7 +356,7 @@ TEST(SerialTest, AddingAndRemovingUrcFilter) {
 
 // Tests that URCs are filtered properly and the callback function is called.
 
-TEST(SerialTest, UrcFilter) {
+TEST_F(SerialFixture, UrcFilter) {
     Serial s;
     Sequence s1;
     pSerCom = new MockSerialCom();

@@ -27,9 +27,23 @@ using ::testing::IsNull;
 
 using namespace nbiot;
 
-extern int number_of_calls;
+class UrcFixture : public ::testing::Test {
+public:
 
-void do_nothing(const char *);
+    virtual void SetUp() {
+        number_of_calls = 0;
+    };
+
+    virtual void TearDown() {};
+
+    static void do_nothing(const char* c) {
+        number_of_calls++;
+    };
+
+    static int number_of_calls;
+};
+
+int UrcFixture::number_of_calls = 0;
 
 class _UrcCallback {
 public:
@@ -53,7 +67,7 @@ TEST(UrcFilterTest, ConstructFromString) {
 
 // Test object construction from normal string with setting a handler
 
-TEST(UrcFilterTest, ConstructFromStringAndHandler) {
+TEST_F(UrcFixture, ConstructFromStringAndHandler) {
     UrcFilter u("+NSOMNI", do_nothing);
     EXPECT_TRUE(u.handler.attached());
     EXPECT_STREQ("+NSOMNI", u.urc.c_str());
@@ -66,7 +80,7 @@ TEST(UrcFilterTest, ConstructFromStringAndHandler) {
 // Tests that copy constructor copies the object and both objects call
 // the same callback function
 
-TEST(UrcFilterTest, CopyConstructor) {
+TEST_F(UrcFixture, CopyConstructor) {
     UrcFilter u("+NSOMNI", do_nothing);
     UrcFilter u_copy(u);
     EXPECT_STREQ(u.urc.c_str(), u_copy.urc.c_str());
@@ -81,7 +95,7 @@ TEST(UrcFilterTest, CopyConstructor) {
 // Tests that the assignment operator copies the object and both objects call
 // the same callback function
 
-TEST(UrcFilterTest, AssignmentOperator) {
+TEST_F(UrcFixture, AssignmentOperator) {
     UrcFilter u("+NSOMNI", do_nothing);
     UrcFilter u_copy;
     u_copy = u;
@@ -110,7 +124,7 @@ TEST(UrcFilterTest, EqComparisionOperator) {
 
 // Tests that handlers can be set properly and call the right function exactly once.
 
-TEST(UrcFilterTest, SetHandler) {
+TEST_F(UrcFixture, SetHandler) {
     UrcFilter u("+NSOMNI");
     MockUrcCallback UHC;
     u.setHandler(do_nothing);
@@ -129,7 +143,7 @@ TEST(UrcFilterTest, SetHandler) {
 // Tests that isValid only returns true when a urc filter has both a string
 // and a handler and otherwise returns false
 
-TEST(UrcFilterTest, IsValid) {
+TEST_F(UrcFixture, IsValid) {
     UrcFilter u_nonvalid("+NSOMNI");
     UrcFilter u_valid("+NSOMNI", do_nothing);
 

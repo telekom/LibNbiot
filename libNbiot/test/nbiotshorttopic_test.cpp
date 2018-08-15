@@ -1,5 +1,5 @@
 /* ========================================================================
- * LibNbiot: nbiotloop_test.cpp
+ * LibNbiot: nbiotshorttopic_test.cpp
  *
  * Copyright (c) 2018, Edgar Hindemith, Yassine Amraue, Thorsten
  * Krautscheid, Kolja Vornholt, T-Systems International GmbH
@@ -47,12 +47,9 @@ TEST(NbiotShortTopicConstruction, TopicFromCharArray) {
 }
 
 //TEST(NbiotShortTopicConstruction, NullptrConstruction) {
-//    char* bytes = nullptr;
-//    NbiotShortTopic *st = new NbiotShortTopic(bytes);
+//    char *bytes = nullptr;
 //
-//    EXPECT_NE(st, nullptr);
-//
-//    delete st;
+//    new NbiotShortTopic(bytes);
 //}
 
 TEST(NbiotShortTopicConstruction, TopicFromChars) {
