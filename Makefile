@@ -30,7 +30,7 @@ export PLATFORMS := default
 
 
 # MODULE, define the module and firmware combination to be used in compilation. The following modules are currently supported:
-# SARA-N2XX-B656, 
+# SARA-NXX-B657SP3 SARA-N2XX-B656
 export MODULE    := SARA-N2XX-B657SP3
 
 

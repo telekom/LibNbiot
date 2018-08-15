@@ -46,7 +46,6 @@ VPATH     := $(SRCDIR) $(INCDIR)
 INCLUDES  := $(addprefix -I ,$(VPATH) $(COREINC) $(EXTINC))
 OBJECTS   := $(subst $(SRCDIR)/,,$(subst .cpp,.o,$(notdir $(shell find $(SRCDIR) -name "*.cpp"))))
 TARGET    := libnbiot.a
-APPLIB    := libnbiotapp.a
 LINKER    := ar
 LFLAGS    := cq
 
@@ -125,6 +124,7 @@ LINKER    := armar
 LFLAGS    := r
 # Add ti specific files to include search path - adjust this according to your installation
 INCLUDES  += -I=/opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include
+TARGET    := libnbiot.lib
 endif
 
 
@@ -132,14 +132,7 @@ endif
 first: all
 
 
-all: $(TARGET) $(APPLIB)
-
-
-$(APPLIB): $(TARGET)
-	$(LINKER) -x $(EXTLIB)/libmqttsnpaho.a
-	$(LINKER) -x $(EXTLIB)/libstm.a
-	$(LINKER) -r $(APPLIB) *.o
-	cp -f $(APPLIB) $(LIB)/.
+all: $(TARGET)
 
 
 $(TARGET): $(OBJECTS)
