@@ -217,7 +217,7 @@ int Network::ipRead(nbiot::string& data, int len, unsigned short timeout_ms)
                         avail = atoi(list[nsorfRespIdx_bytesAvail].c_str());
                         if((0 < avail) && (avail <= len))
                         {
-                            data.append(nbiot::string::fromHex(list[nsorfRespIdx_data].substr(1, list[nsorfRespIdx_data].size() - 2).c_str()));
+                            data.append(nbiot::string::fromHex(list[nsorfRespIdx_data].strip('"').c_str()));
                             m_bytesAvail = static_cast<size_t>(atoi(list[nsorfRespIdx_bytesRem].c_str()));
                         }
                     }
@@ -241,7 +241,7 @@ bool Network::write(unsigned char* buffer, unsigned long len, unsigned short tim
         nbiot::string hex = nbiot::string((char*)(buffer), len).toHex();
         data += hex;
         data += "\"";
-        #ifdef DEBUG_MODEM
+#ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
         debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
 #endif
