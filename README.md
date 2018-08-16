@@ -1,7 +1,7 @@
 # LibNbiot - A non-blocking MQTT-SN Library for NB-IoT
 
 The repository contains the source code for the LibNbiot, which allows to access the
-**Telekom Cloud of Things** with **NB-IoT** radio modules.
+**Telekom Cloud of Things** with **NB-IoT** radio modules and MQTT-SN.
 
 ## Building from command line
 
@@ -53,7 +53,6 @@ Currently the following platforms are supported:
 * **x86_64-shared-debug** (64-bit, shared library, debug settings enabled)
 * **arm-cortex-m3** (ARM Cortex M3 bare metal, static library, optimized for size)
 * **arm-cortex-m3-debug** (ARM Cortex M3 bare metal, static library, debug settings enabled)
-* **msp432-debug** (TI MSP432 ARM Cortex M3, compiled with TI-ARM compiler, static library, debug settings enabled)
 
 By default the only target platform enabled is **default**. To enable another/additional one, just open
 the makefile and add it to the `PLATFORMS` variable. For example the variable should look like this
@@ -132,14 +131,13 @@ environment (c-example), respectively. Meanwhile examples for
 
 * Cypress PSoC5
 * Arduino Mega
-* TI MSP432
 
 were added. These examples can be found in the respective subfolders in the examples directory as well. However,
 as they require environment specific setups, they come with dedicated READMEs, which explain their setup and usage.
 
 ### Building
 
-To build the examples, the library has to be compiled with `PLATFORM` containing the `default` architecture (see:
+To build the PC examples, the library has to be compiled with `PLATFORM` containing the `default` architecture (see:
 *Cross platfrom builds*, above). After this navigate to the `examples` directory and execute:
 
     make
@@ -186,6 +184,17 @@ should be presented by the running example program, similar to this:
     [----------] Id:           1
     [----------] Payload:      1234
     [----------] Topic:        NBIoT/111111111112345/CMD/MyCmd
+
+## Supported hardware
+
+In the current state the library offers only support for the u-Blox SARA-N2XX series of modules. Two different firmware
+versions are supported for these modules:
+
+* B656
+* B657SP3
+
+The code should be applicable to the Quectel BC-95 series as well, however, this is mainly untested. Support for further
+modules and firmware versions will be added in future releases.
 
 ## Building custom applications
 
