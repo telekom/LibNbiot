@@ -12,29 +12,34 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================================
 */
 
 #include "nbiotcoreapp.h"
+#include "modem.h"
+#include "network.h"
 
-static NbiotCoreApp* nbiotCoreAppInstance = 0l;
+static NbiotCoreApp* nbiotCoreAppInstance = nullptr;
 
 NbiotCoreApp::NbiotCoreApp():
     m_time(),
     m_serial(serialDebugPrefix),
-    m_modem(m_serial),
-    m_network(m_serial),
+    m_modem(new Modem(m_serial)),
+    m_network(new Network(m_serial)),
     coreConfigError(CoreErrorNoConfig)
 {}
 
-NbiotCoreApp::~NbiotCoreApp() {}
+NbiotCoreApp::~NbiotCoreApp() 
+{
+    delete m_modem;
+}
 
 NbiotCoreApp& NbiotCoreApp::getInstance()
 {
-    if(0l == nbiotCoreAppInstance)
+    if(nullptr == nbiotCoreAppInstance)
     {
         nbiotCoreAppInstance = new NbiotCoreApp();
     }
@@ -43,10 +48,10 @@ NbiotCoreApp& NbiotCoreApp::getInstance()
 
 void NbiotCoreApp::destroy()
 {
-    if(0l != nbiotCoreAppInstance)
+    if(nullptr != nbiotCoreAppInstance)
     {
         delete nbiotCoreAppInstance;
-        nbiotCoreAppInstance = 0l;
+        nbiotCoreAppInstance = nullptr;
     }
 }
 
@@ -103,7 +108,7 @@ unsigned int NbiotCoreApp::nbiotCoreConfig(NbiotCoreConf* conf)
 
         if((nullptr != conf->apn) && (0 < strlen(conf->apn)))
         {
-            m_modem.configSetApn(conf->apn);
+            m_modem->configSetApn(conf->apn);
         }
         else
         {
@@ -112,7 +117,7 @@ unsigned int NbiotCoreApp::nbiotCoreConfig(NbiotCoreConf* conf)
 
         if((nullptr != conf->apnUser) && (0 < strlen(conf->apnUser)))
         {
-            m_modem.configSetApnUser(conf->apnUser);
+            m_modem->configSetApnUser(conf->apnUser);
         }
         else
         {
@@ -121,26 +126,16 @@ unsigned int NbiotCoreApp::nbiotCoreConfig(NbiotCoreConf* conf)
 
         if((nullptr != conf->apnPwd) && (0 < strlen(conf->apnPwd)))
         {
-            m_modem.configSetApnPwd(conf->apnPwd);
+            m_modem->configSetApnPwd(conf->apnPwd);
         }
         else
         {
             result |= CoreWarnApnPwd;
         }
 
-        if((nullptr != conf->operMccMnc) && (0 < strlen(conf->operMccMnc)))
+        if((nullptr != conf->plmn) && (0 < strlen(conf->plmn)))
         {
-            m_modem.configSetOperMccMnc(conf->operMccMnc);
-        }
-
-        if((nullptr != conf->imsi) && (0 < strlen(conf->imsi)))
-        {
-            m_modem.configSetImsi(conf->imsi);
-        }
-
-        if((nullptr != conf->imsiPwd) && (0 < strlen(conf->imsiPwd)))
-        {
-            m_modem.configSetImsiPwd(conf->imsiPwd);
+            m_modem->configSetPlmn(conf->plmn);
         }
 
         coreConfigError = result;

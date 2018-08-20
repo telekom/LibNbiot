@@ -75,7 +75,7 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                         debugPrintf("eventLoop (sleep): handle wakeup and ping\r\n");
 #endif
                         sendEvent(NbiotStm::ConnectedAwakeEvent);
-                        m_dataPool.client.pmPing(m_dataPool.imsi.getData());
+                        m_dataPool.client.pmPing(m_dataPool.authLogin.getData());
                         m_dataPool.client.yield(/*tenSecondsMs*/); // since default is 15 sec. use default
                         m_dataPool.lastPollMs = getMillis();
                     }
@@ -114,8 +114,13 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                         m_dataPool.m_currentTopic.returnCode = static_cast<enum MQTTSN_returnCodes>(m_loopController.getLoopValue());
                         pubackNotify(m_dataPool.m_currentTopic);
 
-                        if (m_dataPool.m_currentTopic.returnCode!=RC_REJECTED_INVALID_TOPIC_ID) {
+                        if (RC_REJECTED_INVALID_TOPIC_ID != m_dataPool.m_currentTopic.returnCode)
+                        {
                             /// \todo checkout if we really need to disconnect or if we can recover from here
+                            // MQTT-SN spec V1.2 § 6.13:
+                            // After N_retry retransmissions, the client aborts the procedure and assumes
+                            // that its MQTT-SN connection to the gateway is disconnected.
+
                             m_dataPool.m_errno = ConnectionError;
                             postEvent(NbiotStm::DisconnectEvent); // disconnect: need to be post event!
                             // otherwise the (new) disconnect-loop-client

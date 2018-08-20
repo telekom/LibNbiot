@@ -31,59 +31,146 @@
 #define MQTTCLIENT_QOS1 1
 #include "MQTTSNClient.h"
 
-
+/*!
+ * \brief The NbiotMqttSnClient class
+ */
 class NbiotMqttSnClient : public MQTTSN::Client <NbiotMqttSnClient, INetwork, nbiot::Timer, 200, 5> 
 {
 
 public:
-
+    /*!
+     * \brief NbiotMqttSnClient
+     * \param lc
+     * \param topicName
+     * \param command_timeout_ms
+     */
     NbiotMqttSnClient(nbiot::NbiotLoop& lc, MQTTSN_topicid& topicName, unsigned int command_timeout_ms = 20000);
 
+    /*!
+     * \brief loopConnect
+     * \param length
+     */
     void loopConnect(int length);
+    /*!
+     * \brief loopDisconnect
+     * \param length
+     */
     void loopDisconnect(int length);
 
-    void loopSubscribe(int length);
+    /*!
+     * \brief loopSubscribe
+     * \param length
+     */
+    void loopSubscribe(unsigned short id, unsigned long timer_left);
+    /*!
+     * \brief loopUnsubscribe
+     * \param length
+     */
     void loopUnsubscribe(int length);
 
+    /*!
+     * \brief registerTopic
+     * \param topicName
+     * \return
+     */
     int registerTopic(MQTTSN_topicid& topicName);
-    void loopRegister(int length); 
+    /*!
+     * \brief loopRegister
+     * \param length
+     */
+    void loopRegister(int length);
+    /*!
+     * \brief loopPublish
+     * \param id
+     * \param timer_left
+     */
     void loopPublish(unsigned short id, unsigned long timer_left);
 
+    /*!
+     * \brief loopYield
+     * \param timeout_ms
+     */
     void loopYield(unsigned long timeout_ms);
+    /*!
+     * \brief stopYield
+     */
     void stopYield();
 
+    /*!
+     * \brief notifyRegister
+     * \param topicid
+     * \param topicName
+     * \return
+     */
     unsigned char notifyRegister(unsigned short topicid, MQTTSNString topicName );
+    /*!
+     * \brief notifyPublish
+     * \param topicid
+     * \param returncode
+     */
     void notifyPublish(unsigned short topicid, unsigned char returncode);
 
+    /*!
+     * \brief notifyPingResponse
+     */
     void notifyPingResponse();
+    /*!
+     * \brief notifyDisconnect
+     */
     void notifyDisconnect();
     
-
+    /*!
+     * \brief pmPing
+     * \param cID
+     * \return
+     */
     int pmPing(char* cID);
 
     template<class NHC>
+    /*!
+     * \brief setPubackNotifyHandler
+     * \param nhc
+     */
     void setPubackNotifyHandler(NHC* nhc, void (NHC::*paNotifyHandler)(nbiot::NbiotTopic&))
     {
         pubackNotifyHandler.attach(nhc, paNotifyHandler);
     }
 
     template<class NHC>
+    /*!
+     * \brief setRegisterNotifyHandler
+     * \param nhc
+     */
     void setRegisterNotifyHandler(NHC* nhc, int (NHC::*regNotifyHandler)(nbiot::NbiotTopic&))
     {
         registerNotifyHandler.attach(nhc, regNotifyHandler);
     }
 
     template<class NHC>
+    /*!
+     * \brief setDisconnectNotifyHandler
+     * \param nhc
+     */
     void setDisconnectNotifyHandler(NHC* nhc, void (NHC::*disNotifyHandler)(int))
     {
         disconnectNotifyHandler.attach(nhc, disNotifyHandler);
     }
 
     template<class NHC>
+    /*!
+     * \brief setPingRespNotifyHandler
+     * \param nhc
+     */
     void setPingRespNotifyHandler(NHC* nhc, void (NHC::*pingrespNotifyHandler)(int))
     {
         pingRespNotifyHandler.attach(nhc, pingrespNotifyHandler);
     }
+
+    /*!
+     * \brief setPubMaxRetry
+     * \param maxRetry
+     */
+    void setMaxRetry(unsigned short maxRetry) { m_maxRetry = maxRetry; }
 
 private:
 
@@ -91,6 +178,7 @@ private:
     bool doConLoop(int&);
     bool finishConLoop(int&);
 
+    bool sendPubPacket(int packetId, unsigned char dup, unsigned long timeout);
     bool startPubLoop(int&);
     bool doPubLoop(int&);
     bool finishPubLoop(int&);
@@ -99,6 +187,7 @@ private:
     bool doRegLoop(int&);
     bool finishRegLoop(int&);
 
+    bool sendSubPacket(int packetId, unsigned char dup, unsigned long timeout);
     bool startSubLoop(int&);
     bool doSubLoop(int&);
     bool finishSubLoop(int&);
@@ -126,6 +215,12 @@ private:
     nbiot::LoopClient m_unsubLoopClient;
     nbiot::LoopClient m_yieldLoopClient;
     nbiot::LoopClient m_disLoopClient;
+
+    unsigned long m_pubRetryTimeout;
+    unsigned short m_pubRetryCount;
+    unsigned long m_subRetryTimeout;
+    unsigned short m_subRetryCount;
+    unsigned short m_maxRetry;
 
     FP<void, nbiot::NbiotTopic&> pubackNotifyHandler;
     FP<int, nbiot::NbiotTopic&> registerNotifyHandler;

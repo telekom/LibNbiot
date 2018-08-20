@@ -7,6 +7,10 @@ external/lib/**
 external/include/**
 examples/build/**
 examples/bin/**
+examples/c-example/bin/**
+examples/c-example/build/**
+examples/cpp-example/bin/**
+examples/cpp-example/build/**
 libNbiot/build/**
 libNbiot/lib/**
 libNbiotCore/build/**

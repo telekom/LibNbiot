@@ -32,7 +32,7 @@ unsigned int nbiotConfig(NbiotConf* conf)
 
     if(ErrorNoConfig == configError)
     {
-        if(NULL != conf->notify_fu)
+        if(nullptr != conf->notify_fu)
         {
             nbiotMqtt.setNotifyHandler(conf->notify_fu);
         }
@@ -77,7 +77,7 @@ unsigned int nbiotConfig(NbiotConf* conf)
             result |= ErrorPollInterval;
         }
 
-        if((NULL != conf->gateway) && (0 < strlen(conf->gateway)))
+        if((nullptr != conf->gateway) && (0 < strlen(conf->gateway)))
         {
             nbiotMqtt.setGateway(conf->gateway);
         }
@@ -93,6 +93,25 @@ unsigned int nbiotConfig(NbiotConf* conf)
         else
         {
             result |= ErrorPort;
+        }
+
+        if(MAX_RESEND_LIMIT >= conf->maxResend)
+        {
+            nbiotMqtt.setMaxResend(conf->maxResend);
+        }
+        else
+        {
+            result |= ErrorMaxResend;
+        }
+
+        if(nullptr != conf->login)
+        {
+            nbiotMqtt.setLogin(conf->login);
+        }
+
+        if(nullptr != conf->password)
+        {
+            nbiotMqtt.setPassword(conf->password);
         }
         
         configError = result;

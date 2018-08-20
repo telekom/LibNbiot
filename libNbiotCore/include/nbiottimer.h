@@ -25,32 +25,115 @@
 
 namespace nbiot {
 
+/*!
+ * \brief The Timer class
+ */
 class Timer:public ITimer
 {
 public:
+    /*!
+     * \brief Timer
+     */
     Timer(): start_ms(0), end_ms(0) {}
+    /*!
+     * \brief Timer
+     * \param end
+     */
     Timer(unsigned long end): start_ms(0), end_ms(0) { start(end); }
+    /*!
+     * \brief Timer
+     * \param end
+     */
     Timer(int end): start_ms(0), end_ms(0) { start(end); }
+    /*!
+     * \brief Timer
+     * \param end
+     */
     Timer(unsigned short end): start_ms(0), end_ms(0) { start(end); }
+    /*!
+     * \brief ~Timer
+     */
     virtual ~Timer() {}
 
+    /*!
+     * \brief start
+     */
     virtual void start();
+    /*!
+     * \brief start
+     * \param end
+     */
     virtual void start(unsigned long end);
+    /*!
+     * \brief start
+     * \param end
+     */
     virtual void start(int end);
+    /*!
+     * \brief start
+     * \param end
+     */
     virtual void start(unsigned short end);
 
+    /*!
+     * \brief setTime
+     * \param end
+     */
     virtual void setTime(unsigned long end);
+    /*!
+     * \brief setTime
+     * \param end
+     */
     virtual void setTime(int end);
+    /*!
+     * \brief setTime
+     * \param end
+     */
     virtual void setTime(unsigned short end);
 
+    /*!
+     * \brief getTime
+     * \return
+     */
     virtual unsigned long getTime() const;
+    /*!
+     * \brief expired
+     * \return
+     */
     virtual unsigned long expired() const;
+    /*!
+     * \brief remaining
+     * \return
+     */
     virtual unsigned long remaining() const;
+    /*!
+     * \brief clear
+     */
     virtual void clear();
+    /*!
+     * \brief valid
+     * \return
+     */
     virtual bool valid() const;
+    /*!
+     * \brief _expired
+     * \return
+     */
     bool _expired() { return (0 == remaining()); }
+    /*!
+     * \brief countdown_ms
+     * \param ms
+     */
     void countdown_ms (unsigned long ms) { start(ms); }
+    /*!
+     * \brief countdown
+     * \param s
+     */
     void countdown (unsigned long s) { start(ms_per_sec * s); }
+    /*!
+     * \brief left_ms
+     * \return
+     */
     unsigned short left_ms()
     {
         unsigned short ret = static_cast<unsigned short>(remaining());

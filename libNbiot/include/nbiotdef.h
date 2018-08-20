@@ -21,6 +21,9 @@
 #ifndef NBIOTDEF_H
 #define NBIOTDEF_H
 
+/*!
+ * \brief The MQTTSN_returnCodes enum
+ */
 enum MQTTSN_returnCodes
 {
     RC_ACCEPTED,
@@ -29,6 +32,9 @@ enum MQTTSN_returnCodes
     RC_REJECTED_NOT_SUPPORTED
 };
 
+/*!
+ * \brief The StateIds enum
+ */
 enum StateIds
 {
     InvalidState = 0,
@@ -40,10 +46,13 @@ enum StateIds
     DeepSleepState,
     DisconnectedSleepState,
     ConnectedAwakeState,
-    WaitForGprsState,
+    WaitForAttachState,
     WaitForConnectState
 };
 
+/*!
+ * \brief The ErrorNumber enum
+ */
 enum ErrorNumber
 {
     Success = 0,
@@ -57,6 +66,9 @@ enum ErrorNumber
     InvalidTopicID
 };
 
+/*!
+ * \brief The NbiotAction enum
+ */
 enum NbiotAction
 {
     Initialize,
@@ -73,12 +85,18 @@ enum NbiotAction
     Wakeup
 };
 
+/*!
+ * \brief The NbiotEventMode enum
+ */
 enum NbiotEventMode
 {
     EventModeActive,
     EventModeAsleep
 };
 
+/*!
+ * \brief The NbiotResult enum
+ */
 enum NbiotResult
 {
     LC_Success,
@@ -87,6 +105,9 @@ enum NbiotResult
     LC_Fail
 };
 
+/*!
+ * \brief The NbiotLoopId enum
+ */
 enum NbiotLoopId
 {
     LI_Unknown = -1,

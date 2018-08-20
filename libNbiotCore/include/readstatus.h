@@ -21,6 +21,9 @@
 #ifndef READSTATUS_H
 #define READSTATUS_H
 
+/*!
+ * \brief The ReadStatus enum
+ */
 typedef enum rxStatus
 {
     rx_empty = 0,

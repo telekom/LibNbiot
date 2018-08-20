@@ -21,10 +21,9 @@
 #ifndef LIBNBIOTCORE_SERIAL_TEST_H
 #define LIBNBIOTCORE_SERIAL_TEST_H
 
-#endif //LIBNBIOTCORE_SERIAL_TEST_H
-
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <nbiotmessage.h>
 
 #include "serial.h"
 
@@ -84,11 +83,23 @@ WriteStatus writeStatus() {
     return ret;
 }
 
-int number_of_calls = 0;
+class SerialFixture : public ::testing::Test {
+public:
 
-void do_nothing(const char *) {
-    number_of_calls++;
-}
+    virtual void SetUp() {
+        number_of_calls = 0;
+    };
+
+    virtual void TearDown() {};
+
+    static void do_nothing(const char* c) {
+        number_of_calls++;
+    };
+
+    static int number_of_calls;
+};
+
+int SerialFixture::number_of_calls = 0;
 
 class _UrcCallback {
 public:
@@ -102,3 +113,5 @@ public:
     MOCK_METHOD1(do_nothing, void(
             const char*));
 };
+
+#endif //LIBNBIOTCORE_SERIAL_TEST_H

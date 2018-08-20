@@ -702,18 +702,17 @@ template<class Derived, class Network, class Timer, int MAX_PACKET_SIZE, int MAX
 int MQTTSN::Client<Derived, Network, Timer, MAX_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::subscribe(MQTTSN_topicid& topicFilter, enum QoS qos, messageHandler messageHandler)
 {
     int rc = FAILURE;
-    int len = 0;
 
     if (isconnected)
     {
-        if(0 < (len = MQTTSNSerialize_subscribe(sendbuf, MAX_PACKET_SIZE, 0, qos, packetid.getNext(), &topicFilter)))
-        {
-            (void)messageHandler;
-            m_topicName = topicFilter;
+        (void)messageHandler;
+        unsigned short id = packetid.getNext();
+        Timer timer = Timer(command_timeout_ms);
+        m_topicName = topicFilter;
+        m_qos = qos;
 
-            static_cast<Derived*>(this)->loopSubscribe(len);
-            rc = SUCCESS;
-        }
+        static_cast<Derived*>(this)->loopSubscribe(id, timer.remaining());
+        rc = SUCCESS;
     }
     return rc;
 }

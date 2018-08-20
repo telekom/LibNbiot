@@ -27,24 +27,43 @@
 #include "nbiotmessage.h"
 
 namespace nbiot {
+/*!
+ * \brief The NbiotShortTopic class
+ */
 class NbiotShortTopic
 {
 public:
+    /*!
+     * \brief NbiotShortTopic
+     */
     NbiotShortTopic()
     {
         shortName[0] = '\0';
         shortName[1] = '\0';
     }
+    /*!
+     * \brief NbiotShortTopic
+     * \param other
+     */
     NbiotShortTopic(const NbiotShortTopic& other)
     {
         shortName[0] = other.shortName[0];
         shortName[1] = other.shortName[1];
     }
+    /*!
+     * \brief NbiotShortTopic
+     * \param bytes
+     */
     NbiotShortTopic(char bytes[2])
     {
         shortName[0] = bytes[0];
         shortName[1] = bytes[1];
     }
+    /*!
+     * \brief NbiotShortTopic
+     * \param b0
+     * \param b1
+     */
     NbiotShortTopic(char b0, char b1)
     {
         shortName[0] = b0;
@@ -52,41 +71,73 @@ public:
     }
 
 
+    /*!
+     * \brief operator =
+     * \param other
+     * \return
+     */
     NbiotShortTopic& operator = (const NbiotShortTopic& other)
     {
         shortName[0] = other.shortName[0];
         shortName[1] = other.shortName[1];
         return *this;
     }
+    /*!
+     * \brief operator =
+     * \param bytes
+     * \return
+     */
     NbiotShortTopic& operator = (char bytes[2])
     {
         shortName[0] = bytes[0];
         shortName[1] = bytes[1];
         return *this;
     }
+    /*!
+     * \brief operator ==
+     * \param bytes
+     * \return
+     */
     bool operator == (char bytes[2])
     {
         return ((shortName[0] == bytes[0]) &&
                 (shortName[1] == bytes[1]));
     }
+    /*!
+     * \brief operator ==
+     * \param bytes
+     * \return
+     */
     bool operator == (const char bytes[2])
     {
         return ((shortName[0] == bytes[0]) &&
                 (shortName[1] == bytes[1]));
     }
 
+    /*!
+     * \brief shortName
+     */
     char shortName[2];
 };
 
+/*!
+ * \brief The NbiotTopic class
+ */
 class NbiotTopic
 {
 public:
+    /*!
+     * \brief The TopicTypeNormal enum
+     */
     enum TopicTypeNormal
     {
         TOPIC_NAME,
         TOPIC_ID
     };
 
+    /*!
+     * \brief The RegistrationFlag enum
+     */
     enum RegistrationFlag
     {
         REG_NONE = 0,
@@ -95,11 +146,31 @@ public:
         REG_BOTH = 3
     };
 
+    /*!
+     * \brief NbiotTopic
+     */
     NbiotTopic():type(MQTTSN_TOPIC_TYPE_NORMAL),id(0),shortName(),topicName(), returnCode(MQTTSN_RC_ACCEPTED), mh(nullptr), regFlag(REG_NONE){}
+    /*!
+     * \brief NbiotTopic
+     * \param bytes
+     */
     NbiotTopic(char bytes[2]):type(MQTTSN_TOPIC_TYPE_SHORT),id(0),shortName(bytes),topicName(), returnCode(MQTTSN_RC_ACCEPTED), mh(nullptr), regFlag(REG_NONE){}
+    /*!
+     * \brief NbiotTopic
+     * \param topicId
+     */
     NbiotTopic(unsigned short topicId):type(MQTTSN_TOPIC_TYPE_PREDEFINED),id(topicId),shortName(),topicName(), returnCode(MQTTSN_RC_ACCEPTED), mh(nullptr), regFlag(REG_NONE){}
+    /*!
+     * \brief NbiotTopic
+     * \param name
+     */
     NbiotTopic(const char* name):type(MQTTSN_TOPIC_TYPE_NORMAL),id(0),shortName(),topicName(name), returnCode(MQTTSN_RC_ACCEPTED), mh(nullptr), regFlag(REG_NONE){}
 
+    /*!
+     * \brief operator =
+     * \param other
+     * \return
+     */
     NbiotTopic& operator = (const NbiotTopic& other)
     {
         type = other.type;
@@ -115,9 +186,29 @@ public:
         return *this;
     }
 
+    /*!
+     * \brief operator ==
+     * \param topicId
+     * \return
+     */
     bool operator == (unsigned short topicId) { return (id == topicId); }
+    /*!
+     * \brief operator ==
+     * \param bytes
+     * \return
+     */
     bool operator == (char bytes[2]) { return (shortName == bytes); }
+    /*!
+     * \brief operator ==
+     * \param name
+     * \return
+     */
     bool operator == (const char* name) { return (topicName == name); }
+    /*!
+     * \brief operator ==
+     * \param topicid
+     * \return
+     */
     bool operator == (const MQTTSN_topicid& topicid)
     {
         if(type == topicid.type)
@@ -140,6 +231,10 @@ public:
         return false;
     }
 
+    /*!
+     * \brief valid
+     * \return
+     */
     bool valid()
     {
         switch(type)
@@ -155,6 +250,10 @@ public:
         }
     }
 
+    /*!
+     * \brief setReg
+     * \param flag
+     */
     void setReg(RegistrationFlag flag)
     {
         if(REG_NONE != flag)
@@ -166,6 +265,10 @@ public:
             regFlag = REG_NONE;
         }
     }
+    /*!
+     * \brief unsetReg
+     * \param flag
+     */
     void unsetReg(RegistrationFlag flag)
     {
         if(REG_NONE != flag)
@@ -177,6 +280,11 @@ public:
             regFlag = REG_BOTH;
         }
     }
+    /*!
+     * \brief isReg
+     * \param flag
+     * \return
+     */
     bool isReg(RegistrationFlag flag) const
     {
         if(REG_NONE != flag)
@@ -189,13 +297,26 @@ public:
         }
     }
 
+    /*!
+     * \brief hasHandler
+     * \return
+     */
     bool hasHandler() const { return (nullptr != mh); }
 
+    /*!
+     * \brief isWildcardTopic
+     * \return
+     */
     bool isWildcardTopic() const
     {
         return ((!topicName.empty()) && ((string::npos != topicName.find('+')) || (string::npos != topicName.find('#'))));
     }
 
+    /*!
+     * \brief toSNTopic
+     * \param topicid
+     * \param ttn
+     */
     void toSNTopic(MQTTSN_topicid& topicid, TopicTypeNormal ttn = TOPIC_NAME)
     {
         topicid.type = type;
@@ -226,11 +347,17 @@ public:
         }
     }
 
-    // slightly modified copy of MQTTClient::isTopicMatched
-    //
-    // assume topic filter and name is in correct format
-    // # can only be at end
-    // + and # can only be next to separator
+    /*!
+     * \brief isTopicMatched
+     * slightly modified copy of MQTTClient::isTopicMatched
+     *
+     * assume topic filter and name is in correct format
+     * # can only be at end
+     * + and # can only be next to separator
+     *
+     * \param topic
+     * \return
+     */
     bool isTopicMatched(const NbiotTopic& topic) const
     {
         unsigned int i = 0;
@@ -259,12 +386,33 @@ public:
     }
 
 
+    /*!
+     * \brief type
+     */
     enum MQTTSN_topicTypes type;
+    /*!
+     * \brief id
+     */
     unsigned short id;
+    /*!
+     * \brief shortName
+     */
     NbiotShortTopic shortName;
+    /*!
+     * \brief topicName
+     */
     string topicName;
+    /*!
+     * \brief returnCode
+     */
     unsigned char returnCode; // used in notifications about this topic
+    /*!
+     * \brief mh
+     */
     messageHandler mh;
+    /*!
+     * \brief regFlag
+     */
     unsigned char regFlag;
 };
 

@@ -27,9 +27,15 @@
 #include "nbiotstring.h"
 #include "urcfilterlist.h"
 
+/*!
+ * \brief The Serial class
+ */
 class Serial
 {
 public:
+    /*!
+     * \brief The SerialError enum
+     */
     enum SerialError
     {
         NoError = 0,
@@ -41,6 +47,9 @@ public:
         NoWriteFunction
     };
 
+    /*!
+     * \brief The SerialReadMode enum
+     */
     enum SerialReadMode
     {
         Normal,
@@ -48,31 +57,104 @@ public:
         Ignore
     };
 
+    /*!
+     * \brief Serial
+     */
     Serial();
+    /*!
+     * \brief Serial
+     * \param dbgprf
+     */
     Serial(int dbgprf);
+    /*!
+     * \brief Serial
+     * \param other
+     */
     Serial(const Serial& other);
 
+    /*!
+     * \brief ~Serial
+     */
     virtual ~Serial() {}
 
+    /*!
+     * \brief operator =
+     * \param other
+     * \return
+     */
     Serial& operator=(const Serial& other);
 
+    /*!
+     * \brief configSetReadStatus
+     */
     void configSetReadStatus(ReadStatus (*readstatus_fu)());
+    /*!
+     * \brief configSetReadByte
+     */
     void configSetReadByte(unsigned char (*readbyte_fu)());
+    /*!
+     * \brief configSetPutChar
+     */
     void configSetPutChar(void (*putchar_fu)(unsigned char));
+    /*!
+     * \brief configSetWriteStatus
+     */
     void configSetWriteStatus(WriteStatus (*writestatus_fu)());
 
+    /*!
+     * \brief getError
+     * \return
+     */
     int getError() const { return serial_error; }
+    /*!
+     * \brief clearError
+     */
     void clearError() { setError(NoError); }
 
+    /*!
+     * \brief readLine
+     * \param line
+     * \param timeout_ms
+     * \param readMode
+     * \return
+     */
     size_t readLine(nbiot::string& line, unsigned short timeout_ms, SerialReadMode readMode=Normal);
+    /*!
+     * \brief readRaw
+     * \param buffer
+     * \param timeout_ms
+     * \return
+     */
     size_t readRaw(unsigned char* buffer, unsigned short timeout_ms);
 
+    /*!
+     * \brief write
+     * \param c
+     * \return
+     */
     size_t write(char c);
 
+    /*!
+     * \brief write
+     * \param buffer
+     * \param size
+     * \return
+     */
     size_t write(const char* buffer, size_t size);
+    /*!
+     * \brief write
+     * \param str
+     * \return
+     */
     size_t write(const nbiot::string& str);
 
     template<class UHC>
+    /*!
+     * \brief addUrcFilter
+     * \param urc
+     * \param uhc
+     * \return
+     */
     bool addUrcFilter(const char* urc, UHC* uhc, void (UHC::*urc_handler)(const char*))
     {
         int index = -1;
@@ -93,13 +175,38 @@ public:
         return ret;
     }
 
+    /*!
+     * \brief addUrcFilter
+     * \param urc
+     * \return
+     */
     bool addUrcFilter(const char* urc, void (*urc_handler)(const char*));
+    /*!
+     * \brief removeUrcFilter
+     * \param urc
+     * \return
+     */
     bool removeUrcFilter(const char* urc);
 
+    /*!
+     * \brief clearFilter
+     */
     void clearFilter() { m_filterList.clear(); }
+    /*!
+     * \brief hasFilter
+     * \return
+     */
     bool hasFilter() const { return !m_filterList.isEmpty(); }
 
+    /*!
+     * \brief setDebugPrefix
+     * \param prefix
+     */
     void setDebugPrefix(int prefix) { dbg_prefix = prefix; }
+    /*!
+     * \brief getDebugPrefix
+     * \return
+     */
     int getDebugPrefix() const { return dbg_prefix; }
 
 private:

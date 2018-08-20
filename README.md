@@ -1,10 +1,7 @@
 # LibNbiot - A non-blocking MQTT-SN Library for NB-IoT
 
 The repository contains the source code for the LibNbiot, which allows to access the
-**Telekom Cloud of Things** with **NB-IoT** radio modules.
-
-**NOTICE**: The newest commit only supports the new syntax of firmware **B657SP3** and greater. If your module has the older firmware **B656**, please update the firmware of your module or revert to commit [ed399bb](https://github.com/telekom/LibNbiot/commit/ed399bb3073868019978e2174a9599301f5a2771).
-
+**Telekom Cloud of Things** with **NB-IoT** radio modules and MQTT-SN.
 
 ## Building from command line
 
@@ -58,7 +55,7 @@ Currently the following platforms are supported:
 * **arm-cortex-m3-debug** (ARM Cortex M3 bare metal, static library, debug settings enabled)
 
 By default the only target platform enabled is **default**. To enable another/additional one, just open
-the makefile and add it to the PLATFORMS variable. For example the variable should look like this
+the makefile and add it to the `PLATFORMS` variable. For example the variable should look like this
 
     export PLATFORMS := arm-cortex-m3 arm-cortex-m3-debug
 
@@ -135,13 +132,12 @@ environment (c-example), respectively. Meanwhile examples for
 * Cypress PSoC5
 * Arduino Mega
 
-were added. These examples can be found in the respective directories in the examples directory as well. However,
-as they require environment specific setups, they come with dedicated READMEs, which can be found in the respective
-directories.
+were added. These examples can be found in the respective subfolders in the examples directory as well. However,
+as they require environment specific setups, they come with dedicated READMEs, which explain their setup and usage.
 
 ### Building
 
-To build the examples, the library has to be compiled with `PLATFORM` containing the `default` architecture (see:
+To build the PC examples, the library has to be compiled with `PLATFORM` containing the `default` architecture (see:
 *Cross platfrom builds*, above). After this navigate to the `examples` directory and execute:
 
     make
@@ -188,6 +184,39 @@ should be presented by the running example program, similar to this:
     [----------] Id:           1
     [----------] Payload:      1234
     [----------] Topic:        NBIoT/111111111112345/CMD/MyCmd
+
+## Supported hardware
+
+In the current state the library offers only support for the u-Blox SARA-N2XX series of modules. Two different firmware
+versions are supported for these modules:
+
+* B656
+* B657SP3
+
+The code should be applicable to the Quectel BC-95 series as well, however, this is mainly untested. Support for further
+modules and firmware versions will be added in future releases.
+
+## Building custom applications
+
+As explained in the sections above, the makefiles distributed with the library allow compilation for several target
+platforms. The result is usually a set of for libraries:
+
+* libnbiot
+* libnbiotcore
+* libnbiotstm
+* libmqttsnpaho
+
+which provide the functions from the different packages. There are some dependencies which have to be taken into
+account during compilation: **libnbiot** depends on the three libraries. This means, hat **libnbiot** is usually
+required to be the first listed library for most compilers/linkers.
+
+For compilation/linkage with the **gcc** toolchain, a linker call would look similiar to this:
+
+    gcc main.o libnbiot.a libnbiotcore.a libstm.a libmqttsnpaho.a
+
+If you don't want to care about providing the proper ordering of the libraries, you can add `-Wl,--no-as-needed` to the linker options
+(see [gcc](https://gcc.gnu.org/) and [ld](https://sourceware.org/binutils/docs-2.27/ld/index.html) manuals for further information).
+
 
 ## License
 

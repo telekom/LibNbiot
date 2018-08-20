@@ -12,7 +12,7 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #############################################################################
@@ -25,8 +25,13 @@
 # is controlled here.
 #
 # Currently these platforms are supported.
-# export PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortex-m3 arm-cortex-m3-debug
+# export PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortex-m3 arm-cortex-m3-debug msp432-debug
 export PLATFORMS := default
+
+
+# MODULE, define the module and firmware combination to be used in compilation. The following modules are currently supported:
+# SARA-NXX-B657SP3 SARA-N2XX-B656
+export MODULE    := SARA-N2XX-B657SP3
 
 
 # Internal variables
@@ -65,6 +70,8 @@ $(CORELIB): $(EXTERNAL)
 	@echo "copy build results"
 	cp -r $@/lib/* $(LIBDIR)/.
 	cp -r $@/include/* $(INCDIR)/.
+	cp $@/src/modems/*.h $(INCDIR)/.
+	cp $@/src/modems/$(MODULE)/*.h $(INCDIR)/.
 
 
 $(EXTERNAL): directories

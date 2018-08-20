@@ -29,7 +29,7 @@
  *
  * \section intro Introduction
  *
- * The nbIOTCore library provides data and functions shared by libNbiot and libNbiotEmu.
+ * The NB-IoT-core library provides data and network functions for the higher level libNbiot.
  *
  * \section details Details
  * 

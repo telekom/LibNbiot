@@ -23,26 +23,62 @@
 
 #include "nbiottime_t.h"
 
+/*!
+ * \brief The NbiotTime class
+ */
 class NbiotTime
 {
 public:
+    /*!
+     * \brief NbiotTime
+     */
     NbiotTime(): data(new NbiotTime_t),ticksPerMs(1),msPerTick(1),ticksCurrentMilli(0), tickLock(false)
     {
         data->timestamp = 0;
         data->millis = 0;
     }
+    /*!
+     * \brief ~NbiotTime
+     */
     virtual ~NbiotTime()
     {
         delete data;
     }
 
+    /*!
+     * \brief setTickFrequency
+     * \param ticks
+     */
     void setTickFrequency(unsigned long ticks);
+    /*!
+     * \brief getMinDelay
+     * \return
+     */
     unsigned short getMinDelay() const { return ((0 == msPerTick)? 1 : msPerTick); }
+    /*!
+     * \brief getMillis
+     * \return
+     */
     long long getMillis() const;
+    /*!
+     * \brief addMillis
+     * \param ms
+     */
     void addMillis(unsigned long ms);
+    /*!
+     * \brief getTime
+     * \return
+     */
     time_t getTime();
+    /*!
+     * \brief setTime
+     * \param t
+     */
     void setTime(time_t t);
 
+    /*!
+     * \brief tick
+     */
     void tick();
 
 private:

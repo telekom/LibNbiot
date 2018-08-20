@@ -28,19 +28,37 @@
 
 namespace nbiot {
 
+/*!
+ * \brief The NbiotRegistryList class
+ */
 class NbiotRegistryList : public util::list<nbiot::NbiotTopic>
 {
 public:
+    /*!
+     * \brief indexOf
+     * \param topicName
+     * \return
+     */
     int indexOf(const char* topicName) const
     {
         return util::list<nbiot::NbiotTopic>::indexOf(topicName);
     }
 
+    /*!
+     * \brief indexOf
+     * \param topicShort
+     * \return
+     */
     int indexOf(char topicShort[2]) const
     {
         return util::list<nbiot::NbiotTopic>::indexOf(topicShort);
     }
 
+    /*!
+     * \brief indexOf
+     * \param topicId
+     * \return
+     */
     int indexOf(unsigned short topicId) const
     {
         return util::list<nbiot::NbiotTopic>::indexOf(topicId);

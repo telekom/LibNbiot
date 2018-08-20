@@ -21,20 +21,48 @@
 #ifndef INETWORK_H
 #define INETWORK_H
 
+/*!
+ * \brief The INetwork class
+ */
 class INetwork
 {
 public:
-    virtual ~INetwork() {}//;
+    virtual ~INetwork() {}
 
+    /*!
+     * \brief connect
+     * \param hostname
+     * \param port
+     * \return
+     */
     virtual bool connect(const char* hostname, unsigned short port) = 0;
+    /*!
+     * \brief read
+     * \param buffer
+     * \param len
+     * \param timeout
+     * \return
+     */
     virtual int read(unsigned char* buffer, int len, unsigned short timeout) = 0;
+    /*!
+     * \brief write
+     * \param buffer
+     * \param len
+     * \param timeout
+     * \return
+     */
     virtual bool write(unsigned char* buffer, unsigned long len, unsigned short timeout) = 0;
+    /*!
+     * \brief disconnect
+     * \return
+     */
     virtual bool disconnect() = 0;
+    /*!
+     * \brief isConnected
+     * \return
+     */
     virtual bool isConnected() = 0;
 };
 
-//INetwork::~INetwork()
-//{
-//}
 #endif // INETWORK_H
 

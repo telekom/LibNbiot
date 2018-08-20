@@ -19,6 +19,8 @@
 */
 
 #include "serial_test.h"
+#include <libnbiotcore.h>
+#include "repeatedtimer.h"
 
 using ::testing::AtLeast;
 using ::testing::Return;
@@ -173,6 +175,10 @@ TEST(SerialTest, ReadRawByteWithRxAvailable) {
 // Tests ReadRaw timeout when trying to read a character from buffer but buffer is empty
 
 TEST(SerialTest, ReadRawTimeoutRxEmpty) {
+    RepeatedTimer tick_timer(1, tick);
+
+    tick_timer.start();
+
     Serial s;
     pSerCom = new MockSerialCom();
 
@@ -192,6 +198,7 @@ TEST(SerialTest, ReadRawTimeoutRxEmpty) {
     EXPECT_EQ((int) Serial::ReadTimeout, s.getError());
     EXPECT_EQ(0, result);
 
+    tick_timer.stop();
     delete (pSerCom);
 }
 
@@ -328,7 +335,7 @@ TEST(SerialTest, ReadLineIgnoresCarriageReturn) {
 
 // Tests that URC filters can be added and removed.
 
-TEST(SerialTest, AddingAndRemovingUrcFilter) {
+TEST_F(SerialFixture, AddingAndRemovingUrcFilter) {
     Serial s;
     MockUrcCallback UHC;
     ASSERT_TRUE(s.addUrcFilter("+NSOMNI", do_nothing))
@@ -349,7 +356,7 @@ TEST(SerialTest, AddingAndRemovingUrcFilter) {
 
 // Tests that URCs are filtered properly and the callback function is called.
 
-TEST(SerialTest, UrcFilter) {
+TEST_F(SerialFixture, UrcFilter) {
     Serial s;
     Sequence s1;
     pSerCom = new MockSerialCom();

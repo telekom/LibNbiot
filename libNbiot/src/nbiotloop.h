@@ -28,24 +28,60 @@
 
 namespace nbiot {
 
+/*!
+ * \brief The iLoopControlled class
+ */
 class iLoopControlled
 {
 public:
     virtual ~iLoopControlled() {}
 
+    /*!
+     * \brief preLoopStep
+     * \return
+     */
     virtual NbiotResult preLoopStep() = 0;
+    /*!
+     * \brief loopStep
+     * \return
+     */
     virtual NbiotResult loopStep() = 0;
+    /*!
+     * \brief postLoopStep
+     * \return
+     */
     virtual NbiotResult postLoopStep() = 0;
 
+    /*!
+     * \brief getResult
+     * \return
+     */
     virtual NbiotResult getResult() const = 0;
+    /*!
+     * \brief getValue
+     * \return
+     */
     virtual int getValue() const = 0;
+    /*!
+     * \brief setValue
+     */
     virtual void setValue(int) = 0;
+    /*!
+     * \brief getLoopId
+     * \return
+     */
     virtual NbiotLoopId getLoopId() const = 0;
 };
 
+/*!
+ * \brief The NbiotLoop class
+ */
 class NbiotLoop
 {
 public:
+    /*!
+     * \brief NbiotLoop
+     */
     NbiotLoop():
         m_clientList(nullptr),
         m_loopClient(nullptr),
@@ -55,6 +91,10 @@ public:
     {}
     virtual ~NbiotLoop() {}
 
+    /*!
+     * \brief nbiotLoop
+     * \return
+     */
     NbiotResult nbiotLoop()
     {
         NbiotResult ret = LC_Idle;
@@ -111,6 +151,10 @@ public:
         return ret;
     }
 
+    /*!
+     * \brief registerLoopClient
+     * \param client
+     */
     void registerLoopClient(iLoopControlled* client)
     {
         if(nullptr != client)
@@ -130,6 +174,9 @@ public:
         }
     }
 
+    /*!
+     * \brief loopBreak
+     */
     void loopBreak()
     {
         if(0 < m_clientList.count()) // don't set break-flag in advance
@@ -138,11 +185,26 @@ public:
         }
     }
 
+    /*!
+     * \brief getLoopValue
+     * \return
+     */
     int getLoopValue() const { return m_loopValue; }
+    /*!
+     * \brief getLoopId
+     * \return
+     */
     NbiotLoopId getLoopId() const { return m_loopId; }
 
+    /*!
+     * \brief isBusy
+     * \return
+     */
     bool isBusy() const { return ((0 < m_clientList.count()) || (LI_Unknown != m_loopId)); }
 
+    /*!
+     * \brief loop_id
+     */
     const char* loop_id[8] = {
                         "LI_Cgatt",
                         "LI_Yield",

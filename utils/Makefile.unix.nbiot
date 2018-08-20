@@ -12,14 +12,14 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #############################################################################
 
 # Define any target platforms here. Only targets defined here will be build.
 # Don't forget to add appropriate cases below.
-# PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortex-m3 arm-cortex-m3-debug
+# PLATFORMS := default x86 x86-debug x86-shared x86-debug-shared x86_64 x86_64-debug x86_64-shared x86_64-shared-debug arm-cortex-m3 arm-cortex-m3-debug msp432-debug
 PLATFORMS := default
 
 
@@ -43,21 +43,18 @@ VPATH     := $(SRCDIR) $(INCDIR)
 
 
 # Variable definitions.
-INCLUDES  := $(addprefix -I ,$(VPATH)) -I $(COREINC) -I  $(EXTINC)
+INCLUDES  := $(addprefix -I ,$(VPATH) $(COREINC) $(EXTINC))
 OBJECTS   := $(subst $(SRCDIR)/,,$(subst .cpp,.o,$(notdir $(shell find $(SRCDIR) -name "*.cpp"))))
-AR        := ar
-ARFLAGS   := cq
 TARGET    := libnbiot.a
-APPLIB    := libnbiotapp.a
-LINKER    := $(AR)
-LFLAGS    := $(ARFLAGS)
+LINKER    := ar
+LFLAGS    := cq
 
 
 # Add special definitions and compile options for target platforms here. Don't
 # forget to activate them by adding an entry to PLATFORMS above:
 ifeq ($(ARCH),default)
 CXX      := g++
-CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb
+CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb -D DEBUG
 endif
 ifeq ($(ARCH),x86)
 CXX      := g++
@@ -117,21 +114,25 @@ CXX       := arm-none-eabi-gcc
 CXXFLAGS  := -mcpu=cortex-m3 -mthumb -Wa,-alh=nbiot_time.lst \
   -g -Wall -ffunction-sections -D DEBUG -g -O0 -ffat-lto-objects -std=c++0x -ggdb
 endif
+ifeq ($(ARCH),msp432-debug)
+CXX       := armcl
+CXXFLAGS  := -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me \
+  --define=__MSP432P401R__ --define=ccs -g --gcc --diag_warning=225 --diag_wrap=off \
+  --display_error_number --abi=eabi --c++14 -eo=o
+INCLUDES  := $(subst -I ,-I=,$(INCLUDES))
+LINKER    := armar
+LFLAGS    := r
+# Add ti specific files to include search path - adjust this according to your installation
+INCLUDES  += -I=/opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include
+TARGET    := libnbiot.lib
+endif
 
 
 # Build targets, usually these don't need to be modified.
 first: all
 
 
-all: $(TARGET) $(APPLIB)
-
-
-$(APPLIB): $(TARGET)
-	$(AR) -x $(EXTLIB)/libmqttsnpaho.a
-	$(AR) -x $(EXTLIB)/libstm.a
-	$(AR) -r $(APPLIB) *.o
-	$(AR) -r $(APPLIB) *.co
-	cp -f $(APPLIB) $(LIB)/.
+all: $(TARGET)
 
 
 $(TARGET): $(OBJECTS)
@@ -140,7 +141,7 @@ $(TARGET): $(OBJECTS)
 
 
 %.o: %.cpp
-	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $< -o $@
+	$(CXX) -c $< $(CXXFLAGS) $(INCLUDES)
 
 
 endif

@@ -117,8 +117,4 @@ TEST(NbiotTimeTest, Tick) {
                                 << "Timestamp wasn't updated although milliseconds passed 1000";
 }
 
-// TODO: Test delay
-TEST(NbiotTimeTest, Delay) {
-}
-
 

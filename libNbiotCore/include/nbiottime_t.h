@@ -21,7 +21,10 @@
 #ifndef NBIOTTIME_T_H
 #define NBIOTTIME_T_H
 #include <time.h>
-    
+
+/*!
+ * \brief The NbiotTime_t struct
+ */
 struct NbiotTime_t
 {
     unsigned short millis;

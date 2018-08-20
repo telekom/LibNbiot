@@ -63,6 +63,8 @@
 
 #define ECHO_PORT 16666 /*!< ECHO_PORT: port of the echo service */
 
+#define MAX_RESEND_LIMIT 10 /*!< MAXRESEND: MQTT-SN spec recommends a maximum of five attempts - ten is the limit */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -79,11 +81,14 @@ struct NbiotConf
     unsigned short pollInterval; /*!< The interval in msec. to poll for subscribed messages after publish */
     const char* gateway; /*!< IP-address of the nbIOT gateway server */
     unsigned short port; /*!< (MQTT-)port of the nbIOT gateway server */
+    unsigned short maxResend; /*!< The maximum number of re-transmission attempts */
+    const char* login; /*!< login string for authentication. If left empty, the IMSI will be used */
+    const char* password; /*!< password string for authentication */
 };
 
 typedef struct NbiotConf NbiotConf;
 
-#define NbiotConf_initializer {NULL, 300, 0, 20, 10000, NULL, 1883}
+#define NbiotConf_initializer {NULL, 300, 0, 20, 10000, NULL, 1883, 0, NULL, NULL}
 
 /*!
  * \brief The NbiotConfigError enum enumerates the possible errors of the configuration ( nbiotConfig returns an OR'ed result )
@@ -97,6 +102,7 @@ enum NbiotConfigError
     ErrorPollInterval = 512, /*!< Invalid autopoll-interval */
     ErrorGateway = 1024, /*!< No gateway */
     ErrorPort = 2048, /*!< Invalid port number (privileged-port-numbers: < 1024) */
+    ErrorMaxResend = 4096, /*!< Invalid re-transmission maximum */
     ErrorMultipleConfig = 16384, /*!< Configuration was called more than one time */
     ErrorNoConfig = 32768 /*!< Configuration was never called */
 };

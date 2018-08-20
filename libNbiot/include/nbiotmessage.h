@@ -28,6 +28,9 @@ typedef struct NbiotMessage NbiotMessage;
 
 typedef struct MessageData MessageData;
 
+/*!
+ * \brief The NbiotMessage struct
+ */
 struct NbiotMessage
 {
     enum QoS qos;
@@ -38,12 +41,18 @@ struct NbiotMessage
     size_t payloadlen;
 };
 
+/*!
+ * \brief The MessageData struct
+ */
 struct MessageData
 {
     NbiotMessage* message;
     const char* topicName;
 };
 
+/*!
+ * \brief messageHandler
+ */
 typedef void (*messageHandler)(MessageData*);
 
 #endif // NBIOTMESSAGE_H

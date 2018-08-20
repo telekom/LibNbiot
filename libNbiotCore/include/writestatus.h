@@ -21,6 +21,9 @@
 #ifndef WRITESTATUS_H
 #define WRITESTATUS_H
 
+/*!
+ * \brief The WriteStatus enum
+ */
 typedef enum txStatus
 {
     tx_empty = 0,

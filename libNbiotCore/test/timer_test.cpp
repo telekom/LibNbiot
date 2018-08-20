@@ -20,18 +20,51 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <libnbiotcore.h>
 #include <nbiottimer.h>
-#include <chrono>
+
+#include "repeatedtimer.h"
+#include <limits.h>
 
 using namespace nbiot;
-using namespace std::chrono;
 
-TEST(TimerTest, StandardConstructor) {
+class TimerTest : public ::testing::Test {
+public:
+    void SetUp() {
+        setTime(0);
+        tick_timer = new RepeatedTimer(1, tick);
+    }
+
+    void start_tick_timer() {
+        tick_timer->start();
+    }
+
+    void pass_ms(unsigned long ms) {
+        updateMillis(ms);
+    }
+
+    void pass_sec(unsigned long s) {
+        updateMillis(1000 * s);
+    }
+
+    void pass_min(unsigned long min) {
+        updateMillis(60 * 1000 * min);
+    }
+
+    void TearDown() {
+        tick_timer->stop();
+        delete tick_timer;
+    }
+
+    RepeatedTimer *tick_timer;
+};
+
+TEST(TimerSetupTest, StandardConstructor) {
     Timer t;
     EXPECT_FALSE(t.valid());
 }
 
-TEST(TimerTest, SettingTime) {
+TEST_F(TimerTest, SettingTime) {
     Timer t;
     t.setTime(10);
     EXPECT_EQ(10, t.getTime());
@@ -41,57 +74,92 @@ TEST(TimerTest, SettingTime) {
     EXPECT_EQ(-10, t.getTime());
 }
 
-TEST(TimerTest, StartTimer) {
+TEST_F(TimerTest, StartTimer) {
     Timer t;
     t.setTime(100);
-    high_resolution_clock::time_point t1, t2;
-
     t.start();
-    t1 = high_resolution_clock::now();
-    while (t.remaining() > 0) {
-    }
-    t2 = high_resolution_clock::now();
-    EXPECT_NEAR(0.1, duration_cast<duration<double>>(t2 - t1).count(), 0.1);
+    EXPECT_NE(t.remaining(), 0);
+    pass_ms(100);
+    EXPECT_EQ(t.remaining(), 0);
 }
 
-TEST(TimerTest, StartTimerWithTimeSetting) {
+//TEST_F(TimerTest, StartTimerWithMaxULONG) {
+//    // Test max unsigned long
+//
+//    Timer t;
+//
+//    t.setTime(ULONG_MAX);
+//    EXPECT_EQ(ULONG_MAX, t.getTime())
+//                        << "There was an error setting the time to ULONG_MAX.";
+//
+//    t.start();
+//    EXPECT_NE(0, t.remaining())
+//                        << "Timer.remaining() should not return 0 here, because timer was set to ULONG_MAX "
+//                        << "and no time passed yet";
+//    pass_ms(ULONG_MAX);
+//    EXPECT_EQ(0, t.remaining())
+//                        << "Timer.remaining() should be zero here, because ULONG_MAX passed.";
+//}
+
+//TEST_F(TimerTest, StartTimerWithMillisAtMaxLONGLONG) {
+//    // Test max unsigned long
+//
+//    Timer t;
+//    unsigned short time = 1000;
+//
+//    setTime(0);
+//    updateMillis(LONG_LONG_MAX);
+//    EXPECT_EQ(LONG_LONG_MAX, getMillis());
+//
+//    t.setTime(time);
+//    EXPECT_EQ(time, t.getTime())
+//                        << "There was an error setting the time to LONG_MAX.";
+//
+//    t.start();
+//    EXPECT_EQ(time, t.remaining())
+//                        << "Timer.remaining() should equal time here, because timer was set to time "
+//                        << "and no time passed yet";
+//    pass_ms(time);
+//    EXPECT_EQ(0, t.remaining())
+//                        << "Timer.remaining() should be zero here, because time passed.";
+//}
+
+TEST_F(TimerTest, StartTimerWithTimeSetting) {
     Timer t;
     t.setTime(10);
 
-    high_resolution_clock::time_point t1, t2;
     t.start(100);
-    t1 = high_resolution_clock::now();
-    while (t.remaining() > 0) {
-    }
-    t2 = high_resolution_clock::now();
-    EXPECT_NEAR(0.1, duration_cast<duration<double>>(t2 - t1).count(), 0.1);
+    EXPECT_NE(t.remaining(), 0);
+    pass_ms(100);
+    EXPECT_EQ(t.remaining(), 0);
 }
 
-TEST(TimerTest, ConstructAndStart) {
-    high_resolution_clock::time_point t1, t2;
+TEST_F(TimerTest, ConstructAndStart) {
     Timer t(100);
-    t1 = high_resolution_clock::now();
-    while (t.remaining() > 0) {
-    }
-    t2 = high_resolution_clock::now();
-    EXPECT_NEAR(0.1, duration_cast<duration<double>>(t2 - t1).count(), 0.1);
+    EXPECT_NE(t.remaining(), 0);
+    pass_ms(100);
+    EXPECT_EQ(t.remaining(), 0);
 }
 
-TEST(TimerTest, ClearTime) {
+TEST_F(TimerTest, ClearTime) {
+    tick();
+
     Timer t;
 
     EXPECT_FALSE(t.valid());
     EXPECT_EQ(0, t.expired());
     EXPECT_EQ(0, t.remaining());
 
-    t.start(100);
+    t.start(1000);
 
-    EXPECT_GT(t.remaining(), 0);
     EXPECT_TRUE(t.valid());
+    EXPECT_EQ(0, t.expired());
     EXPECT_NE(0, t.remaining());
 
-    while (0 < t.remaining()) {};
+    pass_sec(1);
+
     EXPECT_NE(0, t.expired());
+    EXPECT_EQ(0, t.remaining());
 
     t.setTime(100);
     t.clear();
