@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <nbiotmodemtools.h>
+//#include <nbiotmodemtools.h>
 
 // Tests that NbiotModemTools Constructor works properly. Assert that new object is not null.
 

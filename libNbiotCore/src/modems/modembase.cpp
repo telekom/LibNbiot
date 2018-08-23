@@ -27,13 +27,13 @@
 const char* ModemBase::cmdCIMI = "AT+CIMI";
 const char* ModemBase::cmdCGATT0 = "AT+CGATT=0";
 const char* ModemBase::cmdCGATTquery = "AT+CGATT?";
-const char* ModemBase::respCGATTquery = "+CGATT: ";
+const char* ModemBase::respCGATTquery = "+CGATT:";
 const char* ModemBase::cmdCFUN1 = "AT+CFUN=1";
 const char* ModemBase::cmdCGDCONT_arg = "AT+CGDCONT=1,\"IP\",\"%s\"\r";
 const char* ModemBase::cmdCOPS_arg = "AT+COPS=1,2,\"%s\"\r";
 const char* ModemBase::cmdCFUN_arg = "AT+CFUN=%d\r";
 const char* ModemBase::cmdCFUNquery = "AT+CFUN?";
-const char* ModemBase::respCFUNquery = "+CFUN: ";
+const char* ModemBase::respCFUNquery = "+CFUN:";
 const char* ModemBase::respOK = "OK";
 
 

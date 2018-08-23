@@ -240,6 +240,7 @@ bool Network::write(unsigned char* buffer, unsigned long len, unsigned short tim
         nbiot::string data = nbiot::string::Printf(cmdNSOST_arg, m_connectionNumber, m_hostname.c_str(), m_port, len);
         nbiot::string hex = nbiot::string((char*)(buffer), len).toHex();
         data += hex;
+        data += "\r";
         #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
         debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");

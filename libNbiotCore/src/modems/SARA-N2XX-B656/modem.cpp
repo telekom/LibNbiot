@@ -63,20 +63,16 @@ bool Modem::reboot()
     return ok;
 }
 
-bool Module::initialize()
+bool Modem::initialize()
 {
     bool ok = true;
     #ifdef DEBUG_MODEM
     nbiot::Timer t = nbiot::Timer(FIVE_MINUTES);
     #endif
 
-
-    if(ok)
+    if(!m_cmd.sendCommand(cmdCFUN1))
     {
-        if(!m_cmd.sendCommand(cmdCFUN1))
-        {
-            ok = false;
-        }
+        ok = false;
     }
 
     if(ok)
@@ -119,9 +115,3 @@ bool Module::initialize()
 #endif
     return ok;
 }
-
-
-
-
-
-
