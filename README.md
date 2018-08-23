@@ -179,7 +179,7 @@ temperature measurements have arrived in the Cloud. The state of the operation s
 **Executing** to **Successful**. Before it changes from **Executing** to **Successful** a notification (new message)
 should be presented by the running example program, similar to this:
 
-    [ DEBUG    ] ----- New message 001 -----
+    [ MSG      ] ----- New message 001 -----
     [----------] QoS:          1
     [----------] Id:           1
     [----------] Payload:      1234

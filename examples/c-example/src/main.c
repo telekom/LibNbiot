@@ -117,7 +117,8 @@ void notificationHandler(const Notification *n)
     // Handle your notifications here
     notification_id++;
 
-    debugPrintf("\033[0;32m[ Debug    ]\033[0m ");
+    debugPrintf("\033[0;34m[ NOTIFY   ]\033[0m ");
+
 
     debugPrintf("----- New notification %03d -----\r\n", notification_id);
 
@@ -142,7 +143,7 @@ void subscriptionHandler(MessageData* msg)
     messageArrived = 1;
     message_counter++;
 
-    debugPrintf("\033[0;32m[ Debug    ]\033[0m ");
+    debugPrintf("\033[0;35m[ MSG      ]\033[0m ");
 
     debugPrintf("----- New message %03d -----\r\n", message_counter);
 
@@ -194,6 +195,7 @@ unsigned char init(char* imsi, char* pw, char* ser)
         conf.pollInterval = 10000;
         conf.login = imsi;
         conf.password = pw;
+        conf.maxResend = 5;
 
         unsigned int retConf = nbiotConfig(&conf);
 
@@ -204,7 +206,7 @@ unsigned char init(char* imsi, char* pw, char* ser)
             ret = nbiotStart();
             if(1 == ret)
             {
-                debugPrintf("\033[0;32m[ Debug    ]\033[0m ");
+                debugPrintf("\033[0;32m[ DEBUG    ]\033[0m ");
                 debugPrintf("\033[0;32mInit Successfull\033[0m \r\n");
             }
         }
@@ -215,7 +217,7 @@ unsigned char init(char* imsi, char* pw, char* ser)
     }
     if (0 == ret)
     {
-        debugPrintf("\033[0;31m[ Debug    ]\033[0m ");
+        debugPrintf("\033[0;31m[ DEBUG    ]\033[0m ");
         debugPrintf("\033[0;31mInit Error\033[0m \r\n");
     }
 
@@ -266,12 +268,12 @@ int main(int argc, char** argv)
             imsi = optarg;
             if(15 == strlen(imsi))
             {
-                debugPrintf("\033[0;32m[ Debug    ]\033[0m ");
+                debugPrintf("\033[0;32m[ DEBUG    ]\033[0m ");
                 debugPrintf("imsi: %s\r\n", imsi);
             }
             else
             {
-                debugPrintf("\033[0;31m[ Debug    ]\033[0m ");
+                debugPrintf("\033[0;31m[ DEBUG    ]\033[0m ");
                 debugPrintf("imsi: invalid value (imsi has to be of length 15) - aborting\r\n");
                 imsi = NULL;
             }
@@ -282,12 +284,12 @@ int main(int argc, char** argv)
             pw = optarg;
             if(8 == strlen(pw))
             {
-                debugPrintf("\033[0;32m[ Debug    ]\033[0m ");
+                debugPrintf("\033[0;32m[ DEBUG    ]\033[0m ");
                 debugPrintf("pw: %s\r\n", pw);
             }
             else
             {
-                debugPrintf("\033[0;31m[ Debug    ]\033[0m ");
+                debugPrintf("\033[0;31m[ DEBUG    ]\033[0m ");
                 debugPrintf("pw: invalid value (pw has to be of length 8) - aborting\r\n");
                 pw = NULL;
             }
@@ -298,12 +300,12 @@ int main(int argc, char** argv)
             ser = optarg;
             if(-1 != access(ser, F_OK))
             {
-                debugPrintf("\033[0;32m[ Debug    ]\033[0m ");
+                debugPrintf("\033[0;32m[ DEBUG    ]\033[0m ");
                 debugPrintf("serial node: %s\r\n", ser);
             }
             else
             {
-                debugPrintf("\033[0;31m[ Debug    ]\033[0m ");
+                debugPrintf("\033[0;31m[ DEBUG    ]\033[0m ");
                 debugPrintf("serial: no device node with path \"%s\" exists - aborting\r\n", ser);
                 ser = NULL;
             }
@@ -322,7 +324,7 @@ int main(int argc, char** argv)
 
     if(NULL == imsi || NULL == pw || NULL == ser)
     {
-        debugPrintf("\033[0;31m[ Error    ]\033[0m ");
+        debugPrintf("\033[0;31m[ ERROR    ]\033[0m ");
         debugPrintf("parameters imsi, pw and serial, have to be set as described in usage: \r\n\r\n");
 
         usage();

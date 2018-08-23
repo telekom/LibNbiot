@@ -20,7 +20,17 @@ the library mangement tool from the Arduino IDE.
 
 ## Starting the example
 
-Execute the python-script. Open the Arduino IDE and import the newly created LibNbiot.zip-library. Open the 
+Execute the python-script. You will get a prompt to choose the module/firmware you want to use:
+
+    --- Available firmwares:
+    ---  1: SARA-N2XX-B657SP3   
+    ---  2: SARA-N2XX-B656      
+    
+    --- Enter firmware index: 
+ 
+The script will create a LibNbiot.zip-library for the specified module/firmware.
+
+Open the Arduino IDE and import the newly created LibNbiot.zip-library. Open the 
 example **SimpleExample**.
 
     #define AUTH_IMSI "111111111111111"

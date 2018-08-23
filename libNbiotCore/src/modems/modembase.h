@@ -21,7 +21,7 @@
 #ifndef MODEMBASE_H
 #define MODEMBASE_H
 
-#include <cstdlib>
+#include <stdlib.h>
 
 #include "imodem.h"
 #include "atcommands.h"

@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <nbiotconnectivity.h>
+//#include <nbiotconnectivity.h>
 
 // Tests that an NbiotConnectivity object can be constructed from an instance of class Serial.
 // Expect that the constructed object is not null.

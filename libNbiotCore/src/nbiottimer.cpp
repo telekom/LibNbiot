@@ -38,28 +38,24 @@ void Timer::start(unsigned long end)
     end_ms = start_ms + end;
 }
 
-void Timer::start(unsigned short end) {
-    start(static_cast<unsigned long> (end));
-}
-
-    void Timer::start(int end) {
-        start(static_cast<unsigned long> (end));
-    }
+//void Timer::start(int end) {
+//    start(static_cast<unsigned long> (end));
+//}
 
 void Timer::setTime(unsigned long end)
 {
     end_ms = static_cast<long long>(end);
 }
 
-void Timer::setTime(int end)
-{
-    end_ms = static_cast<long long>(end);
-}
-
-void Timer::setTime(unsigned short end)
-{
-    end_ms = static_cast<long long>(end);
-}
+//void Timer::setTime(int end)
+//{
+//    end_ms = static_cast<long long>(end);
+//}
+//
+//void Timer::setTime(unsigned short end)
+//{
+//    end_ms = static_cast<long long>(end);
+//}
 
 unsigned long Timer::getTime() const
 {
