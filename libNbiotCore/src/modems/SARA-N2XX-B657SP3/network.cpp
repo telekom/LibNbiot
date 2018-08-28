@@ -104,44 +104,52 @@ bool Network::connect(const char* hostname, unsigned short port)
 int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
 {
     int rc = -1;
-    int dgmLen = 0;
+    int dgmLen = ipAvailable();
     int reqLen = MQTTSN_MIN_PACKET_LEN;
 
     if(MQTTSN_MIN_PACKET_LEN < len)
     {
         reqLen = len;
     }
-
     nbiot::Timer timer(timeout_ms);
+
 #ifdef DEBUG_MODEM
     bool dbgLine = false;
 #endif
+
     nbiot::string data;
     int bytes = 0;
     int rb = -1;
     while (readInterval < timer.remaining())
     {
+        m_cmd.readResponse(REPLY_IGNORE_LINE, timer.remaining());
         dgmLen = ipAvailable();
+        if (dgmLen == 0) {
+
+#ifdef DEBUG_MODEM
+#ifdef DEBUG_COLOR
+            if (!dbgLine) {
+                debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+            }
+#endif
+            debugPrintf(".");
+            dbgLine = true;
+#endif
+
+            continue;
+        }
+
         if((reqLen <= (dgmLen + bytes)) || ((0 < bytes) && (0 < dgmLen)))
         {
             break;
         }
-        rb = ipRead(data, 1, readInterval);// also poll the input stream
+
+        rb = ipRead(data, dgmLen, readInterval);// also poll the input stream
+
         if(0 < rb)
         {
             bytes += rb;
         }
-#ifdef DEBUG_MODEM
-        if(0 == dgmLen)
-        {
-#ifdef DEBUG_COLOR
-            if (!dbgLine)
-                debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
-#endif
-            debugPrintf(".");
-            dbgLine = true;
-        }
-#endif
     }
 #ifdef DEBUG_MODEM
     if(dbgLine)
@@ -149,8 +157,6 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
         debugPrintf("\r\n");
     }
 #endif
-    //Quick Fix: Make sure that dgmLen is updated in all cases, especially if while-loop is left because )timer.remaining <= readInterval)
-    dgmLen = ipAvailable();
     if(0 < dgmLen)
     {
 #ifdef DEBUG_MODEM

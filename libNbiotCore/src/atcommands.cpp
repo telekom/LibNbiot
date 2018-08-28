@@ -176,6 +176,16 @@ bool AtCommands::readResponse(ExpectedReply expected, unsigned short timeout_ms)
             }
             break;
         }
+        case REPLY_IGNORE_LINE:
+        {
+            nbiot::string resp;
+            serial.readLine(resp, timeout_ms, Serial::Ignore);
+            if(Serial::NoError == serial.getError())
+            {
+                result = true;
+            }
+            break;
+        }
         case REPLY_IGNORE:
         // FALLTHRU
         default:
