@@ -64,8 +64,6 @@ public:
         autoPollInterval(0),
         eventLoopExecInterval(oneHundredMs),
         eventLoopLock(true),
-        eventLoopMs(0l),
-        lastPollMs(0l),
         m_cleanSession(0),
         m_autoReconnect(false),
         m_duration(0),
@@ -148,13 +146,13 @@ public:
      */
     bool eventLoopLock;
     /*!
-     * \brief eventLoopMs
+     * \brief eventLoopTimer
      */
-    long long eventLoopMs;
+    Timer eventLoopTimer;
     /*!
-     * \brief lastPollMs
-     */
-    long long lastPollMs;
+    * \brief autoPollTimer
+    */
+    Timer autoPollTimer;
     /*!
      * \brief m_cleanSession
      */
