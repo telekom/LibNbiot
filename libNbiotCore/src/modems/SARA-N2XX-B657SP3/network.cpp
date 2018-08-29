@@ -111,9 +111,12 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
     nbiot::Timer timer(timeout_ms);
     nbiot::string data;
 
-    if (len >= 0) {
+    if (len >= 0)
+    {
         reqLen = len;
-    } else {
+    }
+    else
+    {
         return rc;
     }
 
@@ -130,16 +133,19 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
 #endif
 
     // Loop and look for incoming messages until enough bytes available
-    while (readInterval < timer.remaining() && bytes < reqLen) {
+    while (readInterval < timer.remaining() && bytes < reqLen)
+    {
         m_cmd.readResponse(REPLY_IGNORE, readInterval);
         dgmLen = ipAvailable();
 
         // No bytes available
-        if (dgmLen == 0) {
+        if (dgmLen == 0)
+        {
 
 #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
-            if (!dbgLine) {
+            if (!dbgLine)
+            {
                 debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
             }
 #endif
@@ -156,9 +162,11 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
         }
 
         // Not enough bytes available but there is something we can read.
-        if (0 < dgmLen) {
+        if (0 < dgmLen)
+        {
             rb = ipRead(data, dgmLen, readInterval);
-            if(0 < rb) {
+            if(0 < rb)
+            {
                 bytes += rb;
             }
         }
@@ -172,7 +180,8 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
 #endif
 
     // Read remaining bytes
-    if(0 < dgmLen && bytes < reqLen) {
+    if(0 < dgmLen && bytes < reqLen)
+    {
 #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
         debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
@@ -181,7 +190,9 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
 #endif
         unsigned short to = (readInterval < timer.remaining())?static_cast<unsigned short>(timer.remaining()):readInterval;
         rc = ipRead(data, reqLen - bytes, to) + bytes;
-    } else {
+    }
+    else
+    {
         rc = bytes;
     }
 
