@@ -30,9 +30,10 @@ BINDIR   := bin
 
 
 # Compiler and linker settings
+CC	     := gcc
 CXX      := g++
 CXXFLAGS := -std=c++11 -Wall -g -O0 -ggdb
-CCFLAGS  := -Wall -g -O0 -ggdb
+CFLAGS   := -Wall -g -O0 -ggdb
 LDFLAGS  := -lnbiot -lstm -lmqttsnpaho -lnbiotcore -pthread -lrt
 INCLUDES := ../../include
 LIB      := $(CURDIR)/../../lib/default
@@ -58,7 +59,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 
 
 $(BUILDDIR)/%.co: $(SRCDIR)/%.c
-	$(CC) -c $(CCFLAGS) -I $(INCLUDES) -I $(SRCDIR) $< -o $@
+	$(CC) -c $(CFLAGS) -I $(INCLUDES) -I $(SRCDIR) $< -o $@
 
 
 directories:
