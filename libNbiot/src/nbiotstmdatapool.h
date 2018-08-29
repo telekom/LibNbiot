@@ -207,7 +207,7 @@ private:
     NbiotStmDataPool& operator = (NbiotStmDataPool&);
 
     static const unsigned int minKeepAlive = 60;
-    static const unsigned int clientCommandTimeout = 15000;
+    static const unsigned int clientCommandTimeout = 120000;
     static const unsigned short defaultMqttPort = 1883;
     static const unsigned short defaultMaxTopics = 20;
 };

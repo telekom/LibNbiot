@@ -1152,7 +1152,7 @@ void NbiotStm::doModemAttach()
     debugPrintf("register CGATT loop client\r\n");
 #endif
     m_dataPool.m_modemAttached = false;
-    m_attachLoopClient.getTimer().setTime(fiftyFiveSeconds);
+    m_attachLoopClient.getTimer().setTime(attachTimeout);
     m_dataPool.m_loopCtrl.registerLoopClient(&m_attachLoopClient);
 }
 
