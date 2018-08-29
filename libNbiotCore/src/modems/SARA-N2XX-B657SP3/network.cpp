@@ -100,58 +100,87 @@ bool Network::connect(const char* hostname, unsigned short port)
     return ret;
 }
 
-#define MQTTSN_MIN_PACKET_LEN 1
 int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
 {
     int rc = -1;
     int dgmLen = 0;
-    int reqLen = MQTTSN_MIN_PACKET_LEN;
+    int reqLen = 0;
+    int rb = -1;
+    int bytes = 0;
 
-    if(MQTTSN_MIN_PACKET_LEN < len)
+    nbiot::Timer timer(timeout_ms);
+    nbiot::string data;
+
+    if (len >= 0)
     {
         reqLen = len;
     }
+    else
+    {
+        return rc;
+    }
 
-    nbiot::Timer timer(timeout_ms);
+    // Try to read requested length
+    rb = ipRead(data, reqLen, readInterval);
+
+    if(0 < rb)
+    {
+        bytes += rb;
+    }
+
 #ifdef DEBUG_MODEM
     bool dbgLine = false;
 #endif
-    nbiot::string data;
-    int bytes = 0;
-    int rb = -1;
-    while (readInterval < timer.remaining())
+
+    // Loop and look for incoming messages until enough bytes available
+    while (readInterval < timer.remaining() && bytes < reqLen)
     {
+        m_cmd.readResponse(REPLY_IGNORE, readInterval);
         dgmLen = ipAvailable();
-        if((reqLen <= (dgmLen + bytes)) || ((0 < bytes) && (0 < dgmLen)))
+
+        // No bytes available
+        if (dgmLen == 0)
         {
-            break;
-        }
-        rb = ipRead(data, 1, readInterval);// also poll the input stream
-        if(0 < rb)
-        {
-            bytes += rb;
-        }
+
 #ifdef DEBUG_MODEM
-        if(0 == dgmLen)
-        {
 #ifdef DEBUG_COLOR
             if (!dbgLine)
+            {
                 debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+            }
 #endif
             debugPrintf(".");
             dbgLine = true;
-        }
 #endif
+            continue;
+        }
+
+        // Enough bytes available
+        if(reqLen <= (dgmLen + bytes))
+        {
+            break;
+        }
+
+        // Not enough bytes available but there is something we can read.
+        if (0 < dgmLen)
+        {
+            rb = ipRead(data, dgmLen, readInterval);
+            if(0 < rb)
+            {
+                bytes += rb;
+            }
+        }
     }
+
 #ifdef DEBUG_MODEM
     if(dbgLine)
     {
         debugPrintf("\r\n");
     }
 #endif
-    //Quick Fix: Make sure that dgmLen is updated in all cases, especially if while-loop is left because )timer.remaining <= readInterval)
-    dgmLen = ipAvailable();
-    if(0 < dgmLen)
+
+    // Read remaining bytes
+    if(0 < dgmLen && bytes < reqLen)
     {
 #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
@@ -160,18 +189,20 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
         debugPrintf("datagram-len: %d\r\n", dgmLen);
 #endif
         unsigned short to = (readInterval < timer.remaining())?static_cast<unsigned short>(timer.remaining()):readInterval;
-        rc = ipRead(data, dgmLen, to) + bytes;
+        rc = ipRead(data, reqLen - bytes, to) + bytes;
     }
     else
     {
         rc = bytes;
     }
+
 #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
     debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
 #endif
     debugPrintf("r(%d): ", rc);
 #endif
+
     if(0 < rc)
     {
         data.copy(buffer, static_cast<size_t>(rc));

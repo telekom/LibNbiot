@@ -792,15 +792,13 @@ bool NbiotStm::actionInitialEntry(const StmEvent& e)
         reInitialize = true;
     }
 
-    // switch modem on (nothing happens if already on)
-    NbiotCoreApp::getInstance().getModemInstance().switchModem(IModem::MODEM_ON);
-
     if(!reInitialize)
     {
         // reboot modem (switching off and on again)
         ok = NbiotCoreApp::getInstance().getModemInstance().reboot();
     }
     // init modem
+
     if(ok && !NbiotCoreApp::getInstance().getModemInstance().initialize())
     {
         ok = false;

@@ -30,12 +30,12 @@ class Serial;
  */
 typedef enum expectedReply
 {
-    REPLY_OK,       /*!< just "OK" */
-    REPLY_ANY,      /*!< any response-line followed by "OK" */
-    REPLY_COPY,     /*!< all response-lines will be copied to 'response' */
-    REPLY_EXACT,    /*!< exactly one response-line that differs from "OK" */
-    REPLY_IGNORE,   /*!< every response will be ignored */
-    REPLY_NONE      /*!< there must be no response */
+    REPLY_OK,            /*!< just "OK" */
+    REPLY_ANY,           /*!< any response-line followed by "OK" */
+    REPLY_COPY,          /*!< all response-lines will be copied to 'response' */
+    REPLY_EXACT,         /*!< exactly one response-line that differs from "OK" */
+    REPLY_IGNORE,        /*!< every response will be ignored */
+    REPLY_NONE          /*!< there must be no response */
 } ExpectedReply;
 
 /*!
