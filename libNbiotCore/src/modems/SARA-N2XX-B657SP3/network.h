@@ -121,7 +121,7 @@ private:
     static const char* cmdNSOST_arg;
     static const char* cmdNSOCL_arg;
 
-    static const unsigned int readInterval = 100;
+    static const unsigned int readInterval = 250;
     static const unsigned int oneSecond = 1000;
     static const unsigned int threeSeconds = 3000;
     static const unsigned int tenSeconds = 10000;
