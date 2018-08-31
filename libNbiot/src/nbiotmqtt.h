@@ -184,7 +184,7 @@ public:
      * \brief setAutoPoll
      * \param autoPoll
      */
-    void setAutoPoll(unsigned int autoPoll) { m_dataPool.autoPollInterval = autoPoll; }
+    void setAutoPoll(unsigned int autoPoll);
     /*!
      * \brief setTimerCallback
      * \param tcInterval

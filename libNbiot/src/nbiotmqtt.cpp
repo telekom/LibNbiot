@@ -36,6 +36,8 @@ NbiotMQTT::NbiotMQTT() :
     m_evLoopRc(LC_Idle),
     m_pollInterval(oneSecondMs)
 {
+    m_dataPool.eventLoopTimer.clear();
+    m_dataPool.autoPollTimer.clear();
     m_dataPool.client.setPubackNotifyHandler(this, &NbiotMQTT::pubackNotify);
     m_dataPool.client.setRegisterNotifyHandler(this, &NbiotMQTT::registerNotify);
     m_dataPool.client.setDisconnectNotifyHandler(this, &NbiotMQTT::disconnectNotify);
@@ -46,7 +48,11 @@ NbiotMQTT::~NbiotMQTT()
 {
 }
 
-
+void NbiotMQTT::setAutoPoll(unsigned int autoPoll)
+{
+    m_dataPool.autoPollInterval = autoPoll;
+    m_dataPool.autoPollTimer.start(m_dataPool.autoPollInterval * NbiotStmDataPool::oneSecondMs);
+}
 
 NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
 {
@@ -54,10 +60,9 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
     {
         if(!m_dataPool.eventLoopLock)
         {
-            long long millis = getMillis();
-            if(millis >= m_dataPool.eventLoopMs)
+            if (m_dataPool.eventLoopTimer.remaining() <= 0)
             {
-                m_dataPool.eventLoopMs = millis + m_dataPool.eventLoopExecInterval;
+                m_dataPool.eventLoopTimer.start(m_dataPool.eventLoopExecInterval);
 
                 // lock multiple calls of a time consuming callback (more than eventLoopExecInterval)
                 m_dataPool.eventLoopLock = true;
@@ -77,7 +82,7 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                         sendEvent(NbiotStm::ConnectedAwakeEvent);
                         m_dataPool.client.pmPing(m_dataPool.authLogin.getData());
                         m_dataPool.client.yield(/*tenSecondsMs*/); // since default is 15 sec. use default
-                        m_dataPool.lastPollMs = getMillis();
+                        m_dataPool.autoPollTimer.start(m_dataPool.autoPollInterval * NbiotStmDataPool::oneSecondMs);
                     }
 #ifdef DEBUG_MQTT
                     else
@@ -195,14 +200,13 @@ NbiotResult NbiotMQTT::eventLoop(NbiotEventMode mode)
                     m_stm.eventDispatcher()->dispatch();
                     if((0 < m_dataPool.autoPollInterval) && (m_dataPool.client.isConnected()))
                     {
-                        // some time passed after dispacth()
-                        millis = getMillis();
                         // maintain keep alive time
-                        if(m_dataPool.autoPollInterval < ((millis - m_dataPool.lastPollMs) / NbiotStmDataPool::oneSecondMs))
+                        if(m_dataPool.autoPollTimer.remaining() <= 0)
                         {
                             m_dataPool.client.yield(halfSecondMs);
-                            m_dataPool.lastPollMs = millis;
+                            m_dataPool.autoPollTimer.start(m_dataPool.autoPollInterval * NbiotStmDataPool::oneSecondMs);
                         }
+
                     }
                     m_evLoopRc = LC_Idle;
                 }
@@ -584,7 +588,7 @@ void NbiotMQTT::poll(unsigned short pollInterval)
         {
             m_dataPool.client.yield((0 == pollInterval)?m_pollInterval:pollInterval);
         }
-        m_dataPool.lastPollMs = getMillis();
+        m_dataPool.autoPollTimer.start(m_dataPool.autoPollInterval * NbiotStmDataPool::oneSecondMs);
     }
 }
 
