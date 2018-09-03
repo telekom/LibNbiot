@@ -28,6 +28,9 @@
 #include "serial.h"
 #include "inetwork.h"
 
+
+#define READ_BUFFER_SIZE 64
+
 /*!
  * \brief The Network class
  */
@@ -103,23 +106,17 @@ private:
     nbiot::string m_hostname;
     unsigned short m_port;
     size_t m_bytesAvail;
-    nbiot::string m_nsonmi;
-    unsigned short m_lastListenPort;
+    nbiot::string m_qiurc;
 
-    static const int maxSocket = 7; /*!< Specific for NEUL chipset: A maximum of 7 sockets are supported. */
-    static const unsigned short listenPortBase = 10001;
+    unsigned char m_readBuffer[READ_BUFFER_SIZE];
+
     static const unsigned short byteCountMask = 0xFFFF;
 
-    static const int nsorfRespIdx_connNum = 0;
-    static const int nsorfRespIdx_bytesAvail = 3;
-    static const int nsorfRespIdx_data = 4;
-    static const int nsorfRespIdx_bytesRem = 5;
-
-    static const char* cmdNSOCR_arg;
-    static const char* respNSONMI_arg;
-    static const char* cmdNSORF_arg;
-    static const char* cmdNSOST_arg;
-    static const char* cmdNSOCL_arg;
+    static const char* cmdQIOPEN_arg;
+    static const char* respQIURCrecv_arg;
+    static const char* cmdQIRD_arg;
+    static const char* cmdQISENDEX_arg;
+    static const char* cmdQICLOSE_arg;
 
     static const unsigned int readInterval = 100;
     static const unsigned int oneSecond = 1000;

@@ -27,11 +27,13 @@
 
 #include "network.h"
 
-const char* Network::cmdNSOCR_arg = "AT+NSOCR=\"DGRAM\",17,%d\r";
-const char* Network::respNSONMI_arg = "+NSONMI: %d,";
-const char* Network::cmdNSORF_arg = "AT+NSORF=%d,%d\r";
-const char* Network::cmdNSOST_arg = "AT+NSOST=%d,\"%s\",%d,%d,\"";
-const char* Network::cmdNSOCL_arg = "AT+NSOCL=%d\r";
+
+const char* Network::cmdQIOPEN_arg = "AT+QIOPEN=1,%d,\"UDP\",\"%s\",%d\r";
+const char* Network::respQIURCrecv_arg = "+QIURC \"recv\": %d,";
+const char* Network::cmdQIRD_arg = "AT+QIRD=%d,%d\r";
+const char* Network::cmdQISENDEX_arg = "AT+QISENDEX=%d,\"";
+const char* Network::cmdQICLOSE_arg = "AT+QICLOSE=%d\r";
+
 
 Network::Network(Serial& serial) :
     m_cmd(serial),
@@ -39,10 +41,11 @@ Network::Network(Serial& serial) :
     m_hostname(),
     m_port(0),
     m_bytesAvail(0),
-    m_nsonmi(),
-    m_lastListenPort(listenPortBase-1)
+    m_nsonmi()
 {
     m_cmd.clearFilter();
+
+    memset( m_readBuffer, READ_BUFFER_SIZE, '0');
 }
 
 
@@ -50,32 +53,48 @@ bool Network::connect(const char* hostname, unsigned short port)
 {
     bool ret = true;
 
-    unsigned short listenPort = m_lastListenPort;
-    if((0 <= m_connectionNumber) && (maxSocket > m_connectionNumber))
+    if(m_cmd.sendCommand(nbiot::string::Printf(cmdQIOPEN_arg, m_connectionNumber+1, hostname, m_port)))
     {
-        listenPort = (listenPortBase + m_connectionNumber);
-    }
-
-    if(m_cmd.sendCommand(nbiot::string::Printf(cmdNSOCR_arg, listenPort)))
-    {
-        if(!m_cmd.readResponse(REPLY_ANY, threeSeconds))
+        if(!m_cmd.readResponse(REPLY_OK, threeSeconds))
         {
             ret = false;
+        }
+        else
+        {
+            if(!m_cmd.readUntil(nbiot::string::Printf("+QIOPEN: %d,0\r").c_str(), tenSeconds))
+            {
+                ret = false;
+            }
         }
     }
     else
     {
         ret = false;
     }
+
     if(ret)
     {
         nbiot::string response = m_cmd.getResponse();
-        m_connectionNumber = atoi(response.c_str());
-        if((0 <= m_connectionNumber) && (maxSocket > m_connectionNumber))
+
+        nbiot::StringList l = response.split(",");
+        if(2 == l.count() && 0 == atoi(l[1].c_str()))
+        {
+            nbiot::StringList tokens = l[0].split(":");
+            if(2 == tokens.count())
+            {
+                m_connectionNumber = atoi(tokens[1].c_str());
+            }
+            ret = false;
+        }
+        else
+        {
+            ret = false;
+        }
+
+        if((0 <= m_connectionNumber))
         {
             m_hostname = hostname;
             m_port = port;
-            m_lastListenPort = listenPort;
         }
         else
         {
@@ -88,8 +107,8 @@ bool Network::connect(const char* hostname, unsigned short port)
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
     if(ret)
     {
-        m_nsonmi = nbiot::string::Printf(respNSONMI_arg, m_connectionNumber);
-        m_cmd.addUrcFilter(m_nsonmi.c_str(), this, &Network::parseFilterResult);
+        m_qiurc = nbiot::string::Printf(respQIURCrecv_arg, m_connectionNumber);
+        m_cmd.addUrcFilter(m_qiurc.c_str(), this, &Network::parseFilterResult);
     }
 #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
@@ -178,7 +197,7 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
 #ifdef DEBUG_MODEM
         for(size_t i = 0; i < static_cast<size_t>(rc); ++i)
         {
-            debugPrintf("%02X ", buffer[i]);
+            debugPrintf("%02X ", buffer[i]);            
         }
 #endif
     }
@@ -193,9 +212,13 @@ unsigned short Network::ipAvailable()
     return static_cast<unsigned short>((m_bytesAvail & byteCountMask));
 }
 
+
+// TODO
 int Network::ipRead(nbiot::string& data, int len, unsigned short timeout_ms)
 {
     int avail = -1;
+
+
 
     nbiot::Timer timer(timeout_ms);
     if(m_cmd.sendCommand(nbiot::string::Printf(cmdNSORF_arg, m_connectionNumber, len)))
@@ -237,7 +260,7 @@ bool Network::write(unsigned char* buffer, unsigned long len, unsigned short tim
 
     if((!m_hostname.empty()) && (0 < m_port))
     {
-        nbiot::string data = nbiot::string::Printf(cmdNSOST_arg, m_connectionNumber, m_hostname.c_str(), m_port, len);
+        nbiot::string data = nbiot::string::Printf(cmdQISENDEX_arg, m_connectionNumber);
         nbiot::string hex = nbiot::string((char*)(buffer), len).toHex();
         data += hex;
         data += "\"";
@@ -250,9 +273,12 @@ bool Network::write(unsigned char* buffer, unsigned long len, unsigned short tim
 
         if(m_cmd.sendCommand(data.c_str()))
         {
-            if(m_cmd.readResponse(REPLY_ANY, timeout))
+            if(m_cmd.readResponse(REPLY_EXACT, timeout))
             {
-                ret = true;
+                if(m_cmd.getResponse() == "SEND OK")
+                {
+                    ret = true;
+                }
             }
         }
     }
@@ -284,7 +310,7 @@ bool Network::disconnect()
 
     if(0 <= m_connectionNumber)
     {
-        if(m_cmd.sendCommand(nbiot::string::Printf(cmdNSOCL_arg, m_connectionNumber)))
+        if(m_cmd.sendCommand(nbiot::string::Printf(cmdQICLOSE_arg, m_connectionNumber)))
         {
             if(!m_cmd.readResponse(REPLY_OK, tenSeconds))
             {
@@ -301,7 +327,7 @@ bool Network::disconnect()
         m_hostname = "";
         m_port = 0;
         m_connectionNumber = -1;
-        m_cmd.removeUrcFilter(m_nsonmi.c_str());
+        m_cmd.removeUrcFilter(respQIURCrecv_arg.c_str());
         m_nsonmi = "";
     }
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
