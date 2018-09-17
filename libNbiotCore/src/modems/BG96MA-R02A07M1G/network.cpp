@@ -26,10 +26,11 @@
 #include "nbiotdebug.h"
 
 #include "network.h"
+#include <nbiotcircularbuffer.h>
 
 
 const char* Network::cmdQIOPEN_arg = "AT+QIOPEN=1,%d,\"UDP\",\"%s\",%d\r";
-const char* Network::respQIURCrecv_arg = "+QIURC \"recv\": %d,";
+const char* Network::respQIURCrecv_arg = "+QIURC";
 const char* Network::cmdQIRD_arg = "AT+QIRD=%d,%d\r";
 const char* Network::cmdQISENDEX_arg = "AT+QISENDEX=%d,\"";
 const char* Network::cmdQICLOSE_arg = "AT+QICLOSE=%d\r";
@@ -40,12 +41,9 @@ Network::Network(Serial& serial) :
     m_connectionNumber(-1),
     m_hostname(),
     m_port(0),
-    m_bytesAvail(0),
-    m_nsonmi()
+    m_bytesAvail(0)
 {
     m_cmd.clearFilter();
-
-    memset( m_readBuffer, READ_BUFFER_SIZE, '0');
 }
 
 
@@ -53,7 +51,7 @@ bool Network::connect(const char* hostname, unsigned short port)
 {
     bool ret = true;
 
-    if(m_cmd.sendCommand(nbiot::string::Printf(cmdQIOPEN_arg, m_connectionNumber+1, hostname, m_port)))
+    if(m_cmd.sendCommand(nbiot::string::Printf(cmdQIOPEN_arg, m_connectionNumber+1, hostname, port)))
     {
         if(!m_cmd.readResponse(REPLY_OK, threeSeconds))
         {
@@ -61,9 +59,11 @@ bool Network::connect(const char* hostname, unsigned short port)
         }
         else
         {
-            if(!m_cmd.readUntil(nbiot::string::Printf("+QIOPEN: %d,0\r").c_str(), tenSeconds))
+            if(!m_cmd.readUntil(nbiot::string::Printf("+QIOPEN: %d,0").c_str(), tenSeconds))
             {
                 ret = false;
+            } else {
+                m_connectionNumber++;
             }
         }
     }
@@ -83,8 +83,10 @@ bool Network::connect(const char* hostname, unsigned short port)
             if(2 == tokens.count())
             {
                 m_connectionNumber = atoi(tokens[1].c_str());
+            } else
+            {
+                ret = false;
             }
-            ret = false;
         }
         else
         {
@@ -119,85 +121,58 @@ bool Network::connect(const char* hostname, unsigned short port)
     return ret;
 }
 
-#define MQTTSN_MIN_PACKET_LEN 1
 int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
 {
     int rc = -1;
-    int dgmLen = 0;
-    int reqLen = MQTTSN_MIN_PACKET_LEN;
+    int reqLen = 0;
+    int rb = -1;
+    int bytes = read_buffer.size();
 
-    if(MQTTSN_MIN_PACKET_LEN < len)
+    nbiot::Timer timer(timeout_ms);
+    nbiot::string data;
+
+    if (len >= 0)
     {
         reqLen = len;
     }
-
-    nbiot::Timer timer(timeout_ms);
-#ifdef DEBUG_MODEM
-    bool dbgLine = false;
-#endif
-    nbiot::string data;
-    int bytes = 0;
-    int rb = -1;
-    while (readInterval < timer.remaining())
+    else
     {
-        dgmLen = ipAvailable();
-        if((reqLen <= (dgmLen + bytes)) || ((0 < bytes) && (0 < dgmLen)))
-        {
-            break;
-        }
-        rb = ipRead(data, 1, readInterval);// also poll the input stream
+        return rc;
+    }
+
+    // Loop and look for incoming messages until enough bytes available
+    while (readInterval < timer.remaining() && read_buffer.size() < reqLen)
+    {
+        rb = ipRead(read_buffer, 1, readInterval);
         if(0 < rb)
         {
             bytes += rb;
         }
-#ifdef DEBUG_MODEM
-        if(0 == dgmLen)
-        {
-#ifdef DEBUG_COLOR
-            if (!dbgLine)
-                debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
-#endif
-            debugPrintf(".");
-            dbgLine = true;
-        }
-#endif
     }
+
+
 #ifdef DEBUG_MODEM
-    if(dbgLine)
-    {
-        debugPrintf("\r\n");
-    }
-#endif
-    //Quick Fix: Make sure that dgmLen is updated in all cases, especially if while-loop is left because )timer.remaining <= readInterval)
-    dgmLen = ipAvailable();
-    if(0 < dgmLen)
-    {
-#ifdef DEBUG_MODEM
-#ifdef DEBUG_COLOR
-        debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
-#endif
-        debugPrintf("datagram-len: %d\r\n", dgmLen);
-#endif
-        unsigned short to = (readInterval < timer.remaining())?static_cast<unsigned short>(timer.remaining()):readInterval;
-        rc = ipRead(data, dgmLen, to) + bytes;
-    }
-    else
-    {
-        rc = bytes;
-    }
-#ifdef DEBUG_MODEM
-#ifdef DEBUG_COLOR
+    #ifdef DEBUG_COLOR
     debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
 #endif
     debugPrintf("r(%d): ", rc);
 #endif
-    if(0 < rc)
+
+    if(0 < bytes)
     {
+        rc = 0;
+        unsigned char c;
+        while(!read_buffer.empty() && rc < reqLen) {
+            read_buffer.get(&c);
+            data.append((char*) &c, 1);
+            rc++;
+        }
+
         data.copy(buffer, static_cast<size_t>(rc));
 #ifdef DEBUG_MODEM
         for(size_t i = 0; i < static_cast<size_t>(rc); ++i)
         {
-            debugPrintf("%02X ", buffer[i]);            
+            debugPrintf("%02X ", buffer[i]);
         }
 #endif
     }
@@ -212,46 +187,54 @@ unsigned short Network::ipAvailable()
     return static_cast<unsigned short>((m_bytesAvail & byteCountMask));
 }
 
-
 // TODO
-int Network::ipRead(nbiot::string& data, int len, unsigned short timeout_ms)
+int Network::ipRead(nbiot::CircularBuffer<READ_BUFFER_SIZE>& data, int len, unsigned short timeout_ms)
 {
     int avail = -1;
-
-
+    int rb = 0;
 
     nbiot::Timer timer(timeout_ms);
-    if(m_cmd.sendCommand(nbiot::string::Printf(cmdNSORF_arg, m_connectionNumber, len)))
+    if(m_cmd.sendCommand(nbiot::string::Printf(cmdQIRD_arg, m_connectionNumber, len)))
     {
-        if(m_cmd.readResponse(REPLY_ANY, timeout_ms))
+        if(m_cmd.readUntil("+QIRD:", timer.remaining()))
         {
             nbiot::string response = m_cmd.getResponse();
-            if(0 == response.find("OK"))
+            if(!(response == "ERROR"))
             {
-                avail = 0;
-            }
-            else
-            {
-                nbiot::StringList list = response.split(',');
-                if(6 == list.count())
+                size_t pos = response.find(':');
+                if(nbiot::string::npos != pos)
                 {
-                    if(m_connectionNumber == atoi(list[nsorfRespIdx_connNum].c_str()))
+                    pos++;
+                    while (' ' == response.at(pos)) // eat up spaces if there are any
                     {
-                        avail = atoi(list[nsorfRespIdx_bytesAvail].c_str());
-                        if((0 < avail) && (avail <= len))
-                        {
-                            data.append(nbiot::string::fromHex(list[nsorfRespIdx_data].strip('"').c_str()));
-                            m_bytesAvail = static_cast<size_t>(atoi(list[nsorfRespIdx_bytesRem].c_str()));
-                        }
+                        pos++;
+                    }
+                    if (pos < response.size())
+                    {
+                        nbiot::string number = response.substr(pos, response.size());
+                        avail = atoi(number.c_str());
                     }
                 }
+            }
+            if (0 < avail)
+            {
+                unsigned char *c;
+                for (int i = 0; i < avail; ++i)
+                {
+                    if(m_cmd.serial.readRaw(c, static_cast<unsigned short>(timer.remaining())))
+                    {
+                        data.put(*c);
+                        rb++;
+                    }
+                }
+                m_cmd.readResponse(REPLY_OK, static_cast<unsigned short>(timer.remaining()));
             }
         }
     }
 
     m_cmd.readResponse(REPLY_IGNORE, static_cast<unsigned short>(timer.remaining()));
 
-    return avail;
+    return rb;
 }
 
 bool Network::write(unsigned char* buffer, unsigned long len, unsigned short timeout)
@@ -275,7 +258,8 @@ bool Network::write(unsigned char* buffer, unsigned long len, unsigned short tim
         {
             if(m_cmd.readResponse(REPLY_EXACT, timeout))
             {
-                if(m_cmd.getResponse() == "SEND OK")
+                nbiot::string response = m_cmd.getResponse();
+                if(response == "SEND OK")
                 {
                     ret = true;
                 }
@@ -290,18 +274,26 @@ bool Network::write(unsigned char* buffer, unsigned long len, unsigned short tim
 void Network::parseFilterResult(const char *strFilterResult)
 {
     nbiot::string response = strFilterResult;
-    size_t pos = response.find(',');
-    if(nbiot::string::npos != pos)
-    {
-        nbiot::string number = response.substr((pos + 1));
-        m_bytesAvail = static_cast<size_t>(atoi(number.c_str()));
-        #ifdef DEBUG_MODEM
+            #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
         debugPrintf("\n\033[0;32m[ MODEM    ]\033[0m ");
 #endif
-        debugPrintf("available bytes:: %d\r\n", m_bytesAvail);
+        debugPrintf("Filter: ");
+        debugPrintf(response.c_str());
+        debugPrintf("\r\n");
         #endif
-    }
+//    size_t pos = response.find(',');
+//    if(nbiot::string::npos != pos)
+//    {
+//        nbiot::string number = response.substr((pos + 1));
+//        m_bytesAvail = static_cast<size_t>(atoi(number.c_str()));
+//        #ifdef DEBUG_MODEM
+//#ifdef DEBUG_COLOR
+//        debugPrintf("\n\033[0;32m[ MODEM    ]\033[0m ");
+//#endif
+//        debugPrintf("available bytes:: %d\r\n", m_bytesAvail);
+//        #endif
+//    }
 }
 
 bool Network::disconnect()
@@ -327,8 +319,8 @@ bool Network::disconnect()
         m_hostname = "";
         m_port = 0;
         m_connectionNumber = -1;
-        m_cmd.removeUrcFilter(respQIURCrecv_arg.c_str());
-        m_nsonmi = "";
+        m_cmd.removeUrcFilter(respQIURCrecv_arg);
+//        m_nsonmi = "";
     }
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
 

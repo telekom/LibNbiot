@@ -27,9 +27,10 @@
 #include "nbiotstring.h"
 #include "serial.h"
 #include "inetwork.h"
+#include "nbiotcircularbuffer.h"
 
 
-#define READ_BUFFER_SIZE 64
+#define READ_BUFFER_SIZE 256
 
 /*!
  * \brief The Network class
@@ -99,7 +100,7 @@ private:
     Network& operator=(const Network&) = delete;
 
     unsigned short ipAvailable();
-    int ipRead(nbiot::string& data, int len, unsigned short timeout_ms);
+    int ipRead(nbiot::CircularBuffer<READ_BUFFER_SIZE>& data, int len, unsigned short timeout_ms);
 
     AtCommands m_cmd;
     int m_connectionNumber;
@@ -122,6 +123,8 @@ private:
     static const unsigned int oneSecond = 1000;
     static const unsigned int threeSeconds = 3000;
     static const unsigned int tenSeconds = 10000;
+
+    nbiot::CircularBuffer<READ_BUFFER_SIZE> read_buffer; // specific for BG96 module
 
 };
 

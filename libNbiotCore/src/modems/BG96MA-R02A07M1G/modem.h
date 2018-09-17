@@ -50,6 +50,8 @@ public:
      */
     virtual bool reboot();
 
+    virtual bool attach();
+
     /*!
      * \brief initialize
      * \return

@@ -31,11 +31,33 @@
 #define FIVE_MINUTES 300000
 #endif
 
+bool Modem::attach()
+{
+    bool ret = true;
 
+    if(m_cmd.sendCommand("AT+CGATT=1"))
+    {
+        if(!m_cmd.readResponse(REPLY_OK, 60000))
+        {
+            ret = false;
+        }
+    }
+    else
+    {
+        ret = false;
+    }
+
+
+    m_cmd.readResponse(REPLY_IGNORE, oneSecond);
+
+    return ret;
+}
 
 bool Modem::reboot()
 {
     bool ok = true;
+    m_cmd.sendCommand("ATE0");
+    m_cmd.readResponse(REPLY_OK, oneSecond);
     #ifdef DEBUG_MODEM
     nbiot::Timer t = nbiot::Timer(FIVE_MINUTES);
     #endif
