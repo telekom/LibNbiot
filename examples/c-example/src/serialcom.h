@@ -72,6 +72,7 @@ private:
     std::string m_deviceName;
     bool m_isConnected;
     SerialSettings m_settings;
+    unsigned char m_char_buffer;
 };
 
 #endif // SERIALCOM_

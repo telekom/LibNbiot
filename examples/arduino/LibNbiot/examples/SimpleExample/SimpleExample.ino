@@ -31,6 +31,8 @@
 #define AUTH_IMSI "111111111111111"
 #define AUTH_PWD "PASSWORD"
 
+unsigned char m_char_buffer;
+
 unsigned char readByte() {
     char ret;
     ret = 0;
@@ -52,7 +54,8 @@ void writeByte(unsigned char buf) {
 ReadStatus readStatus() {
     ReadStatus ret = rx_empty;
     if (Serial1) {
-        ret = rx_avail;
+        if(0 < Serial1.readBytes(&m_char_buffer, 1))
+            ret = rx_avail;
     }
     return ret;
 }

@@ -109,8 +109,6 @@ private:
     size_t m_bytesAvail;
     nbiot::string m_qiurc;
 
-    unsigned char m_readBuffer[READ_BUFFER_SIZE];
-
     static const unsigned short byteCountMask = 0xFFFF;
 
     static const char* cmdQIOPEN_arg;

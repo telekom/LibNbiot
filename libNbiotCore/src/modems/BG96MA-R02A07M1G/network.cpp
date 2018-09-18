@@ -150,14 +150,6 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
         }
     }
 
-
-#ifdef DEBUG_MODEM
-    #ifdef DEBUG_COLOR
-    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
-#endif
-    debugPrintf("r(%d): ", rc);
-#endif
-
     if(0 < bytes)
     {
         rc = 0;
@@ -170,15 +162,17 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
 
         data.copy(buffer, static_cast<size_t>(rc));
 #ifdef DEBUG_MODEM
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
+        debugPrintf("r(%d): ", rc);
         for(size_t i = 0; i < static_cast<size_t>(rc); ++i)
         {
             debugPrintf("%02X ", buffer[i]);
         }
+        debugPrintf("\r\n");
 #endif
     }
-#ifdef DEBUG_MODEM
-    debugPrintf("\r\n");
-#endif
     return rc;
 }
 
@@ -218,12 +212,12 @@ int Network::ipRead(nbiot::CircularBuffer<READ_BUFFER_SIZE>& data, int len, unsi
             }
             if (0 < avail)
             {
-                unsigned char *c;
                 for (int i = 0; i < avail; ++i)
                 {
-                    if(m_cmd.serial.readRaw(c, static_cast<unsigned short>(timer.remaining())))
+                    unsigned char c = -1;
+                    if(m_cmd.serial.readRaw(&c, static_cast<unsigned short>(timer.remaining())))
                     {
-                        data.put(*c);
+                        data.put(c);
                         rb++;
                     }
                 }

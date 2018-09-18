@@ -178,26 +178,6 @@ namespace nbiot {
         return ret;
     }
 
-    char string::pop()
-    {
-        char ret = 0;
-        if(0 < sz)
-        {
-            ret = data[sz];
-            sz--;
-            if(0 == sz)
-            {
-                clear();
-            }
-            else
-            {
-//                memmove(data, &data[1], sz);
-                data[sz] = 0;
-            }
-        }
-        return ret;
-    }
-
     size_t string::find(const char* str) const
     {
         size_t result = npos;
