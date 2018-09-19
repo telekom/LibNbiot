@@ -122,7 +122,7 @@ private:
     static const unsigned int threeSeconds = 3000;
     static const unsigned int tenSeconds = 10000;
 
-    nbiot::CircularBuffer<READ_BUFFER_SIZE> read_buffer; // specific for BG96 module
+    nbiot::CircularBuffer<READ_BUFFER_SIZE> m_readBuffer; // specific for BG96 module
 
 };
 

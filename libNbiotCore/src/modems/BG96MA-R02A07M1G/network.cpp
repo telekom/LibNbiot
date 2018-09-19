@@ -30,7 +30,7 @@
 
 
 const char* Network::cmdQIOPEN_arg = "AT+QIOPEN=1,%d,\"UDP\",\"%s\",%d\r";
-const char* Network::respQIURCrecv_arg = "+QIURC";
+const char* Network::respQIURCrecv_arg = "+QIURC: \"recv\",";
 const char* Network::cmdQIRD_arg = "AT+QIRD=%d,%d\r";
 const char* Network::cmdQISENDEX_arg = "AT+QISENDEX=%d,\"";
 const char* Network::cmdQICLOSE_arg = "AT+QICLOSE=%d\r";
@@ -126,7 +126,7 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
     int rc = -1;
     int reqLen = 0;
     int rb = -1;
-    int bytes = read_buffer.size();
+    int bytes = m_readBuffer.size();
 
     nbiot::Timer timer(timeout_ms);
     nbiot::string data;
@@ -140,13 +140,28 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
         return rc;
     }
 
-    // Loop and look for incoming messages until enough bytes available
-    while (readInterval < timer.remaining() && read_buffer.size() < reqLen)
+    // Try to read requested length (helps to make sure we didn't miss any URC
+    if(!m_bytesAvail) {
+        rb = ipRead(m_readBuffer, reqLen, readInterval);
+        m_bytesAvail = 0;
+    }
+
+    if(0 < rb)
     {
-        rb = ipRead(read_buffer, 1, readInterval);
-        if(0 < rb)
-        {
-            bytes += rb;
+        bytes += rb;
+    }
+
+    // Loop and look for incoming messages until enough bytes available
+    while (readInterval < timer.remaining() && m_readBuffer.size() < reqLen)
+    {
+        m_cmd.readResponse(REPLY_IGNORE, readInterval);
+        if (m_bytesAvail) {
+            rb = ipRead(m_readBuffer, reqLen - bytes, readInterval);
+            m_bytesAvail = 0;
+            if(0 < rb)
+            {
+                bytes += rb;
+            }
         }
     }
 
@@ -154,8 +169,8 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
     {
         rc = 0;
         unsigned char c;
-        while(!read_buffer.empty() && rc < reqLen) {
-            read_buffer.get(&c);
+        while(!m_readBuffer.empty() && rc < reqLen) {
+            m_readBuffer.get(&c);
             data.append((char*) &c, 1);
             rc++;
         }
@@ -275,19 +290,21 @@ void Network::parseFilterResult(const char *strFilterResult)
         debugPrintf("Filter: ");
         debugPrintf(response.c_str());
         debugPrintf("\r\n");
-        #endif
-//    size_t pos = response.find(',');
-//    if(nbiot::string::npos != pos)
-//    {
-//        nbiot::string number = response.substr((pos + 1));
-//        m_bytesAvail = static_cast<size_t>(atoi(number.c_str()));
+            #endif
+    size_t pos = response.find(',');
+
+    if(nbiot::string::npos != pos)
+    {
+        nbiot::string number = response.substr((pos + 1));
+        size_t connectionNumber = static_cast<size_t>(atoi(number.c_str()));
+        m_bytesAvail = 1;
 //        #ifdef DEBUG_MODEM
 //#ifdef DEBUG_COLOR
 //        debugPrintf("\n\033[0;32m[ MODEM    ]\033[0m ");
 //#endif
 //        debugPrintf("available bytes:: %d\r\n", m_bytesAvail);
 //        #endif
-//    }
+    }
 }
 
 bool Network::disconnect()

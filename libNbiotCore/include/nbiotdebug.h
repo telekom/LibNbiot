@@ -22,7 +22,7 @@
 #define NBIOTDEBUG_H
 
 //#ifndef DEBUG
-//#define DEBUG /*!< global debugging output on or off */
+#define DEBUG /*!< global debugging output on or off */
 //#undef DEBUG
 //#endif
 #define DEBUGLINE_LENGTH (256u) /*!< maximum length of a single debugging output line */
@@ -33,8 +33,8 @@
 // #define DEBUG_SERIAL /*!< debugging output for the class Serial */
 // #define DEBUG_SERIAL_VERBOSE /*!< verbose debugging output for the method Serial::readLine */
 // #define DEBUG_SERIAL_RAW /*!< debugging output for the method Serial::readRaw */
-// #define DEBUG_ATCOMMANDS /*!< debugging output for the class AtCommands */
-// #define DEBUG_MODEM /*!< debugging output for the classes NbiotModemTools and NbiotConnectivity */
+#define DEBUG_ATCOMMANDS /*!< debugging output for the class AtCommands */
+#define DEBUG_MODEM /*!< debugging output for the classes NbiotModemTools and NbiotConnectivity */
 
 #define DEBUG_MQTT /*!< debugging output for LibNbiot classes */
 
