@@ -38,24 +38,24 @@ namespace nbiot
 
         bool get(unsigned char*);
 
-        bool empty() const { return (!_full && (_head == _tail)); }
+        bool empty() const { return (!m_full && (m_head == m_tail)); }
 
-        bool full() const { return _full; }
+        bool full() const { return m_full; }
 
         size_t capacity() const { return _max; };
 
         size_t size() const;
 
     private:
-        void _advance();
+        void advance();
 
-        void _retreat();
+        void retreat();
 
-        unsigned char _buffer[max_size];
-        size_t _head;
-        size_t _tail;
+        unsigned char m_buffer[max_size];
+        size_t m_head;
+        size_t m_tail;
         size_t _max; // capacity of the buffer
-        bool _full;
+        bool m_full;
     };
 }
 
@@ -63,24 +63,24 @@ namespace nbiot
 {
     template <size_t max_size>
     void CircularBuffer<max_size>::reset() {
-        _head = 0;
-        _tail = 0;
-        _full = false;
+        m_head = 0;
+        m_tail = 0;
+        m_full = false;
     }
 
     template <size_t max_size>
     size_t CircularBuffer<max_size>::size() const {
         size_t size = _max;
 
-        if(!_full)
+        if(!m_full)
         {
-            if(_head >= _tail)
+            if(m_head >= m_tail)
             {
-                size = (_head - _tail);
+                size = (m_head - m_tail);
             }
             else
             {
-                size = (_max + _head - _tail);
+                size = (_max + m_head - m_tail);
             }
         }
 
@@ -88,27 +88,27 @@ namespace nbiot
     }
 
     template <size_t max_size>
-    void CircularBuffer<max_size>::_advance() {
-        if(_full)
+    void CircularBuffer<max_size>::advance() {
+        if(m_full)
         {
-            _tail = (_tail + 1) % _max;
+            m_tail = (m_tail + 1) % _max;
         }
 
-        _head = (_head + 1) % _max;
-        _full = (_head == _tail);
+        m_head = (m_head + 1) % _max;
+        m_full = (m_head == m_tail);
     }
 
     template <size_t max_size>
-    void CircularBuffer<max_size>::_retreat() {
-        _full = false;
-        _tail = (_tail + 1) % _max;
+    void CircularBuffer<max_size>::retreat() {
+        m_full = false;
+        m_tail = (m_tail + 1) % _max;
     }
 
     template <size_t max_size>
     void CircularBuffer<max_size>::put(unsigned char data) {
-        _buffer[_head] = data;
+        m_buffer[m_head] = data;
 
-        _advance();
+        advance();
     }
 
     template <size_t max_size>
@@ -117,8 +117,8 @@ namespace nbiot
 
         if(data != nullptr && !empty())
         {
-            *data = _buffer[_tail];
-            _retreat();
+            *data = m_buffer[m_tail];
+            retreat();
 
             r = true;
         }
