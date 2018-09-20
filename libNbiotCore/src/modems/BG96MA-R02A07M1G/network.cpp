@@ -24,15 +24,16 @@
 #include "nbiottimer.h"
 #include "nbiotstringlist.h"
 #include "nbiotdebug.h"
-
 #include "network.h"
-#include <nbiotcircularbuffer.h>
+#include "nbiotcircularbuffer.h"
 
 
 const char* Network::cmdQIOPEN_arg = "AT+QIOPEN=1,%d,\"UDP\",\"%s\",%d\r";
 const char* Network::respQIURCrecv_arg = "+QIURC: \"recv\",";
 const char* Network::cmdQIRD_arg = "AT+QIRD=%d,%d\r";
+const char* Network::respQIRD = "+QIRD:";
 const char* Network::cmdQISENDEX_arg = "AT+QISENDEX=%d,\"";
+const char* Network::respQISENDEX = "SEND OK";
 const char* Network::cmdQICLOSE_arg = "AT+QICLOSE=%d\r";
 
 
@@ -62,7 +63,9 @@ bool Network::connect(const char* hostname, unsigned short port)
             if(!m_cmd.readUntil(nbiot::string::Printf("+QIOPEN: %d,0").c_str(), tenSeconds))
             {
                 ret = false;
-            } else {
+            }
+	    else
+	    {
                 m_connectionNumber++;
             }
         }
@@ -83,7 +86,8 @@ bool Network::connect(const char* hostname, unsigned short port)
             if(2 == tokens.count())
             {
                 m_connectionNumber = atoi(tokens[1].c_str());
-            } else
+            }
+	    else
             {
                 ret = false;
             }
@@ -107,11 +111,13 @@ bool Network::connect(const char* hostname, unsigned short port)
         }
     }
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
+    
     if(ret)
     {
         m_qiurc = nbiot::string::Printf(respQIURCrecv_arg, m_connectionNumber);
         m_cmd.addUrcFilter(m_qiurc.c_str(), this, &Network::parseFilterResult);
     }
+    
 #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
     debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
@@ -119,6 +125,7 @@ bool Network::connect(const char* hostname, unsigned short port)
     debugPrintf("modem connect: %s\r\n", ((ret)?"ok":"fail"));
 #endif
     return ret;
+    
 }
 
 int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
@@ -134,60 +141,61 @@ int Network::read(unsigned char* buffer, int len, unsigned short timeout_ms)
     if (len >= 0)
     {
         reqLen = len;
-    }
-    else
-    {
-        return rc;
-    }
 
-    // Try to read requested length (helps to make sure we didn't miss any URC
-    if(!m_bytesAvail) {
-        rb = ipRead(m_readBuffer, reqLen, readInterval);
-        m_bytesAvail = 0;
-    }
+	// Try to read requested length (helps to make sure we didn't miss any URC
+	if(!m_bytesAvail)
+	{
+	    rb = ipRead(m_readBuffer, reqLen, readInterval);
+	    m_bytesAvail = 0;
+	}
 
-    if(0 < rb)
-    {
-        bytes += rb;
-    }
+	if(0 < rb)
+	{
+	    bytes += rb;
+	}
 
-    // Loop and look for incoming messages until enough bytes available
-    while (readInterval < timer.remaining() && m_readBuffer.size() < reqLen)
-    {
-        m_cmd.readResponse(REPLY_IGNORE, readInterval);
-        if (m_bytesAvail) {
-            rb = ipRead(m_readBuffer, reqLen - bytes, readInterval);
-            m_bytesAvail = 0;
-            if(0 < rb)
-            {
-                bytes += rb;
-            }
-        }
-    }
+	// Loop and look for incoming messages until enough bytes available
+	while (readInterval < timer.remaining() && m_readBuffer.size() < reqLen)
+	{
+	    m_cmd.readResponse(REPLY_IGNORE, readInterval);
+	    if (m_bytesAvail)
+	    {
+		rb = ipRead(m_readBuffer, reqLen - bytes, readInterval);
+		m_bytesAvail = 0;
+		if(0 < rb)
+		{
+		    bytes += rb;
+		}
+	    }
+	}
 
-    if(0 < bytes)
-    {
-        rc = 0;
-        unsigned char c;
-        while(!m_readBuffer.empty() && rc < reqLen) {
-            m_readBuffer.get(&c);
-            data.append((char*) &c, 1);
-            rc++;
-        }
+	if(0 < bytes)
+	{
+	    rc = 0;
+	    unsigned char c;
+	    while(!m_readBuffer.empty() && rc < reqLen)
+	    {
+		m_readBuffer.get(c);
+		data.append((char*) &c, 1);
+		rc++;
+	    }
 
-        data.copy(buffer, static_cast<size_t>(rc));
+	    data.copy(buffer, static_cast<size_t>(rc));
+	    
 #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
-        debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+	    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
 #endif
-        debugPrintf("r(%d): ", rc);
-        for(size_t i = 0; i < static_cast<size_t>(rc); ++i)
-        {
-            debugPrintf("%02X ", buffer[i]);
-        }
-        debugPrintf("\r\n");
+	    debugPrintf("r(%d): ", rc);
+	    for(size_t i = 0; i < static_cast<size_t>(rc); ++i)
+	    {
+		debugPrintf("%02X ", buffer[i]);
+	    }
+	    debugPrintf("\r\n");
 #endif
+	}
     }
+    
     return rc;
 }
 
@@ -196,7 +204,7 @@ unsigned short Network::ipAvailable()
     return static_cast<unsigned short>((m_bytesAvail & byteCountMask));
 }
 
-// TODO
+// TODO: not really required, should be refactored
 int Network::ipRead(nbiot::CircularBuffer<READ_BUFFER_SIZE>& data, int len, unsigned short timeout_ms)
 {
     int avail = -1;
@@ -205,7 +213,7 @@ int Network::ipRead(nbiot::CircularBuffer<READ_BUFFER_SIZE>& data, int len, unsi
     nbiot::Timer timer(timeout_ms);
     if(m_cmd.sendCommand(nbiot::string::Printf(cmdQIRD_arg, m_connectionNumber, len)))
     {
-        if(m_cmd.readUntil("+QIRD:", timer.remaining()))
+        if(m_cmd.readUntil(respQIRD, timer.remaining()))
         {
             nbiot::string response = m_cmd.getResponse();
             if(!(response == "ERROR"))
@@ -225,9 +233,9 @@ int Network::ipRead(nbiot::CircularBuffer<READ_BUFFER_SIZE>& data, int len, unsi
                     }
                 }
             }
-            if (0 < avail)
+            if(0 < avail)
             {
-                for (int i = 0; i < avail; ++i)
+                for(int i = 0; i < avail; ++i)
                 {
                     unsigned char c = -1;
                     if(m_cmd.serial.readRaw(&c, static_cast<unsigned short>(timer.remaining())))
@@ -240,7 +248,6 @@ int Network::ipRead(nbiot::CircularBuffer<READ_BUFFER_SIZE>& data, int len, unsi
             }
         }
     }
-
     m_cmd.readResponse(REPLY_IGNORE, static_cast<unsigned short>(timer.remaining()));
 
     return rb;
@@ -256,19 +263,20 @@ bool Network::write(unsigned char* buffer, unsigned long len, unsigned short tim
         nbiot::string hex = nbiot::string((char*)(buffer), len).toHex();
         data += hex;
         data += "\"";
+	
 #ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
         debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
 #endif
         debugPrintf("data(%d) = %s\n", len, hex.c_str());
-        #endif
+#endif
 
         if(m_cmd.sendCommand(data.c_str()))
         {
             if(m_cmd.readResponse(REPLY_EXACT, timeout))
             {
                 nbiot::string response = m_cmd.getResponse();
-                if(response == "SEND OK")
+                if(response == respQISENDEX)
                 {
                     ret = true;
                 }
@@ -282,28 +290,21 @@ bool Network::write(unsigned char* buffer, unsigned long len, unsigned short tim
 
 void Network::parseFilterResult(const char *strFilterResult)
 {
-    nbiot::string response = strFilterResult;
-            #ifdef DEBUG_MODEM
+    nbiot::string response = strFilterResult;    
+#ifdef DEBUG_MODEM
 #ifdef DEBUG_COLOR
         debugPrintf("\n\033[0;32m[ MODEM    ]\033[0m ");
 #endif
         debugPrintf("Filter: ");
         debugPrintf(response.c_str());
         debugPrintf("\r\n");
-            #endif
+#endif
     size_t pos = response.find(',');
 
     if(nbiot::string::npos != pos)
     {
         nbiot::string number = response.substr((pos + 1));
-        size_t connectionNumber = static_cast<size_t>(atoi(number.c_str()));
         m_bytesAvail = 1;
-//        #ifdef DEBUG_MODEM
-//#ifdef DEBUG_COLOR
-//        debugPrintf("\n\033[0;32m[ MODEM    ]\033[0m ");
-//#endif
-//        debugPrintf("available bytes:: %d\r\n", m_bytesAvail);
-//        #endif
     }
 }
 
@@ -331,7 +332,6 @@ bool Network::disconnect()
         m_port = 0;
         m_connectionNumber = -1;
         m_cmd.removeUrcFilter(respQIURCrecv_arg);
-//        m_nsonmi = "";
     }
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
 

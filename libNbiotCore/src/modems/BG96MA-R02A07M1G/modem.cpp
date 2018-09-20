@@ -31,11 +31,16 @@
 #define FIVE_MINUTES 300000
 #endif
 
+
+const char* Modem::cmdCGATT1 = "AT+CGATT=1";
+const char* Modem::cmdATE0 = "ATE0";
+
+
 bool Modem::attach()
 {
     bool ret = true;
 
-    if(m_cmd.sendCommand("AT+CGATT=1"))
+    if(m_cmd.sendCommand(cmdCGATT1))
     {
         if(!m_cmd.readResponse(REPLY_OK, 60000))
         {
@@ -56,7 +61,7 @@ bool Modem::attach()
 bool Modem::reboot()
 {
     bool ok = true;
-    m_cmd.sendCommand("ATE0");
+    m_cmd.sendCommand(cmdATE0);
     m_cmd.readResponse(REPLY_OK, oneSecond);
     #ifdef DEBUG_MODEM
     nbiot::Timer t = nbiot::Timer(FIVE_MINUTES);
@@ -77,6 +82,7 @@ bool Modem::reboot()
 #endif
     debugPrintf("modem reset: %s - %dms\r\n", ((ok)?"ok":"fail"), t.expired());
 #endif
+    
     return ok;
 }
 

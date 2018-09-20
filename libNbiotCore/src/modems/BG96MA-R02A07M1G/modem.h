@@ -42,7 +42,7 @@ public:
     /*!
      * \brief D'tor
      */
-    virtual ~Modem(){}
+    virtual ~Modem() = default;
 
     /*!
      * \brief reboot 
@@ -65,6 +65,10 @@ private:
     Modem() = delete;
     Modem(const Modem&) = delete;
     Modem& operator=(const Modem&) = delete;
+
+    static const char* cmdCGATT1;
+    static const char* cmdATE0;
+
 };
 
 #endif // MODEM_H

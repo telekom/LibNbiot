@@ -114,7 +114,9 @@ private:
     static const char* cmdQIOPEN_arg;
     static const char* respQIURCrecv_arg;
     static const char* cmdQIRD_arg;
+    static const char* respQIRD;
     static const char* cmdQISENDEX_arg;
+    static const char* respQISENDEX;
     static const char* cmdQICLOSE_arg;
 
     static const unsigned int readInterval = 100;
