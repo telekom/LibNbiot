@@ -54,7 +54,7 @@ public:
      * \param timeout
      * \return
      */
-    virtual bool sendAtCommand(const char* command, char* response, size_t len, unsigned short timeout);
+    bool sendAtCommand(const char* command, char* response, size_t len, unsigned short timeout);
 
     /*!
      * \brief attach

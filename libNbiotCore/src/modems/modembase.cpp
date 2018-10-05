@@ -200,37 +200,6 @@ IModem::ModemState ModemBase::switchModem(IModem::ModemState state)
 }
 
 
-//IModem::ModemState ModemBase::isModemOn()
-//{
-//    IModem::ModemState ret = IModem::ModemState::MODEM_OFF;
-//
-//    if(m_cmd.sendCommand(cmdCFUNquery))
-//    {
-//        if(m_cmd.readResponse(REPLY_ANY, fiveSeconds))
-//        {
-//            nbiot::string response = m_cmd.getResponse();
-//            nbiot::StringList list = response.split(":");
-//            if(1 < list.count())
-//            {
-//                int index = list.count() - 1;
-//                if(1 == atoi(list[index+1].c_str()))
-//                {
-//                    ret = MODEM_ON;
-//                }                
-//            }
-//        }
-//    }
-//    m_cmd.readResponse(REPLY_IGNORE, oneSecond);
-//#ifdef DEBUG_MODEM
-//#ifdef DEBUG_COLOR
-//    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
-//#endif
-//    debugPrintf("is modem on?: %s\r\n", ((ret)?"on":"off"));
-//#endif
-//    return ret;
-//}
-
-
 IModem::ModemState ModemBase::isModemOn()
 {
     IModem::ModemState ret = IModem::MODEM_OFF;
@@ -244,7 +213,7 @@ IModem::ModemState ModemBase::isModemOn()
 #ifdef DEBUG_COLOR
             debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
 #endif
-            debugPrintf("CGATT-Response: %s\r\n", response.c_str());
+            debugPrintf("CFUN-Response: %s\r\n", response.c_str());
             #endif
             size_t pos = response.find(':');
             if(nbiot::string::npos != pos)
