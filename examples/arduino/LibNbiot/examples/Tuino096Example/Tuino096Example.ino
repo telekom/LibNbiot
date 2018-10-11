@@ -65,7 +65,7 @@ char topicTemp[32];
 char payload[11];
 
 // variable that tracks whether the rtc on the Tuino Board was set to a time stamp synchronized by mobile network
-bool rtcSet=false;
+bool rtcSet=true;
 
 RTCZero rtc;
 
