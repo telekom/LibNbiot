@@ -1,5 +1,5 @@
 /* ========================================================================
- * LibNbiot: SimpleExample for Arduino
+ * LibNbiot: ArduinoMegaExample for Arduino
  *
  * Copyright (c) 2018, Edgar Hindemith, Yassine Amraue, Thorsten
  * Krautscheid, Kolja Vornholt, T-Systems International GmbH
