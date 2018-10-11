@@ -29,6 +29,8 @@ For **Tuino096Example** you need:
 * RTCZero
 * Adafruit_ZeroTimer
 
+Please make sure that you choose module/firmware version *BG96MA-R02A07M1G* for the library if you use **Tuino096Example**.
+
 ## Starting the example
 
 Execute the python-script. You will get a prompt to choose the module/firmware you want to use:

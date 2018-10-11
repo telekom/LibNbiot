@@ -65,7 +65,7 @@ char topicTemp[32];
 char payload[11];
 
 // variable that tracks whether the rtc on the Tuino Board was set to a time stamp synchronized by mobile network
-bool rtcSet=true;
+bool rtcSet=false;
 
 RTCZero rtc;
 
@@ -139,20 +139,20 @@ void notificationHandler(const Notification *n) {
     // Handle your notifications here
     notification_id++;
 
-    debugPrintf("[0;34m[ NOTIFY   ][0m ");
+    debugPrintf("[ Debug    ]");
 
     debugPrintf("----- New notification %03d -----\r\n", notification_id);
 
-    debugPrintf("[0;34m[----------][0m State: ");
+    debugPrintf("[----------] State: ");
     debugPrintf("%d\r\n", n->state);
 
-    debugPrintf("[0;34m[----------][0m Action: ");
+    debugPrintf("[----------] Action: ");
     debugPrintf("%d\r\n", n->action);
 
-    debugPrintf("[0;34m[----------][0m ReturnCode: ");
+    debugPrintf("[----------] ReturnCode: ");
     debugPrintf("%d\r\n", n->returnCode);
 
-    debugPrintf("[0;34m[----------][0m ErrorNumber: ");
+    debugPrintf("[----------] ErrorNumber: ");
     debugPrintf("%d\r\n", n->errorNumber);
 }
 
@@ -160,21 +160,21 @@ void subscriptionHandler(MessageData *msg) {
     messageArrived = 1;
     message_counter++;
 
-    debugPrintf("\033[0;35m[ MSG      ]\033[0m ");
+    debugPrintf("[ Debug    ] ");
 
     debugPrintf("----- New message %03d -----\r\n", message_counter);
 
-    debugPrintf("[0;35m[----------][0m QoS: ");
+    debugPrintf("[----------] QoS: ");
     debugPrintf("%d\r\n", msg->message->qos);
 
-    debugPrintf("[0;35m[----------][0m Id: ");
+    debugPrintf("[----------] Id: ");
     debugPrintf("%d\r\n", msg->message->id);
 
-    debugPrintf("[0;35m[----------][0m Payload: ");
+    debugPrintf("[----------] Payload: ");
     debugPrintf("%s\r\n", (char *) msg->message->payload);
 
     if (msg->topicName) {
-        debugPrintf("[0;35m[----------][0m Topic: ");
+        debugPrintf("[----------] Topic: ");
         debugPrintf("%s\r\n", (char *) msg->topicName);
     }
 }
@@ -210,15 +210,14 @@ unsigned char init(char *imsi, char *pw) {
         core_conf.apn = "";  
         core_conf.apnUser = "";
         core_conf.apnPwd = "";
-        core_conf.plmn = "20416";
+        core_conf.plmn = "26201";
           
         unsigned int retCoreConf = nbiotCoreConfig(&core_conf);
         
         if (NoError != (~(CoreWarnApnUser | CoreWarnApnPwd) & retCoreConf))
         {
-           debugPrintf("\033[0;31m[ DEBUG    ]\033[0m ");
-           debugPrintf("\033[0;31mError in core config: %i", retCoreConf);
-           debugPrintf("\033[0m \r\n");
+           debugPrintf("[ DEBUG    ]");
+           debugPrintf("Error in core config: %i\r\n", retCoreConf);
         }
 
         NbiotConf conf;
@@ -236,9 +235,8 @@ unsigned char init(char *imsi, char *pw) {
 
         unsigned int retConf = nbiotConfig(&conf);
         if (NoError != retConf) {
-          debugPrintf("\033[0;31m[ DEBUG    ]\033[0m ");
-          debugPrintf("\033[0;31mError in config: $i", retConf);
-          debugPrintf("\033[0m \r\n");
+          debugPrintf("[ DEBUG    ] ");
+          debugPrintf("Error in config: $i\r\n", retConf);
         }
         
         // Setup the statemachine, initialize internal varibles.
@@ -247,16 +245,16 @@ unsigned char init(char *imsi, char *pw) {
         if ((NoError == retConf) && (NoError == (~(CoreWarnApnUser | CoreWarnApnPwd) & retCoreConf))) {
             
             if (1 == ret) {
-                debugPrintf("\033[0;32m[ DEBUG    ]\033[0m ");
-                debugPrintf("\033[0;32mInit Successfull\033[0m \r\n");
+                debugPrintf("[ Debug    ] ");
+                debugPrintf("Init Successfull \r\n");
             }
         } else {
             ret = 0;
         }
     }
     if (0 == ret) {
-        debugPrintf("\033[0;31m[ DEBUG    ]\033[0m ");
-        debugPrintf("\033[0;31mInit Error\033[0m \r\n");
+        debugPrintf("[ Debug    ] ");
+        debugPrintf("Init Error \r\n");
     }
 
     return ret;
@@ -279,10 +277,10 @@ void setup() {
     setTime(rtc.getEpoch());
 
     // configure timer for tick
-    ticker.configure(TC_CLOCK_PRESCALER_DIV1,TC_COUNTER_SIZE_16BIT,TC_WAVE_GENERATION_MATCH_FREQ);
-    ticker.setCompare(0, SystemCoreClock/1000 -1 );
-    ticker.setCallback(true, TC_CALLBACK_CC_CHANNEL0, Timer3Callback0);
-    ticker.enable(true);
+    globalTimer.configure(TC_CLOCK_PRESCALER_DIV1,TC_COUNTER_SIZE_16BIT,TC_WAVE_GENERATION_MATCH_FREQ);
+    globalTimer.setCompare(0, SystemCoreClock/1000 -1 );
+    globalTimer.setCallback(true, TC_CALLBACK_CC_CHANNEL0, Timer3Callback0);
+    globalTimer.enable(true);
     
     setDebugWriteFunction(dbgWrite);
 
@@ -306,7 +304,7 @@ void setup() {
 void loop() {
     if (retInit) {
       // configure the RTC to the right time as soon as module is attached to the mobile network
-      if ((rtcSet == false) && isNbiotAttached())
+      if ((!rtcSet) && isNbiotAttached())
       {
         char timeBuffer[50]={'0'};
         unsigned char ret = sendAtCommand("AT+QLTS",timeBuffer,49,100);
@@ -347,7 +345,7 @@ void loop() {
             } else {
                 sprintf(payload, "%d", getSensorValue());
   
-                debugPrintf("\033[0;32m[ DEBUG    ]\033[0m ");
+                debugPrintf("[ DEBUG    ] ");
                 debugPrintf("Publish: %s\r\n", payload);
   
                 nbiotPublish(topicTemp, payload, strlen(payload), QOS0);
