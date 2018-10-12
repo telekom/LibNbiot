@@ -40,9 +40,6 @@
 #define MAX_VAL 20
 #define MIN_VAL 0
 
-// read buffer for 1 byte 
-unsigned char m_char_buffer;
-
 // status variable that is required for answering incoming operations (CoT specific)
 unsigned char messageArrived = 0;
 
@@ -76,41 +73,53 @@ int notification_id = 0;
 unsigned char reverseFlag = 0;
 int valueCounter = MIN_VAL;
 
-unsigned char readByte() {
-  unsigned char ret = 0;
+unsigned char readByte() 
+{
+    char ret;
+    ret = 0;
     if (Serial2) {
-        return m_char_buffer;
+        int byteRead = Serial2.readBytes(&ret, 1);
+        if (1 != byteRead) {
+            ret = 0;
+        }
     }
     return ret;
 }
 
-void writeByte(unsigned char buf) {
-    if (Serial2) {
+void writeByte(unsigned char buf) 
+{
+    if (Serial2) 
+    {
         Serial2.write(buf);
     }
 }
 
-ReadStatus readStatus() {
+ReadStatus readStatus() 
+{
     ReadStatus ret = rx_empty;
-    if (Serial2) {
-      if(0 < Serial2.readBytes(&m_char_buffer, 1))
+    if (Serial2 && Serial2.peek() > -1) 
+    {
         ret = rx_avail;
     }
     return ret;
 }
 
-WriteStatus writeStatus() {
+WriteStatus writeStatus() 
+{
     WriteStatus ret = tx_full;
-    if (Serial2) {
+    if (Serial2) 
+    {
         ret = tx_empty;
     }
     return ret;
 }
 
 
-void TC3_Handler(){
+void TC3_Handler()
+{
   Adafruit_ZeroTimer::timerHandler(3);
 }
+
 void Timer3Callback0()
 {
   tick();
@@ -135,7 +144,8 @@ void bg96PowerUp()
   digitalWrite(PIN_BG96_PWRKEY,LOW);
 }
 
-void notificationHandler(const Notification *n) {
+void notificationHandler(const Notification *n) 
+{
     // Handle your notifications here
     notification_id++;
 
@@ -156,7 +166,8 @@ void notificationHandler(const Notification *n) {
     debugPrintf("%d\r\n", n->errorNumber);
 }
 
-void subscriptionHandler(MessageData *msg) {
+void subscriptionHandler(MessageData *msg) 
+{
     messageArrived = 1;
     message_counter++;
 
@@ -173,19 +184,23 @@ void subscriptionHandler(MessageData *msg) {
     debugPrintf("[----------] Payload: ");
     debugPrintf("%s\r\n", (char *) msg->message->payload);
 
-    if (msg->topicName) {
+    if (msg->topicName) 
+    {
         debugPrintf("[----------] Topic: ");
         debugPrintf("%s\r\n", (char *) msg->topicName);
     }
 }
 
-void dbgWrite(const unsigned char *data, unsigned short len) {
-    for (int i = 0; i < len; ++i) {
+void dbgWrite(const unsigned char *data, unsigned short len) 
+{
+    for (int i = 0; i < len; ++i) 
+    {
         SerialUSB.write(data[i]);
     }
 }
 
-unsigned char init(char *imsi, char *pw) {
+unsigned char init(char *imsi, char *pw) 
+{
     unsigned char ret = 0;
     bg96PinsInit();
     bg96PowerUp();
@@ -195,12 +210,13 @@ unsigned char init(char *imsi, char *pw) {
     Serial2.begin(115200);
     delay(2000);
     
-    if (Serial2) {
+    if (Serial2) 
+    {
         ret = 1;
     }
 
-    if (1 == ret) {
-
+    if (1 == ret) 
+    {
         NbiotCoreConf core_conf;
         core_conf.tickFrequency = 1000;
         core_conf.readstatus_fu = readStatus;
@@ -234,7 +250,8 @@ unsigned char init(char *imsi, char *pw) {
         conf.pollInterval = 10000;
 
         unsigned int retConf = nbiotConfig(&conf);
-        if (NoError != retConf) {
+        if (NoError != retConf) 
+        {
           debugPrintf("[ DEBUG    ] ");
           debugPrintf("Error in config: $i\r\n", retConf);
         }
@@ -242,17 +259,20 @@ unsigned char init(char *imsi, char *pw) {
         // Setup the statemachine, initialize internal varibles.
         ret = nbiotStart();
 
-        if ((NoError == retConf) && (NoError == (~(CoreWarnApnUser | CoreWarnApnPwd) & retCoreConf))) {
-            
-            if (1 == ret) {
+        if ((NoError == retConf) && (NoError == (~(CoreWarnApnUser | CoreWarnApnPwd) & retCoreConf))) 
+        {
+            if (1 == ret) 
+            {
                 debugPrintf("[ Debug    ] ");
                 debugPrintf("Init Successfull \r\n");
             }
-        } else {
+        } else 
+        {
             ret = 0;
         }
     }
-    if (0 == ret) {
+    if (0 == ret) 
+    {
         debugPrintf("[ Debug    ] ");
         debugPrintf("Init Error \r\n");
     }
@@ -260,17 +280,20 @@ unsigned char init(char *imsi, char *pw) {
     return ret;
 }
 
-int getSensorValue() {
-    if (MAX_VAL == valueCounter) {
+int getSensorValue() 
+{
+    if (MAX_VAL == valueCounter) 
+    {
         reverseFlag = 1;
-    } else if (MIN_VAL == valueCounter) {
+    } else if (MIN_VAL == valueCounter) 
+    {
         reverseFlag = 0;
     }
     return (reverseFlag) ? valueCounter-- : valueCounter++;
 }
 
-void setup() {
-
+void setup() 
+{
     // initialize RTC
     rtc.begin(); 
     rtc.setEpoch(0);
@@ -301,8 +324,10 @@ void setup() {
 
 }
 
-void loop() {
-    if (retInit) {
+void loop() 
+{
+    if (retInit)
+    {
       // configure the RTC to the right time as soon as module is attached to the mobile network
       if ((!rtcSet) && isNbiotAttached())
       {
@@ -332,17 +357,22 @@ void loop() {
         }            
       }
       
-      if (isNbiotConnected()) {
-        if (LC_Idle == rc) {
+      if (isNbiotConnected()) 
+      {
+        if (LC_Idle == rc)
+        {
             // If not subscribed already, subscribe to command topic.
-            if (!isNbiotSubscribedTo(topicCmd)) {
+            if (!isNbiotSubscribedTo(topicCmd)) 
+            {
                 nbiotSubscribe(topicCmd, subscriptionHandler);
             }
   
-            if (messageArrived) {
+            if (messageArrived) 
+            {
                 nbiotPublish(topicInf, "0", 1, QOS0);
                 messageArrived = 0;                   
-            } else {
+            } else 
+            {
                 sprintf(payload, "%d", getSensorValue());
   
                 debugPrintf("[ DEBUG    ] ");
@@ -351,8 +381,10 @@ void loop() {
                 nbiotPublish(topicTemp, payload, strlen(payload), QOS0);
             }
         }
-       } else {
-            if (LC_Idle == rc) {
+       } else 
+       {
+            if (LC_Idle == rc) 
+            {
                 nbiotConnect(1); // Connect with cleanSession=1
             }
        }

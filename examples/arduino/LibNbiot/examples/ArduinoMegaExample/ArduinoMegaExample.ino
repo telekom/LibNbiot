@@ -33,36 +33,44 @@
 
 unsigned char m_char_buffer;
 
-unsigned char readByte() {
+unsigned char readByte() 
+{
     char ret;
     ret = 0;
-    if (Serial1) {
+    if (Serial1) 
+    {
         int byteRead = Serial1.readBytes(&ret, 1);
-        if (1 != byteRead) {
+        if (1 != byteRead) 
+        {
             ret = 0;
         }
     }
     return ret;
 }
 
-void writeByte(unsigned char buf) {
-    if (Serial1) {
+void writeByte(unsigned char buf) 
+{
+    if (Serial1) 
+    {
         Serial1.write(buf);
     }
 }
 
-ReadStatus readStatus() {
+ReadStatus readStatus() 
+{
     ReadStatus ret = rx_empty;
-    if (Serial1) {
-        if(0 < Serial1.readBytes(&m_char_buffer, 1))
-            ret = rx_avail;
+    if (Serial1 && Serial1.peek() > -1) 
+    {
+        ret = rx_avail;
     }
     return ret;
 }
 
-WriteStatus writeStatus() {
+WriteStatus writeStatus() 
+{
     WriteStatus ret = tx_full;
-    if (Serial1) {
+    if (Serial1) 
+    {
         ret = tx_empty;
     }
     return ret;
@@ -71,7 +79,8 @@ WriteStatus writeStatus() {
 
 int notification_id = 0;
 
-void notificationHandler(const Notification *n) {
+void notificationHandler(const Notification *n) 
+{
     // Handle your notifications here
     notification_id++;
 
@@ -95,7 +104,8 @@ void notificationHandler(const Notification *n) {
 unsigned char messageArrived = 0;
 int message_counter = 0;
 
-void subscriptionHandler(MessageData *msg) {
+void subscriptionHandler(MessageData *msg) 
+{
     messageArrived = 1;
     message_counter++;
 
@@ -112,21 +122,25 @@ void subscriptionHandler(MessageData *msg) {
     debugPrintf("[----------] Payload: ");
     debugPrintf("%s\r\n", (char *) msg->message->payload);
 
-    if (msg->topicName) {
+    if (msg->topicName) 
+    {
         debugPrintf("[----------] Topic: ");
         debugPrintf("%s\r\n", (char *) msg->topicName);
     }
 }
 
 
-void dbgWrite(const unsigned char *data, unsigned short len) {
-    for (int i = 0; i < len; ++i) {
+void dbgWrite(const unsigned char *data, unsigned short len) 
+{
+    for (int i = 0; i < len; ++i) 
+    {
         Serial.write(data[i]);
     }
 }
 
 
-unsigned char init(char *imsi, char *pw) {
+unsigned char init(char *imsi, char *pw) 
+{
     unsigned char ret = 0;
 
     Serial.begin(9600);
@@ -135,11 +149,13 @@ unsigned char init(char *imsi, char *pw) {
     Timer1.initialize(1000);
     Timer1.attachInterrupt(tick);
 
-    if (Serial1) {
+    if (Serial1) 
+    {
         ret = 1;
     }
 
-    if (1 == ret) {
+    if (1 == ret) 
+    {
         NbiotCoreConf core_conf;
 
         core_conf.tickFrequency = 1000;
@@ -167,18 +183,22 @@ unsigned char init(char *imsi, char *pw) {
         unsigned int retCoreConf = nbiotCoreConfig(&core_conf);
         unsigned int retConf = nbiotConfig(&conf);
 
-        if ((NoError == retConf) && (NoError == (~(CoreWarnApnUser | CoreWarnApnPwd) & retCoreConf))) {
+        if ((NoError == retConf) && (NoError == (~(CoreWarnApnUser | CoreWarnApnPwd) & retCoreConf))) 
+        {
             // Setup the statemachine, initialize internal varibles.
             ret = nbiotStart();
-            if (1 == ret) {
+            if (1 == ret) 
+            {
                 debugPrintf("[ Debug    ] ");
                 debugPrintf("Init Successfull \r\n");
             }
-        } else {
+        } else 
+        {
             ret = 0;
         }
     }
-    if (0 == ret) {
+    if (0 == ret) 
+    {
         debugPrintf("[ Debug    ] ");
         debugPrintf("Init Error \r\n");
     }
@@ -193,10 +213,13 @@ unsigned char init(char *imsi, char *pw) {
 unsigned char reverseFlag = 0;
 int valueCounter = MIN_VAL;
 
-int getSensorValue() {
-    if (MAX_VAL == valueCounter) {
+int getSensorValue() 
+{
+    if (MAX_VAL == valueCounter) 
+    {
         reverseFlag = 1;
-    } else if (MIN_VAL == valueCounter) {
+    } else if (MIN_VAL == valueCounter) 
+    {
         reverseFlag = 0;
     }
     return (reverseFlag) ? valueCounter-- : valueCounter++;
@@ -209,7 +232,8 @@ const char topicInf[32];
 const char topicTemp[32];
 char payload[11];
 
-void setup() {
+void setup() 
+{
     // put your setup code here, to run once:
 
     setDebugWriteFunction(dbgWrite);
@@ -230,19 +254,26 @@ void setup() {
 
 }
 
-void loop() {
-    if (retInit) {
-        if (isNbiotConnected()) {
-            if (LC_Idle == rc) {
+void loop() 
+{
+    if (retInit) 
+    {
+        if (isNbiotConnected()) 
+        {
+            if (LC_Idle == rc) 
+            {
                 // If not subscribed already, subscribe to command topic.
-                if (!isNbiotSubscribedTo(topicCmd)) {
+                if (!isNbiotSubscribedTo(topicCmd)) 
+                {
                     nbiotSubscribe(topicCmd, subscriptionHandler);
                 }
 
-                if (messageArrived) {
+                if (messageArrived) 
+                {
                     nbiotPublish(topicInf, "0", 1, QOS0);
                     messageArrived = 0;
-                } else {
+                } else 
+                {
                     sprintf(payload, "%d", getSensorValue());
 
                     debugPrintf("[ DEBUG    ] ");
@@ -252,7 +283,8 @@ void loop() {
                 }
             }
         } else {
-            if (LC_Idle == rc) {
+            if (LC_Idle == rc) 
+            {
                 nbiotConnect(1); // Connect with cleanSession=1
             }
         }
