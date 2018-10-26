@@ -187,14 +187,13 @@ should be presented by the running example program, similar to this:
 
 ## Supported hardware
 
-In the current state the library offers only support for the u-Blox SARA-N2XX series of modules. Two different firmware
-versions are supported for these modules:
+In the current state the library offers support for
 
-* B656
-* B657SP3
+* **u-Blox SARA-N2XX** series (B656 and B657SP3 firmwares)
+* **Quectel BG96**
 
-The code should be applicable to the Quectel BC-95 series as well, however, this is mainly untested. Support for further
-modules and firmware versions will be added in future releases.
+The code for the SARA-N2xx should be applicable to the **Quectel BC-95** series as well, however, this is
+mainly untested. Support for further modules and firmware versions will be added in future releases.
 
 ## Building custom applications
 
