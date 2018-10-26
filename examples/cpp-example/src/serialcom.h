@@ -28,7 +28,7 @@
 
 struct SerialSettings
 {
-    SerialSettings():baud(9600),databits(8),parity("None"),stop(1),softwareHandshake(false),hardwareHandshake(false) {}
+    SerialSettings():baud(115200),databits(8),parity("None"),stop(1),softwareHandshake(false),hardwareHandshake(false) {}
 
     speed_t baud;
     unsigned databits;
@@ -72,6 +72,7 @@ private:
     std::string m_deviceName;
     bool m_isConnected;
     SerialSettings m_settings;
+    unsigned char m_char_buffer;
 };
 
 #ifdef __cplusplus

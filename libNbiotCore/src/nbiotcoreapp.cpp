@@ -106,7 +106,7 @@ unsigned int NbiotCoreApp::nbiotCoreConfig(NbiotCoreConf* conf)
             result |= CoreErrorWriteStatusFu;
         }
 
-        if((nullptr != conf->apn) && (0 < strlen(conf->apn)))
+        if((nullptr != conf->apn) && (0 <= strlen(conf->apn)))
         {
             m_modem->configSetApn(conf->apn);
         }

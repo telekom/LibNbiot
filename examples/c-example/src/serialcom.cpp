@@ -53,26 +53,20 @@ bool SerialCom::connect()
     return m_isConnected;
 }
 
-unsigned char SerialCom::readByte()
-{
+unsigned char SerialCom::readByte() {
     unsigned char ret = 0;
-    if(m_isConnected)
-    {
-        int byteRead = ::read(m_fd, &ret, 1);
-        if(1 != byteRead)
-        {
-            ret = 0;
-        }
+    if (m_isConnected) {
+        return m_char_buffer;
     }
     return ret;
 }
 
-ReadStatus SerialCom::readStatus()
-{
+ReadStatus SerialCom::readStatus() {
     ReadStatus ret = rx_empty;
-    if(m_isConnected)
-    {
-        ret = rx_avail;
+    if (m_isConnected) {
+        if(0 < ::read(m_fd, &m_char_buffer, 1)) {
+            ret = rx_avail;
+        }
     }
     return ret;
 }

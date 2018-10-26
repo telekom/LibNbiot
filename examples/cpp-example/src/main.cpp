@@ -267,7 +267,7 @@ unsigned char init(char *imsi, char *pw, char *ser) {
     core_conf.readbyte_fu = readByte;
     core_conf.putchar_fu = writeByte;
     core_conf.writestatus_fu = writeStatus;
-    core_conf.apn = "nb-cloud.ic.m2mportal.de";
+    core_conf.apn = "";
     core_conf.apnUser = "";
     core_conf.apnPwd = "";
     core_conf.plmn = "26201";
@@ -473,7 +473,7 @@ int main(int argc, char **argv) {
                               << s
                               << std::endl;
 
-                    nbiotPublish(topicTemp, s.c_str(), s.length(), QOS0);
+                    nbiotPublish(topicTemp, s.c_str(), s.length(), QOS1);
                 }
             }
         } else {

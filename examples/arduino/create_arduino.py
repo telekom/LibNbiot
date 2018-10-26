@@ -1,6 +1,7 @@
 import os
 import shutil
 import sys
+import re
 
 from distutils.dir_util import mkpath
 
@@ -51,7 +52,7 @@ while True:
 
 # copy files
 
-sys.stdout.write("--- Copying files..."),
+sys.stdout.write("--- Copying files...")
 
 copy_files('../../libNbiot/include/', arduino_src_dir)
 copy_files('../../libNbiot/src/', arduino_src_dir)
@@ -72,10 +73,24 @@ copyfile('README.md', 'LibNbiot/README.md')
 
 sys.stdout.write("finished!\n")
 
-sys.stdout.write("--- Creating archive LibNbiot.zip...")
+#changing library property file
 
-make_archive('LibNbiot', 'zip', './LibNbiot')
+sys.stdout.write("--- Renaming Library...")
+
+with open(arduino_base_dir+"library.properties") as file:
+	filedata=file.read()
+
+filedata = re.sub("name=.+","name=LibNbiot"+firmware,filedata)
+ 
+with open(arduino_base_dir+"library.properties", "w") as file:
+	file.write(filedata)
+ 
+sys.stdout.write("finished!\n")
+
+sys.stdout.write("--- Creating archive LibNbiot"+firmware+".zip...")
+
+make_archive('LibNbiot'+firmware, 'zip', './LibNbiot')
 
 sys.stdout.write("finished!\n")
 
-print ('--- Successfully created Arduino Library LibNbiot.zip for firmware {}!'.format(firmware))
+print ('--- Successfully created Arduino Library LibNbiot'+firmware+'.zip for firmware {}!'.format(firmware))
