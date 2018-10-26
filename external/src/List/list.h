@@ -108,17 +108,26 @@ public:
         {
             ListElement<T>* current = element(index);
             ListElement<T>* next = static_cast<ListElement<T>*>(current->next);
+            bool isLast = (nullptr == next);
             current->next = (nullptr);
             delete current;
             if(0 == index)
             {
                 elements = next;
+                if(isLast)
+                {
+                    lastElement = elements;
+                }
             }
             else
             {
                 // valid and not 0 -> index - 1 is valid too
                 ListElement<T>* previous = element(index - 1);
                 previous->next = next;
+                if(isLast)
+                {
+                    lastElement = previous;
+                }
             }
             size--;
         }
@@ -137,6 +146,10 @@ public:
             elements = next;
             size--;
         }
+        if(isEmpty())
+        {
+            lastElement = nullptr;
+        }
         return ret;
     }
 
@@ -150,6 +163,10 @@ public:
             delete current;
             elements = next;
             size--;
+        }
+        if(isEmpty())
+        {
+            lastElement = nullptr;
         }
     }
 
