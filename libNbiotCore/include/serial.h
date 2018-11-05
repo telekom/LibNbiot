@@ -167,7 +167,7 @@ public:
             filter.setHandler(uhc, urc_handler);
             m_filterList.append(filter);
             ret = true;
-#ifdef DEBUG
+#ifdef DEBUG_FILTER
 #ifdef DEBUG_COLOR
             debugPrintf("\033[0;35m[ FILTER   ]\033[0m ");
 #endif
@@ -177,14 +177,14 @@ public:
         else
         {
             m_filterList[index].setHandler(uhc, urc_handler);
-#ifdef DEBUG
+#ifdef DEBUG_FILTER
 #ifdef DEBUG_COLOR
             debugPrintf("\033[0;35m[ FILTER   ]\033[0m ");
 #endif
             debugPrintf("replace handler for URC \"%s\"@%d in filter-list\r\n", urc, index);
 #endif
         }
-
+        dumpFilterList();
         return ret;
     }
 
@@ -201,20 +201,10 @@ public:
      */
     bool removeUrcFilter(const char* urc);
 
-#ifdef DEBUG
-    void dumpFilterList()
-    {
-        //for(int i = 0; i < m_filterList.count(); ++i)
-        for(util::ListIterator<nbiot::UrcFilter> it = m_filterList.cbegin(); it != m_filterList.cend(); ++it)
-        {
-#ifdef DEBUG_COLOR
-            debugPrintf("\033[0;35m[ FILTER   ]\033[0m ");
-#endif
-
-            debugPrintf("URC: %s\r\n", (((*it).isValid())?((*it).urc.c_str()):"[INVALID]"));
-        }
-    }
-#endif
+    /*!
+     * \brief dumpFilterList
+     */
+    void dumpFilterList();
 
     /*!
      * \brief clearFilter

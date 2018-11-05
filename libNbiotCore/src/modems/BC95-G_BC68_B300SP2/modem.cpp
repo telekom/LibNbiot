@@ -36,6 +36,7 @@ const char* Modem::respCSCON = "+CSCON:";
 const char* Modem::cmdQREGSWT2 = "AT+QREGSWT=2";
 const char* Modem::cmdQREGSWTquery = "AT+QREGSWT?";
 const char* Modem::respQREGSWTquery = "+QREGSWT:";
+const char* Modem::cmdCOPS0 = "AT+COPS=0";
 #ifdef MANUAL_CONTEXT
 const char* Modem::cmdCGACT_arg = "AT+CGACT=%d,%d\r";
 #endif
@@ -206,28 +207,46 @@ bool Modem::initialize()
     return ok;
 }
 
-//bool Modem::attach()
-//{
-//    bool state = false;
+bool Modem::attach()
+{
+    bool ret = true;
 
-//#ifdef DEBUG_MODEM
-//    if( isAttached() )
-//    {
-//        state = true;
-//    }
-//#endif
+    // AT+COPS=0 activates PLMN autoselection
+    if(m_cmd.sendCommand(cmdCOPS0))
+    {
+        if(!m_cmd.readResponse(REPLY_OK, tenSeconds))
+        {
+            ret = false;
+        }
+    }
+    else
+    {
+        ret = false;
+    }
 
-//    m_cmd.readResponse(REPLY_IGNORE, oneSecond);
+#ifdef DEBUG_MODEM
+    bool state = false;
 
-//#ifdef DEBUG_MODEM
-//#ifdef DEBUG_COLOR
-//    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
-//#endif
-//    debugPrintf("attach: state = %s\r\n", ((state)?"attached":"detached"));
-//#endif
+    if(ret)
+    {
+        if( isAttached() )
+        {
+            state = true;
+        }
+    }
+#endif
 
-//    return true;
-//}
+    m_cmd.readResponse(REPLY_IGNORE, oneSecond);
+
+#ifdef DEBUG_MODEM
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ MODEM    ]\033[0m ");
+#endif
+    debugPrintf("attach: %s, state = %s\r\n", ((ret)?"ok":"fail"), ((state)?"attached":"detached"));
+#endif
+
+    return ret;
+}
 
 bool Modem::setupPmUrcs()
 {

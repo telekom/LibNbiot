@@ -59,10 +59,10 @@ public:
     //! @todo error struct and lastError() method
 
     /*!
-     * \brief attach
-     * \return
+     * \brief attach calls AT+COPS=0 for automatic PLMN selection. The modem should be attached after. You may watch the +CEREG URCs.
+     * \returns true if the command was executed successful and responding "OK"
      */
-    //virtual bool attach();
+    virtual bool attach();
 
     /*!
      * \brief setupPmUrcs
@@ -102,6 +102,7 @@ private:
     static const char* cmdQREGSWT2;
     static const char* cmdQREGSWTquery;
     static const char* respQREGSWTquery;
+    static const char* cmdCOPS0;
 
 #ifdef MANUAL_CONTEXT
     static const char* cmdCGACT_arg;

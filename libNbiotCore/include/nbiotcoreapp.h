@@ -25,8 +25,6 @@
 
 #include "nbiottime.h"
 #include "serial.h"
-//#include "modem.h" /*!< implements IModem */
-//#include "network.h" /*!< implements INetwork (was LibModem before) */
 
 #include "inetwork.h"
 #include "imodem.h"

@@ -39,20 +39,10 @@ public:
      * \brief Timer
      * \param end
      */
-    Timer(unsigned long end): start_ms(0), end_ms(0) { start(end); }
+    explicit Timer(unsigned long end): start_ms(0), end_ms(0) { start(end); }
     /*!
-     * \brief Timer
-     * \param end
+     * \brief ~Timer
      */
-//    Timer(int end): start_ms(0), end_ms(0) { start(end); }
-//    /*!
-//     * \brief Timer
-//     * \param end
-//     */
-//    Timer(unsigned short end): start_ms(0), end_ms(0) { start(end); }
-//    /*!
-//     * \brief ~Timer
-//     */
     virtual ~Timer() {}
 
     /*!
@@ -64,32 +54,12 @@ public:
      * \param end
      */
     virtual void start(unsigned long end);
-//    /*!
-//     * \brief start
-//     * \param end
-//     */
-//    virtual void start(int end);
-//    /*!
-//     * \brief start
-//     * \param end
-//     */
-//    virtual void start(unsigned short end);
 
     /*!
      * \brief setTime
      * \param end
      */
     virtual void setTime(unsigned long end);
-//    /*!
-//     * \brief setTime
-//     * \param end
-//     */
-//    virtual void setTime(int end);
-//    /*!
-//     * \brief setTime
-//     * \param end
-//     */
-//    virtual void setTime(unsigned short end);
 
     /*!
      * \brief getTime

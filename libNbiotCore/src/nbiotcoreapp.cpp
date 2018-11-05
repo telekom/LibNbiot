@@ -110,28 +110,16 @@ unsigned int NbiotCoreApp::nbiotCoreConfig(NbiotCoreConf* conf)
         {
             m_modem->configSetApn(conf->apn);
         }
-        /*else
-        {
-            result |= CoreErrorApn;
-        }*/
 
         if((nullptr != conf->apnUser) && (0 < strlen(conf->apnUser)))
         {
             m_modem->configSetApnUser(conf->apnUser);
         }
-        /*else
-        {
-            result |= CoreWarnApnUser;
-        }*/
 
         if((nullptr != conf->apnPwd) && (0 < strlen(conf->apnPwd)))
         {
             m_modem->configSetApnPwd(conf->apnPwd);
         }
-        /*else
-        {
-            result |= CoreWarnApnPwd;
-        }*/
 
         if((nullptr != conf->plmn) && (0 < strlen(conf->plmn)))
         {

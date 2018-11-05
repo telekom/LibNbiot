@@ -370,12 +370,24 @@ bool Serial::addUrcFilter(const char* urc, void (*urc_handler)(const char*))
     {
         m_filterList.append(nbiot::UrcFilter(urc, urc_handler));
         ret = true;
+#ifdef DEBUG_FILTER
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;35m[ FILTER   ]\033[0m ");
+#endif
+        debugPrintf("append URC \"%s\" to filter-list\r\n", urc);
+#endif
     }
     else
     {
         m_filterList[index].setHandler(urc_handler);
+#ifdef DEBUG_FILTER
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;35m[ FILTER   ]\033[0m ");
+#endif
+        debugPrintf("replace handler for URC \"%s\"@%d in filter-list\r\n", urc, index);
+#endif
     }
-
+    dumpFilterList();
     return ret;
 }
 
@@ -384,10 +396,32 @@ bool Serial::removeUrcFilter(const char* urc)
     int index = -1;
     bool ret = false;
 
+#ifdef DEBUG_FILTER
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;35m[ FILTER   ]\033[0m ");
+#endif
+    debugPrintf("remove URC-Filter: %s\r\n", urc);
+#endif
+
     if(0 <= (index = m_filterList.indexOf(urc)))
     {
         m_filterList.remove(index);
         ret = true;
     }
+    dumpFilterList();
     return ret;
+}
+
+void Serial::dumpFilterList()
+{
+#ifdef DEBUG_FILTER
+    for(util::ListIterator<nbiot::UrcFilter> it = m_filterList.cbegin(); it != m_filterList.cend(); ++it)
+    {
+#ifdef DEBUG_COLOR
+        debugPrintf("\033[0;35m[ FILTER   ]\033[0m ");
+#endif
+
+        debugPrintf("URC: %s\r\n", (((*it).isValid())?((*it).urc.c_str()):"[INVALID]"));
+    }
+#endif
 }
