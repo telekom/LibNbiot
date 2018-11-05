@@ -30,8 +30,9 @@ export PLATFORMS := default
 
 
 # MODULE, define the module and firmware combination to be used in compilation. The following modules are currently supported:
-# SARA-NXX-B657SP3 SARA-N2XX-B656 BG96MA-R02A07M1G
-export MODULE    := BG96MA-R02A07M1G
+
+# SARA-N2XX-B657SP3 SARA-N2XX-B656 BG96MA-R02A07M1G BC95-G_BC68_B300SP2
+export MODULE    := BC95-G_BC68_B300SP2
 
 
 # Internal variables

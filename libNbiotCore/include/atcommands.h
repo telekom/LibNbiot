@@ -21,6 +21,7 @@
 #ifndef ATCOMMANDS_H
 #define ATCOMMANDS_H
 #include "nbiotstring.h"
+#include "nbiotdebug.h"
 #include "serial.h"
 
 class Serial;
@@ -94,7 +95,17 @@ public:
      */
     bool addUrcFilter(const char* urc, UHC* uhc, void (UHC::*urc_handler)(const char*))
     {
-        return serial.addUrcFilter(urc, uhc, urc_handler);
+#ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
+    debugPrintf("add URC-Filter: %s\r\n", urc);
+#endif
+        bool ret = serial.addUrcFilter(urc, uhc, urc_handler);
+#ifdef DEBUG_ATCOMMANDS
+        serial.dumpFilterList();
+#endif
+        return ret;
     }
 
     /*!
@@ -105,7 +116,17 @@ public:
      */
     bool addUrcFilter(const char* urc, void (*urc_handler)(const char*))
     {
-        return serial.addUrcFilter(urc, urc_handler);
+#ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
+    debugPrintf("add URC-Filter: %s\r\n", urc);
+#endif
+        bool ret = serial.addUrcFilter(urc, urc_handler);
+#ifdef DEBUG_ATCOMMANDS
+        serial.dumpFilterList();
+#endif
+        return ret;
     }
 
     /*!
@@ -115,7 +136,17 @@ public:
      */
     bool removeUrcFilter(const char* urc)
     {
-        return serial.removeUrcFilter(urc);
+#ifdef DEBUG_ATCOMMANDS
+#ifdef DEBUG_COLOR
+    debugPrintf("\033[0;32m[ATCOMMANDS]\033[0m ");
+#endif
+    debugPrintf("remove URC-Filter: %s\r\n", urc);
+#endif
+        bool ret = serial.removeUrcFilter(urc);
+#ifdef DEBUG_ATCOMMANDS
+        serial.dumpFilterList();
+#endif
+        return ret;
     }
 
     /*!

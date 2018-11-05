@@ -26,7 +26,7 @@
 
 #define DEBUG_COLOR
 
-// #define DEBUG_SERIAL /*!< debugging output for the class Serial */
+#define DEBUG_SERIAL /*!< debugging output for the class Serial */
 // #define DEBUG_SERIAL_VERBOSE /*!< verbose debugging output for the method Serial::readLine */
 // #define DEBUG_SERIAL_RAW /*!< debugging output for the method Serial::readRaw */
 #define DEBUG_ATCOMMANDS /*!< debugging output for the class AtCommands */

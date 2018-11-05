@@ -191,6 +191,7 @@ In the current state the library offers support for
 
 * **u-Blox SARA-N2XX** series (B656 and B657SP3 firmwares)
 * **Quectel BG96**
+* **Quectel BC68**
 
 The code for the SARA-N2xx should be applicable to the **Quectel BC-95** series as well, however, this is
 mainly untested. Support for further modules and firmware versions will be added in future releases.

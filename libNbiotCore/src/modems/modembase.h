@@ -28,7 +28,6 @@
 #include "nbiotstring.h"
 
 
-
 /*!
  * \brief The ModemBase class
  */
@@ -118,9 +117,55 @@ public:
     void configSetApnPwd(const char* confApnPwd) { m_apnPwd = confApnPwd; }
     /*!
      * \brief configSetOperMccMnc
-     * \param confOperMccMnc
+     * \param confPlmn
      */
     void configSetPlmn(const char* confPlmn) { m_plmn = confPlmn; }    
+
+
+    /*!
+     * \brief installCeregHandler
+     * \param hc
+     * \param ceregHandler
+     */
+    void installCeregHandler(IModemNotify* hc, void (IModemNotify::*ceregHandler) (const CeregResponse&))
+    {
+        if(setupCeregUrc())
+        {
+            m_ceregHandler.attach(hc, ceregHandler);
+        }
+    }
+
+    /*!
+     * \brief setupCeregUrc
+     * \return
+     */
+    virtual bool setupCeregUrc();
+
+
+    /*!
+     * \brief installPmHandler
+     * \param hc
+     * \param pmHandler
+     */
+    void installPmHandler(IModemNotify* hc, void (IModemNotify::*pmHandler) (const PmResponse&))
+    {
+        if(setupPmUrcs())
+        {
+            m_pmHandler.attach(hc, pmHandler);
+        }
+    }
+
+    /*!
+     * \brief setupPmUrcs
+     * \return
+     */
+    virtual bool setupPmUrcs();
+
+    /*!
+     * \brief parseCeregUrc
+     * \param strCeregUrc
+     */
+    virtual void parseCeregUrc(const char* strCeregUrc);
 
 protected:
 
@@ -132,12 +177,41 @@ protected:
     nbiot::string m_apnPwd;
     nbiot::string m_deviceId;
 
+    CeregResponse m_ceregResponse;
+    PmResponse    m_pmResponse;
+public:
+    FP<void, const CeregResponse&> m_ceregHandler;
+    FP<void, const PmResponse&> m_pmHandler;
+
+protected:
+    // CEREG URC field positions
+    enum CeregUrcIndex
+    {
+        cuiStat,
+        cuiTac,
+        cuiCi,
+        cuiAct,
+        cuiCauseType,
+        cuiRejectCause,
+        cuiActiveTime,
+        cuiPeriodicTau
+    };
+
+    // CEREG URC field lengths
+    static const size_t cuTacLen = 2;
+    static const size_t cuCiLen = 4;
+    static const size_t cuActiveTimeLen = 8;
+    static const size_t cuPeriodicTauLen = 8;
+
     static const unsigned int oneSecond = 1000;
     static const unsigned int threeSeconds = 3000;
     static const unsigned int fiveSeconds = 5000;
     static const unsigned int tenSeconds = 10000;
     static const unsigned int sixtyfiveSeconds = 65000;
+    static const unsigned int ceregParamCount = 8;
 
+    static const char* cmdCEREG5;
+    static const char* respCEREG;
     static const char* cmdCFUN1;
     static const char* cmdCGDCONT_arg;
     static const char* cmdCOPS_arg;
@@ -160,4 +234,5 @@ private:
     int getAttachState();
 
 };
+
 #endif // MODEMBASE_H

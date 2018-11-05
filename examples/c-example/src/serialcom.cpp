@@ -63,8 +63,12 @@ unsigned char SerialCom::readByte() {
 
 ReadStatus SerialCom::readStatus() {
     ReadStatus ret = rx_empty;
-    if (m_isConnected) {
-        if(0 < ::read(m_fd, &m_char_buffer, 1)) {
+    if(m_isConnected)
+    {
+        int bytesInBuffer = 0;
+        ioctl(m_fd, FIONREAD, &bytesInBuffer);
+        if(0 < bytesInBuffer)
+        {
             ret = rx_avail;
         }
     }

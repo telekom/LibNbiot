@@ -25,7 +25,7 @@ PLATFORMS := default
 
 # MODULE, define the module and firmware combination to be used in compilation.
 # Only one module must be chosen. These modules are currently supported:
-# SARA-N2XX-B657SP3 SARA-N2XX-B656 BG96MA-R02A07M1G
+# SARA-N2XX-B657SP3 SARA-N2XX-B656 BG96MA-R02A07M1G BC95-G_BC68_B300SP2
 MODULE    ?= BG96MA-R02A07M1G
 
 

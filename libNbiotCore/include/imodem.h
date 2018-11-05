@@ -21,6 +21,9 @@
 #ifndef IMODEM_H
 #define IMODEM_H
 
+#include "responses.h"
+#include "imodemnotify.h"
+
 namespace nbiot
 {
 class string;
@@ -120,9 +123,33 @@ public:
     virtual void configSetApnPwd(const char* confApnPwd) = 0;
     /*!
      * \brief configSetOperMccMnc
-     * \param confOperMccMnc
+     * \param confPlmn
      */
     virtual void configSetPlmn(const char* confPlmn) = 0;
+
+    /*!
+     * \brief installCeregHandler
+     * \param hc
+     * \param ceregHandler
+     */
+    virtual void installCeregHandler(IModemNotify* hc, void (IModemNotify::*ceregHandler) (const CeregResponse&)) = 0;
+    /*!
+     * \brief setupCeregUrc
+     * \return
+     */
+    virtual bool setupCeregUrc() = 0;
+
+    /*!
+     * \brief installPmHandler
+     * \param hc
+     * \param pmHandler
+     */
+    virtual void installPmHandler(IModemNotify* hc, void (IModemNotify::*pmHandler) (const PmResponse&)) = 0;
+    /*!
+     * \brief setupPmUrcs
+     * \return
+     */
+    virtual bool setupPmUrcs() = 0;
 
 protected:
 

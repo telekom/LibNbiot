@@ -24,6 +24,8 @@
 #include "nbiotdebug.h"
 
 
+const char* ModemBase::cmdCEREG5 = "AT+CEREG=5";
+const char* ModemBase::respCEREG = "+CEREG:";
 const char* ModemBase::cmdCIMI = "AT+CIMI";
 const char* ModemBase::cmdCGATT0 = "AT+CGATT=0";
 const char* ModemBase::cmdCGATTquery = "AT+CGATT?";
@@ -41,7 +43,11 @@ ModemBase::ModemBase(Serial& serial) :
     m_cmd(serial),
     m_plmn(),
     m_apn(),
-    m_deviceId()
+    m_deviceId(),
+    m_ceregResponse(),
+    m_pmResponse(),
+    m_ceregHandler(),
+    m_pmHandler()
 {}
 
 
@@ -282,4 +288,77 @@ int ModemBase::getAttachState()
     #endif
     m_cmd.readResponse(REPLY_IGNORE, oneSecond);
     return ret;
+}
+
+bool ModemBase::setupCeregUrc()
+{
+    bool ok = true;
+    // enable network-register URC
+    if(!m_cmd.sendCommand(cmdCEREG5))
+    {
+        ok = false;
+    }
+    if(ok)
+    {
+        if(!m_cmd.readUntil(respOK, tenSeconds))
+        {
+            ok = false;
+        }
+    }
+    if(ok)
+    {
+        m_cmd.addUrcFilter(respCEREG, this, &ModemBase::parseCeregUrc);
+    }
+    return ok;
+}
+
+bool ModemBase::setupPmUrcs()
+{
+    return false;
+}
+
+void ModemBase::parseCeregUrc(const char* strCeregUrc)
+{
+    if(m_ceregHandler.attached())
+    {
+        // +CEREG: urc according to 3GPP document TS 27.007 version 12.7.0 Release 12
+        // +------------------------------------------+
+        // | after successful AT+CEREG=5              |
+        // +------------------------------------------+
+        // | +CEREG: <stat>[,[<tac>],[<ci>],[<AcT>][, |
+        // | [<cause_type>],[<reject_cause>][,        |
+        // | [<Active-Time>],[<Periodic-TAU>]]]]      |
+        // +------------------------------------------+
+        nbiot::string response = strCeregUrc;
+
+        size_t pos = response.find(':');
+        if(nbiot::string::npos != pos)
+        {
+            pos++;
+            while(' ' == response.at(pos)) // eat up spaces if there're any
+            {
+                pos++;
+            }
+            if(response.size() > pos)
+            {
+                nbiot::string params = response.substr(pos);
+                nbiot::StringList list = params.split(',');
+                if(ceregParamCount == list.count()) /// @todo count and read mandatory and optional parameters
+                {
+                    // read param-list into struct
+                    m_ceregResponse.stat = atoi(list[cuiStat].c_str());
+                    list[cuiTac].copy(m_ceregResponse.tac, cuTacLen);
+                    list[cuiCi].copy(m_ceregResponse.ci, cuCiLen);
+                    m_ceregResponse.act = atoi(list[cuiAct].c_str());
+                    m_ceregResponse.causeType = atoi(list[cuiCauseType].c_str());
+                    m_ceregResponse.rejectCause = atoi(list[cuiRejectCause].c_str());
+                    list[cuiActiveTime].copy(m_ceregResponse.activeTime, cuActiveTimeLen);
+                    list[cuiPeriodicTau].copy(m_ceregResponse.periodicTau, cuPeriodicTauLen);
+
+                    // call the handler
+                    m_ceregHandler(m_ceregResponse);
+                }
+            }
+        }
+    }
 }

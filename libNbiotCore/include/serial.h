@@ -24,6 +24,7 @@
 #include "readstatus.h"
 #include "writestatus.h"
 
+#include "nbiotdebug.h"
 #include "nbiotstring.h"
 #include "urcfilterlist.h"
 
@@ -166,10 +167,22 @@ public:
             filter.setHandler(uhc, urc_handler);
             m_filterList.append(filter);
             ret = true;
+#ifdef DEBUG
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;35m[ FILTER   ]\033[0m ");
+#endif
+            debugPrintf("append URC \"%s\" to filter-list\r\n", urc);
+#endif
         }
         else
         {
             m_filterList[index].setHandler(uhc, urc_handler);
+#ifdef DEBUG
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;35m[ FILTER   ]\033[0m ");
+#endif
+            debugPrintf("replace handler for URC \"%s\"@%d in filter-list\r\n", urc, index);
+#endif
         }
 
         return ret;
@@ -187,6 +200,21 @@ public:
      * \return
      */
     bool removeUrcFilter(const char* urc);
+
+#ifdef DEBUG
+    void dumpFilterList()
+    {
+        //for(int i = 0; i < m_filterList.count(); ++i)
+        for(util::ListIterator<nbiot::UrcFilter> it = m_filterList.cbegin(); it != m_filterList.cend(); ++it)
+        {
+#ifdef DEBUG_COLOR
+            debugPrintf("\033[0;35m[ FILTER   ]\033[0m ");
+#endif
+
+            debugPrintf("URC: %s\r\n", (((*it).isValid())?((*it).urc.c_str()):"[INVALID]"));
+        }
+    }
+#endif
 
     /*!
      * \brief clearFilter
