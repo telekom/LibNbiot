@@ -13,7 +13,7 @@ and enough SRAM.
 ##### ArduinoMegaExample
 Connect the UART TX/RX pins of a compatible NB-IoT modem to the UART RX/TX (19,18) pins of the Arduino Mega.
 ##### Tuino096Example
-On the Tuino096 Board the appropriate pins of the Modem are already connected to the µC.    
+On the Tuino096 Board the appropriate pins of the Modem are already connected to the µC. Please make sure that you configure your modem correctly and try to attach it to the network before running the example.
 
 In addition the modem has to be equipped with a **SIM card** which is registered for the **Telekom Cloud of Things**. 
 
